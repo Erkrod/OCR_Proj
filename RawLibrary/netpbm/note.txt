@@ -1,0 +1,3 @@
+at crystal cove it is already installed in /usr/bin so you don't have to worry about it.
+At ubuntu virtual machine, install it by:
+sudo apt-get install netpbm
