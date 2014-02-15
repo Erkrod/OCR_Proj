@@ -74,3 +74,6 @@ build/lib%.a: build/%.o
 
 TestCharArray: build/ExampleCharArray.o
 	$(CC) $(CFLAGS) $< -o bin/$@
+
+TestUTArray: build/utarray_example.o
+	$(CC) $(CFLAGS) $< -o bin/$@
