@@ -4,10 +4,6 @@
 
 #include "utarray.h"
 
-typedef struct {
-	char Char;
-	int Probability;
-	UT_array *nums;
 	/*example of usage for UT_array are available in the following files
 	RawLibrary/uthash-master/tests/test43.c:  UT_array *pairs, *pairs_cpy;
 	RawLibrary/uthash-master/tests/test44.c:  UT_array *a;
@@ -24,6 +20,15 @@ typedef struct {
 	RawLibrary/uthash-master/tests/test81.c:  UT_array *a;
 	RawLibrary/uthash-master/tests/test82.c:  UT_array *a,*b;
 	*/
-}
+
+typedef struct {
+	char Char;
+	int Probability;
+} CharProbability;
+
+typedef struct {
+	UT_array * CharChoices;
+	char CharChosen;
+} CharProfile;
 
 #endif
