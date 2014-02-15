@@ -19,6 +19,6 @@ void Control_MainLoop(ControlHandle *);
 void Control_CleanUp(ControlHandle *);
 
 /*function to take care of all event*/
-ControlHandle * ProcessEvent(ControlHandle *);
+ControlHandle * Control_ProcessEvent(ControlHandle *);
 
 #define

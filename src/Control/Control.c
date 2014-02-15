@@ -15,7 +15,7 @@ void Control_CleanUp(ControlHandle * MainHandle){
 }
 
 /*function to take care of all event*/
-ControlHandle * ProcessEvent(ControlHandle * MainHandle){
+ControlHandle * Control_ProcessEvent(ControlHandle * MainHandle){
 	switch (MainHandle->Event->Type){
 		case Event1:
 			
