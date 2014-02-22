@@ -2,12 +2,18 @@
 #include <stdlib.h>
 #include "utstring.h"
 #include "utarray.h"
+#include "ModelStructure.h"
 
+UT_string * postProcessing(UT_array * );
 
-UT_string * postProcessing(UT_array);
+void CharProfile_free(void * profile_in){
+	CharProfile * profile = (CharProfile *) profile_in;
+	utarray_free(profile->CharChoices);
+}
 
 int main(void)
 {
+	
   UT_array * WholeString = NULL;
   CharProfile NewCharProfile;
   CharProbability NewCharProbability;
@@ -60,7 +66,7 @@ UT_string * postProcessing(UT_array * charList)
   CharProfile * currCharProfile = currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile);
   CharProbability * currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
   int count1 = 1, count2 = 1;
-  
+  int count = 0;
   int percentage = currCharProbability->Probability;
   char chosen = currCharProbability->Char;
   
