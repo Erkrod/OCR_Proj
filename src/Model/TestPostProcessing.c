@@ -59,7 +59,10 @@ int main(void)
   NewCharProbability.Char = 'Z';
   NewCharProbability.Probability = 85;
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
+
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+
   postProcessing(WholeString);
   
   return 0;
