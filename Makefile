@@ -1,5 +1,4 @@
 #get lib sdl ready to compile
-$(shell python pkgconfig_changepath.py)	
 
 CC	:= gcc
 CFLAGS	:= -g
@@ -76,4 +75,7 @@ TestCharArray: build/ExampleCharArray.o
 	$(CC) $(CFLAGS) $< -o bin/$@
 
 TestUTArray: build/utarray_example.o
+	$(CC) $(CFLAGS) $< -o bin/$@
+
+TestPostPo: build/postProcessing.o
 	$(CC) $(CFLAGS) $< -o bin/$@
