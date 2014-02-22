@@ -1,6 +1,6 @@
 #include "model.h"
 
-UT_string postProcessing(UT_array * charList)
+UT_string * postProcessing(UT_array * charList)
 {
   UT_string output;
   CharProfile * currCharProfile = NULL;

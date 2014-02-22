@@ -77,3 +77,7 @@ TestCharArray: build/ExampleCharArray.o
 
 TestUTArray: build/utarray_example.o
 	$(CC) $(CFLAGS) $< -o bin/$@
+	
+	
+PostProcessing: build/TestPostProcessing.o $(MODEL_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(VIEW_LIB_DEPEND)
+		$(CC) build/TestPostProcessing.o -Lbuild $(VIEW_LIB_COMPILE) $(LDFLAGS) -o bin/$@ $(CFLAGS)
