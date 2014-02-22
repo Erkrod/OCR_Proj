@@ -4,6 +4,6 @@
 #include "ModelStructure.h"
 #include "utstring.h"
 
-UT_string * postProcessing(UT_array *)
+UT_string * postProcessing(UT_array * );
 
 #endif
