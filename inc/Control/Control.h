@@ -1,14 +1,23 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <gtk/gtk.h>
 #include "EventStructure.h"
+
+#ifndef TEST_VIEW
 #include "Model.h"
+#endif
+
 #include "View.h"
 
 typedef struct {
 	EventClass event;
+#ifndef TEST_VIEW
 	ImageList * ImageStack;
+#endif
 	/*if necessary*/
 	/*ModelHandle * MainModelHandle;
 	ViewHandle * MainViewHandle;*/
@@ -19,6 +28,6 @@ void Control_MainLoop(ControlHandle *);
 void Control_CleanUp(ControlHandle *);
 
 /*function to take care of all event*/
-ControlHandle * Control_ProcessEvent(ControlHandle *);
+ControlHandle * Control_ProcessEvent(ObjectHandle * ClickedObject);
 
-#define
+#endif

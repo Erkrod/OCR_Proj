@@ -4,6 +4,11 @@ CC	:= gcc
 CFLAGS	:= -g
 LDFLAGS := -lm
 
+#take care of test flags
+ifeq ($(TEST_VIEW),y)
+	CFLAGS += -DTEST_VIEW
+endif
+
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
@@ -11,29 +16,11 @@ MODEL_LIB := Model
 
 CONTROL_LIB := Control
 
-VIEW_LIB := View
+VIEW_LIB := DrawFunctions View
 
-ifeq ($(SESSION),ubuntu)
-	CFLAGS +=-DLINUX_OS
-endif
+GUI_CFLAGS := $(shell pkg-config --cflags gtk+-2.0)
+GUI_LFLAGS := $(shell pkg-config --libs gtk+-2.0)
 
-ifeq ($(OSTYPE),linux)
-	CFLAGS +=-DLINUX_OS
-endif
-
-ifeq ($(QUAN_VERSION), y)
-	CFLAGS +=-DQUAN_VERSION
-endif
-
-ifeq ($(GUI_ENABLE),y)
-
-	GUI_FLAG=-DGUI_ENABLE $(shell pkg-config --cflags sdl2 SDL2_image SDL2_ttf)
-	VIEW_LIB+= display ObjectHandleList ObjectHandle render
-	LDFLAGS+= $(shell pkg-config --libs sdl2 SDL2_image SDL2_ttf)
-else
-        GUI_FLAG=
-       # CFLAGS +=-ansi
-endif
 
 MODEL_LIB_DEPEND := $(addprefix build/lib,$(MODEL_LIB))
 MODEL_LIB_DEPEND := $(addsuffix .a,$(MODEL_LIB_DEPEND))
@@ -63,9 +50,8 @@ clean:
 	rm build/*
 	rm bin/*
 
-build/%.o: %.c
-	
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(GUI_FLAG)
+build/%.o: %.c	
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(GUI_CFLAGS)
 
 build/lib%.a: build/%.o
 	ar rc $@ $<
@@ -79,3 +65,6 @@ TestUTArray: build/utarray_example.o
 
 TestPostPo: build/postProcessing.o
 	$(CC) $(CFLAGS) $< -o bin/$@
+
+TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND)
+	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(GUI_LFLAGS) -o bin/$@ 

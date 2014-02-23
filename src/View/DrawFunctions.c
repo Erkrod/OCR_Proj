@@ -4,9 +4,13 @@
 
 #include "DrawFunctions.h"
 
-GtkWidget *drawMain(){
-
+GtkWidget *drawMain(ViewHandle * MainViewHandle){
+ ObjectHandle * NewObject;
+ 
  GtkWidget *window  = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+ NewObject = ObjectHandle_Initialize("MainWindow", window);
+ HASH_ADD(HashByName, MainViewHandle->ObjectListByName, Name, sizeof(char) * MAX_HASH_KEY_LENGTH, NewObject);
+ HASH_ADD(HashByWidget,MainViewHandle->ObjectListByWidget,Widget,sizeof(GtkWidget *),NewObject);
     
  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
  gtk_window_set_default_size(GTK_WINDOW(window), 1000, 200);
@@ -17,17 +21,25 @@ GtkWidget *drawMain(){
  return window;
 }
 
-GtkWidget *drawMenuBar(){
-
+GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
+  ObjectHandle * NewObject;
   GtkWidget *menubar = gtk_menu_bar_new();
   GtkWidget *separator = gtk_separator_menu_item_new();
-    
+/*****************************************************************************************************************/
+/*RYAN: here is an example of how you can add a new Widget to the data structure*/
+/*The onlythinng you need to change is "NewName", NewGtkWidget*"*/
+  AddWidgetToViewHandle(MainViewHandle, "MenuBar", menubar);
+/*****************************************************************************************************************/  
+  
   /* file options for menubar */
   GtkWidget  *filemenu = gtk_menu_new(),
     *file = gtk_menu_item_new_with_label("File"),
     *open = gtk_menu_item_new_with_label("Open"),
     *save = gtk_menu_item_new_with_label("Save"),
     *quit = gtk_menu_item_new_with_label("Quit");
+  AddWidgetToViewHandle(MainViewHandle, "FileMenu", file);
+  AddWidgetToViewHandle(MainViewHandle, "OpenFile", open);
+  AddWidgetToViewHandle(MainViewHandle, "SaveFile", save);
   
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), filemenu);
@@ -76,7 +88,12 @@ GtkWidget *drawMenuBar(){
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), dictionary);
 
   g_signal_connect(G_OBJECT(quit), "activate", G_CALLBACK(gtk_main_quit), NULL);   
-  g_signal_connect(G_OBJECT(open), "activate", G_CALLBACK(on_open_clicked), NULL);
-
+  
+  
+/*********************************************************************************************************/
+/*RYAN: Here is an example of signal connect. You only need to change the first parameter G_OBJECT(_____)*/
+  g_signal_connect(G_OBJECT(open), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(save), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+/*********************************************************************************************************/
   return menubar;
 }

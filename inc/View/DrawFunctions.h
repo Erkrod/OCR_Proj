@@ -6,10 +6,11 @@
 #define DRAWFUNCTIONS_H
 
 #include <gtk/gtk.h>
-#include "ClickFunctions.h"
+/*#include "ClickFunctions.h"*/
+#include "View.h"
 
-GtkWidget *drawMain();
+GtkWidget *drawMain(ViewHandle * MainViewHandle);
 
-GtkWidget *drawMenuBar();
+GtkWidget *drawMenuBar(ViewHandle * MainViewHandle);
 
 #endif

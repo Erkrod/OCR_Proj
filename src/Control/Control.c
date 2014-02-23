@@ -1,3 +1,5 @@
+
+
 #include "Control.h"
 
 
@@ -15,13 +17,9 @@ void Control_CleanUp(ControlHandle * MainHandle){
 }
 
 /*function to take care of all event*/
-ControlHandle * Control_ProcessEvent(ControlHandle * MainHandle){
-	switch (MainHandle->Event->Type){
-		case Event1:
-			
-			break;
-		case Event2:
-			
-			break;
+ControlHandle * Control_ProcessEvent(ObjectHandle * ClickedObject){
+	printf("Object clicked has name: %s\n", ClickedObject->Name);
+	if (strcmp(ClickedObject->Name,"OpenFile") == 0){
+		printf("Put the function to open file here\n");
 	}
 }
