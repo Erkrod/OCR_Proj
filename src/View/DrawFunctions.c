@@ -22,6 +22,7 @@ GtkWidget *drawMain(ViewHandle * MainViewHandle){
 }
 
 GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
+
   ObjectHandle * NewObject;
   GtkWidget *menubar = gtk_menu_bar_new();
   GtkWidget *separator = gtk_separator_menu_item_new();
@@ -29,6 +30,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
 /*RYAN: here is an example of how you can add a new Widget to the data structure*/
 /*The onlythinng you need to change is "NewName", NewGtkWidget*"*/
   AddWidgetToViewHandle(MainViewHandle, "MenuBar", menubar);
+  AddWidgetToViewHandle(MainViewHandle, "Separator", separator);
 /*****************************************************************************************************************/  
   
   /* file options for menubar */
@@ -37,10 +39,12 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *open = gtk_menu_item_new_with_label("Open"),
     *save = gtk_menu_item_new_with_label("Save"),
     *quit = gtk_menu_item_new_with_label("Quit");
+
   AddWidgetToViewHandle(MainViewHandle, "FileMenu", file);
   AddWidgetToViewHandle(MainViewHandle, "OpenFile", open);
   AddWidgetToViewHandle(MainViewHandle, "SaveFile", save);
-  
+  AddWidgetToViewHandle(MainViewHandle, "QuitProgram", quit);  
+
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), filemenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(filemenu), open);
@@ -58,6 +62,15 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *lineBound     = gtk_menu_item_new_with_label("Line Boundaries"),
     *crop          = gtk_menu_item_new_with_label("Crop  (Select OCR Region)");
 
+  AddWidgetToViewHandle(MainViewHandle, "PreProcessMenu", preProcMenu);
+  AddWidgetToViewHandle(MainViewHandle, "Preprocessing", preProc);
+  AddWidgetToViewHandle(MainViewHandle, "ConvertBW", convert);
+  AddWidgetToViewHandle(MainViewHandle, "RemoveStain", removeStain);
+  AddWidgetToViewHandle(MainViewHandle, "RemoveWrinkle", removeWrinkle);
+  AddWidgetToViewHandle(MainViewHandle, "Rotate", rotate);
+  AddWidgetToViewHandle(MainViewHandle, "LineBoundary", lineBound);
+  AddWidgetToViewHandle(MainViewHandle, "Crop", crop);
+
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), preProc);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(preProc), preProcMenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), convert);
@@ -72,6 +85,10 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *ocr        = gtk_menu_item_new_with_label("OCR"),    
     *performOCR =  gtk_menu_item_new_with_label("Perform OCR");
 
+  AddWidgetToViewHandle(MainViewHandle, "OCRMenu", ocrMenu);
+  AddWidgetToViewHandle(MainViewHandle, "OCR", ocr);
+  AddWidgetToViewHandle(MainViewHandle, "PerformOCR", performOCR);
+
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), ocr);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(ocr), ocrMenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(ocrMenu), performOCR);
@@ -82,18 +99,34 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *edit       = gtk_menu_item_new_with_label("Edit OCR Text Output"),
     *dictionary =  gtk_menu_item_new_with_label("Dictionary Settings");
  
+  AddWidgetToViewHandle(MainViewHandle, "PostProcMenu", postProcMenu);
+  AddWidgetToViewHandle(MainViewHandle, "Postprocessing", postProc);
+  AddWidgetToViewHandle(MainViewHandle, "EditText", edit);
+  AddWidgetToViewHandle(MainViewHandle, "Dictionary", dictionary);
+
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), postProc);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(postProc), postProcMenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), edit);
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), dictionary);
 
   g_signal_connect(G_OBJECT(quit), "activate", G_CALLBACK(gtk_main_quit), NULL);   
-  
-  
-/*********************************************************************************************************/
-/*RYAN: Here is an example of signal connect. You only need to change the first parameter G_OBJECT(_____)*/
   g_signal_connect(G_OBJECT(open), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(save), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
-/*********************************************************************************************************/
+
+  g_signal_connect(G_OBJECT(preProc), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(convert), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(removeStain), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(removeWrinkle), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(rotate), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(lineBound), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(crop), "activate", G_CALLBACK(CatchEvent), MainViewHandle);  
+
+  g_signal_connect(G_OBJECT(ocr), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(performOCR), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+
+  g_signal_connect(G_OBJECT(postProc), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(edit), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(dictionary), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+
   return menubar;
 }
