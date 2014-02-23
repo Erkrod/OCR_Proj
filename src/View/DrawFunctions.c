@@ -13,7 +13,7 @@ GtkWidget *drawMain(ViewHandle * MainViewHandle){
  HASH_ADD(HashByWidget,MainViewHandle->ObjectListByWidget,Widget,sizeof(GtkWidget *),NewObject);
     
  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
- gtk_window_set_default_size(GTK_WINDOW(window), 1000, 200);
+ gtk_window_set_default_size(GTK_WINDOW(window), 1000, 450);
  gtk_window_set_title(GTK_WINDOW(window), "OCR Program");
       
  g_signal_connect_swapped(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
@@ -129,4 +129,28 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   g_signal_connect(G_OBJECT(dictionary), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
 
   return menubar;
+}
+
+GtkWidget *drawImageWindow(ViewHandle *MainViewHandle){
+
+  GtkWidget *scrollWinImage;
+  scrollWinImage = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollWinImage),
+				 GTK_POLICY_ALWAYS,
+				 GTK_POLICY_ALWAYS);
+  AddWidgetToViewHandle(MainViewHandle, "ImageScrollWindow", scrollWinImage);
+
+  return scrollWinImage;
+}
+
+GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
+
+  GtkWidget *scrollWinText;
+  scrollWinText = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollWinText),
+				 GTK_POLICY_ALWAYS,
+				 GTK_POLICY_ALWAYS);
+  AddWidgetToViewHandle(MainViewHandle, "TextScrollWindow", scrollWinText);
+
+  return scrollWinText;
 }

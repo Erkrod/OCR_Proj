@@ -13,4 +13,8 @@ GtkWidget *drawMain(ViewHandle * MainViewHandle);
 
 GtkWidget *drawMenuBar(ViewHandle * MainViewHandle);
 
+GtkWidget *drawImageWindow(ViewHandle *MainViewHandle);
+
+GtkWidget *drawTextWindow(ViewHandle *MainViewHandle);
+
 #endif
