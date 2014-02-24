@@ -31,7 +31,7 @@ void Control_CleanUp(ControlHandle *);
 ControlHandle * Control_ProcessEvent(ObjectHandle * ClickedObject);
 
 /* functions for menu option clicking event */
-void on_open_clicked(GtkWidget *window, gpointer data);
+void on_open_clicked();
 
 void on_save_clicked(GtkWidget *window, gpointer data);
 

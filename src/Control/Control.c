@@ -21,10 +21,11 @@ ControlHandle * Control_ProcessEvent(ObjectHandle * ClickedObject){
 	printf("Object clicked has name: %s\n", ClickedObject->Name);
 	if (strcmp(ClickedObject->Name,"OpenFile") == 0){
 		printf("Put the function to open file here\n");
+		on_open_clicked();
 	}
 }
 
-void on_open_clicked(GtkWidget *window, gpointer data){
+void on_open_clicked(){
     
     GtkWidget *openFile;
        
