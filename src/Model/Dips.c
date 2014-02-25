@@ -150,4 +150,37 @@ IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int are
 	return image;
 }
 
+IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
+	int i, j;
+	unsigned W, H;
+	int x_c, y_c;
+	IMAGE *image_tmp;
+
+	assert(image);
+
+	x_c = x1;
+	x1 = (x1 < x2) ? x1 : x2;
+	x2 = (x_c < x2) ? x2 : x_c;
+
+	y_c = y1;
+	y1 = (y1 < y2) ? y1 : y2;
+	y2 = (y_c < y2) ? y2 : y_c;
+
+	W = (x2 - x1) + 1;
+	H = (y2 - y1) + 1;
+
+	image_tmp = CreateImage(W, H);
+
+	for (i = x1; i <= x2; i++) {
+		for (j = y1; j <= y2; j++) {
+				SetPixelR(image_tmp, i-x1, j-y1, GetPixelR(image, i, j));
+				SetPixelG(image_tmp, i-x1, j-y1, GetPixelG(image, i, j));
+				SetPixelB(image_tmp, i-x1, j-y1, GetPixelB(image, i, j));
+		}
+	}
+
+	DeleteImage(image);
+	image = NULL;
+	return image_tmp;
+}
 
