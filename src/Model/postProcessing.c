@@ -9,11 +9,7 @@ void CharProfile_free(void * profile_in){
 	utarray_free(profile->CharChoices);
 }
 
-/* call function to populate the dictionary */
-void populateDictionary(void);
-
-/* the actual dictionary */
-UT_array * dictionary = NULL;
+UT_array * postProcessingInitialize(void);
 
 UT_string * matchKeywords(UT_string *);
 
@@ -113,8 +109,10 @@ UT_string * matchKeywords(UT_string *output)
   }
 }
 
-void populateDictionary(void)
+UT_array * postProcessingInitialize(void)
 {
+  /* the actual dictionary */
+  UT_array * dictionary = NULL;
   char words[32][15];
   int i = 0;
   
@@ -159,4 +157,5 @@ void populateDictionary(void)
  {
    utarray_push_back(dictionary, &words[i]);
  }
+  return dictionary;
 }
