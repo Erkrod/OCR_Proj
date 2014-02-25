@@ -154,3 +154,88 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
 
   return scrollWinText;
 }
+
+GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
+
+ GtkWidget *rotateWin;    
+ GtkWidget *vboxMain;
+ GtkWidget *vbox;
+ GtkWidget *vbox2;
+ GtkWidget *hbox;    
+ GtkWidget *frame;
+ GtkWidget *spinner;
+ GtkWidget *rotateButton;
+ GtkWidget *closeButton;
+ GtkWidget *label;
+ GtkAdjustment *adj;
+
+ AddWidgetToViewHandle(MainViewHandle, "RotateWindow", rotateWin);
+ AddWidgetToViewHandle(MainViewHandle, "RotateVbox1", vboxMain);
+ AddWidgetToViewHandle(MainViewHandle, "RotateVbox2", vbox);
+ AddWidgetToViewHandle(MainViewHandle, "RotateVbox3", vbox2);
+ AddWidgetToViewHandle(MainViewHandle, "RotateHbox", hbox);
+ AddWidgetToViewHandle(MainViewHandle, "RotateFrame", frame);
+ AddWidgetToViewHandle(MainViewHandle, "RotateSpinner", spinner);
+ AddWidgetToViewHandle(MainViewHandle, "RotateButton", rotateButton);
+ AddWidgetToViewHandle(MainViewHandle, "RotCloseButton", closeButton);
+ AddWidgetToViewHandle(MainViewHandle, "RotateLabel", label);
+  
+ rotateWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+ gtk_window_set_default_size(GTK_WINDOW(rotateWin), 230, 100);
+ g_signal_connect (rotateWin, "destroy",
+		   G_CALLBACK (gtk_main_quit),
+		   NULL);
+
+ gtk_window_set_title (GTK_WINDOW (rotateWin), "Rotate Image");
+ 
+ vboxMain = gtk_vbox_new (FALSE, 5);
+ gtk_container_set_border_width (GTK_CONTAINER (vboxMain), 10);
+ gtk_container_add (GTK_CONTAINER (rotateWin), vboxMain);
+ 
+ frame = gtk_frame_new ("Clockwise Rotation");
+ gtk_box_pack_start (GTK_BOX (vboxMain), frame, TRUE, TRUE, 0);
+ 
+ vbox = gtk_vbox_new (FALSE, 0);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox);
+ 
+ hbox = gtk_hbox_new (FALSE, 30);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 5);
+ 
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), vbox2, FALSE, TRUE, 5);
+ 
+ label = gtk_label_new ("Degrees :");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ gtk_box_pack_start (GTK_BOX (vbox2), label, FALSE, TRUE, 0);
+ 
+ adj = (GtkAdjustment *) gtk_adjustment_new (1.0, 1.0, 360.0, 1.0, 5.0, 0.0);
+
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+ gtk_box_pack_start (GTK_BOX (vbox2), spinner, FALSE, TRUE, 0);
+ 
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), vbox2, FALSE, TRUE, 5);
+ 
+ rotateButton = gtk_button_new_with_label ("Rotate");
+ /* g_signal_connect(rotateButton, "clicked", */
+ /* 		  G_CALLBACK (grab_int_value),    */
+ /* 		  spinner); */
+ g_signal_connect(G_OBJECT(rotateButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+
+ gtk_box_pack_start (GTK_BOX (vbox2), rotateButton, TRUE, TRUE, 5);
+ 
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vboxMain), hbox, FALSE, TRUE, 0);
+ 
+ closeButton = gtk_button_new_with_label ("Close");
+ g_signal_connect_swapped (closeButton, "clicked",
+			   G_CALLBACK (gtk_widget_destroy),
+			   rotateWin);
+ gtk_box_pack_start (GTK_BOX (hbox), closeButton, TRUE, TRUE, 5);
+
+ /* gtk_widget_show_all(rotateWin); */
+
+ return rotateWin;
+}
