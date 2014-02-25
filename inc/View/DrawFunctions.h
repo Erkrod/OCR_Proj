@@ -19,4 +19,6 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle);
 
 GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle);
 
+GtkWidget *drawCropWindow(ViewHandle * MainViewHandle);
+
 #endif

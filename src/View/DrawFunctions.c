@@ -235,7 +235,143 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
 			   rotateWin);
  gtk_box_pack_start (GTK_BOX (hbox), closeButton, TRUE, TRUE, 5);
 
- /* gtk_widget_show_all(rotateWin); */
+ gtk_widget_show_all(rotateWin);
 
  return rotateWin;
+}
+
+GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
+
+ GtkWidget *cropWin;
+ GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *vbox4, *vbox5;
+ GtkWidget *hbox, *hbox2;
+ GtkWidget *spinner, *spinner2, *spinner3, *spinner4;
+ GtkWidget *cropButton, *closeButton;
+ GtkWidget *frame;
+ GtkWidget *label;
+ GtkAdjustment *adj;
+
+ AddWidgetToViewHandle(MainViewHandle, "CropWindow", cropWin);
+ AddWidgetToViewHandle(MainViewHandle, "CropVboxMain", vboxMain);
+ AddWidgetToViewHandle(MainViewHandle, "CropVbox", vbox);
+ AddWidgetToViewHandle(MainViewHandle, "CropVbox2", vbox2);
+ AddWidgetToViewHandle(MainViewHandle, "CropVbox3", vbox3);
+ AddWidgetToViewHandle(MainViewHandle, "CropVbox4", vbox4);
+ AddWidgetToViewHandle(MainViewHandle, "CropVbox5", vbox5);
+ AddWidgetToViewHandle(MainViewHandle, "CropHbox", hbox);
+ AddWidgetToViewHandle(MainViewHandle, "CropHbox2", hbox2);
+ AddWidgetToViewHandle(MainViewHandle, "CropFrame", frame);
+ AddWidgetToViewHandle(MainViewHandle, "CropSpin", spinner);
+ AddWidgetToViewHandle(MainViewHandle, "CropSpin2", spinner2);
+ AddWidgetToViewHandle(MainViewHandle, "CropSpin3", spinner3);
+ AddWidgetToViewHandle(MainViewHandle, "CropSpin4", spinner4);
+ AddWidgetToViewHandle(MainViewHandle, "CropButton", cropButton);
+ AddWidgetToViewHandle(MainViewHandle, "CropCloseButton", closeButton);
+ AddWidgetToViewHandle(MainViewHandle, "Croplabel", label);
+  
+ cropWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+ gtk_window_set_default_size(GTK_WINDOW(cropWin), 230, 100);
+ g_signal_connect (cropWin, "destroy",
+ 		   G_CALLBACK (gtk_main_quit),
+ 		   NULL);
+
+ gtk_window_set_title (GTK_WINDOW (cropWin), "Crop Image");
+ 
+ vboxMain = gtk_vbox_new (FALSE, 5);
+ gtk_container_set_border_width (GTK_CONTAINER (vboxMain), 10);
+ gtk_container_add (GTK_CONTAINER (cropWin), vboxMain);
+ 
+ frame = gtk_frame_new (NULL);
+ gtk_box_pack_start (GTK_BOX (vboxMain), frame, TRUE, TRUE, 0);
+ 
+ vbox = gtk_vbox_new (FALSE, 0);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox);
+
+ /* horizontal frame */
+ frame = gtk_frame_new ("Horizontal");
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+ 
+ hbox = gtk_hbox_new (FALSE, 30);
+ gtk_container_set_border_width (GTK_CONTAINER (hbox), 15);
+ gtk_container_add (GTK_CONTAINER (frame), hbox);
+
+ label = gtk_label_new ("Begin :");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), vbox2, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), spinner, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("End :");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+
+ spinner2 = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner2), TRUE);
+
+ vbox3 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), vbox3, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), spinner2, TRUE, TRUE, 0);
+
+ /* vertical frame */
+ frame = gtk_frame_new ("Vertical");
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+ 
+ hbox2 = gtk_hbox_new (FALSE, 30);
+ gtk_container_set_border_width (GTK_CONTAINER (hbox2), 15);
+ gtk_container_add (GTK_CONTAINER (frame), hbox2);
+
+ label = gtk_label_new ("Begin :");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+
+ spinner3 = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner3), TRUE);
+
+ vbox3 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox2), vbox3, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), spinner3, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("End :");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+
+ spinner4 = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner4), TRUE);
+
+ vbox5 = gtk_vbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox2), vbox5, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox5), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox5), spinner4, TRUE, TRUE, 0);
+
+ /* crop button */
+ cropButton = gtk_button_new_with_label ("Crop");
+ /* g_signal_connect(cropButton, "clicked", */
+ /* 		  G_CALLBACK (gtk_widget_destroy), /\* temporary, need to fix *\/ */
+ /* 		  spinner); */
+ g_signal_connect(G_OBJECT(cropButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (vbox), cropButton, TRUE, TRUE, 5);
+
+ /* close button */
+ closeButton = gtk_button_new_with_label ("Close");
+ g_signal_connect_swapped (closeButton, "clicked",
+ 			   G_CALLBACK (gtk_widget_destroy),
+ 			   cropWin);
+ gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
+
+ gtk_widget_show_all(cropWin); 
+
+ return cropWin;
 }
