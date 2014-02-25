@@ -41,7 +41,7 @@ void on_stainRem_clicked(GtkWidget *window, gpointer data);
 
 void on_wrinkleRem_clicked(GtkWidget *window, gpointer data);
 
-void on_rotate_clicked(GtkWidget *window, gpointer data);
+void on_rotate_clicked();
 
 void on_boundaries_clicked(GtkWidget *window, gpointer data);
 
