@@ -507,9 +507,11 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  radio1 = gtk_radio_button_new_with_label(NULL, "Make Pixel Black");
  AddWidgetToViewHandle(MainViewHandle, "Radio1", radio1);
+ g_signal_connect(G_OBJECT(radio1), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
  radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1),
 						       "Make Pixel White");
  AddWidgetToViewHandle(MainViewHandle, "Radio2", radio2);
+ g_signal_connect(G_OBJECT(radio2), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
  
  gtk_box_pack_start (GTK_BOX (vbox3), radio1, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), radio2, FALSE, TRUE, 0);
