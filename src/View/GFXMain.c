@@ -13,14 +13,15 @@ int main (int   argc, char *argv[]){
 	
   gtk_init(&argc, &argv);  
 
-  GtkWidget *window         = drawMain(MainViewHandle);  
-  GtkWidget *menubar        = drawMenuBar(MainViewHandle);
-  GtkWidget *vbox           = gtk_vbox_new(FALSE, 0);
-  GtkWidget *hbox           = gtk_hbox_new(FALSE, 0);    
-  GtkWidget *scrollWinImage = drawImageWindow(MainViewHandle);
-  GtkWidget *scrollWinText  = drawTextWindow(MainViewHandle);
-  GtkWidget *rotateWindow   = drawRotateWindow(MainViewHandle);
-  GtkWidget *cropWindow     = drawCropWindow(MainViewHandle);
+  GtkWidget *window           = drawMain(MainViewHandle);  
+  GtkWidget *menubar          = drawMenuBar(MainViewHandle);
+  GtkWidget *vbox             = gtk_vbox_new(FALSE, 0);
+  GtkWidget *hbox             = gtk_hbox_new(FALSE, 0);    
+  GtkWidget *scrollWinImage   = drawImageWindow(MainViewHandle);
+  GtkWidget *scrollWinText    = drawTextWindow(MainViewHandle);
+  GtkWidget *rotateWindow     = drawRotateWindow(MainViewHandle);
+  GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
+  GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
 
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
