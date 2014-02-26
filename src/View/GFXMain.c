@@ -22,6 +22,7 @@ int main (int   argc, char *argv[]){
   GtkWidget *rotateWindow     = drawRotateWindow(MainViewHandle);
   GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
   GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
+  GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
 
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
