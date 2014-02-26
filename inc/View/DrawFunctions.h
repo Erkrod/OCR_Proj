@@ -21,4 +21,6 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle);
 
 GtkWidget *drawCropWindow(ViewHandle * MainViewHandle);
 
+GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle);
+
 #endif
