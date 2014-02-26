@@ -23,4 +23,6 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle);
 
 GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle);
 
+GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle);
+
 #endif

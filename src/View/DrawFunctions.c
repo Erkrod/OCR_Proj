@@ -537,3 +537,122 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  return filterWin;
 }
+
+GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
+
+ GtkWidget *ocrWin;
+ GtkWidget *vboxMain, *vbox, *vbox2;
+ GtkWidget *hbox, *hbox2;
+ GtkWidget *frame;
+ GtkWidget *combo;
+ GtkWidget *ocrButton, *closeButton;
+ GtkWidget *label;
+
+ ocrWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+ AddWidgetToViewHandle(MainViewHandle, "OCRWindow", ocrWin);
+ gtk_window_set_default_size(GTK_WINDOW(ocrWin), 230, 100);
+ g_signal_connect (ocrWin, "destroy",
+ 		   G_CALLBACK (gtk_main_quit),
+ 		   NULL);
+ gtk_window_set_title (GTK_WINDOW (ocrWin), "OCR");
+ 
+ vboxMain = gtk_vbox_new (FALSE, 5);
+ AddWidgetToViewHandle(MainViewHandle, "vboxMain", vboxMain);
+ gtk_container_set_border_width (GTK_CONTAINER (vboxMain), 10);
+ gtk_container_add (GTK_CONTAINER (ocrWin), vboxMain);
+ 
+ frame = gtk_frame_new(NULL);
+ AddWidgetToViewHandle(MainViewHandle, "frame", frame);
+ gtk_box_pack_start(GTK_BOX(vboxMain), frame, TRUE, TRUE, 0);
+
+ vbox = gtk_vbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "vbox", vbox);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox);
+
+ /* fonts frame */
+ frame = gtk_frame_new (NULL);
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "vbox2", vbox2);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox2), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox2);
+
+ /* Font */
+ hbox = gtk_hbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "hbox", hbox);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("Font:");
+ AddWidgetToViewHandle(MainViewHandle, "label", label);
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ combo = gtk_combo_box_new_text();
+ AddWidgetToViewHandle(MainViewHandle, "ComboBox", combo);
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 1" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 2" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 3" );
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
+
+ /* Font Size */
+ hbox2 = gtk_hbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "hbox2", hbox2);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox2, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("Font Size:");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ combo = gtk_combo_box_new_text();
+
+ gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "3" );
+
+ gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
+
+ /* Font Resolution */
+ hbox2 = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox2, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("Scan Resolution:  ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ 
+ combo = gtk_combo_box_new_text();
+
+ gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "3" );
+
+ gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
+
+ /* ocr button */
+ ocrButton = gtk_button_new_with_label ("Perform OCR");
+ AddWidgetToViewHandle(MainViewHandle, "OCRButton", ocrButton);
+ /* g_signal_connect(ocrButton, "clicked", */
+ /* 		  G_CALLBACK (gtk_widget_destroy), */
+ /* 		  ocrWin); */
+ g_signal_connect(G_OBJECT(ocrButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (vbox), ocrButton, TRUE, TRUE, 5);
+
+ /* close button */
+ closeButton = gtk_button_new_with_label ("Close");
+ AddWidgetToViewHandle(MainViewHandle, "CloseButton", closeButton);
+ /* g_signal_connect_swapped (closeButton, "clicked", */
+ /* 			   G_CALLBACK (gtk_widget_destroy), */
+ /* 			   ocrWin); */
+ g_signal_connect_swapped (closeButton, "clicked",
+ 			   G_CALLBACK (gtk_widget_destroy),
+ 			   ocrWin);
+ gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
+
+ gtk_widget_show_all(ocrWin); 
+
+ return ocrWin;
+}
