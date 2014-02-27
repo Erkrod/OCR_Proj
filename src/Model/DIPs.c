@@ -323,69 +323,47 @@ IMAGE* Resize(unsigned int percentage, IMAGE *image)
 }
 
 
-/* Juliaset */
-IMAGE *Juliaset(unsigned int W, unsigned int H, unsigned int max_iteration, long double zoom)
+
+
+IMAGE *Crop(IMAGE *image, unsigned int x, unsigned int y, unsigned int W, unsigned int H)
 {
-	float x0, y0, x, y, xtemp;
-	float offset_x = 0.0, offset_y = 0.0;
-	unsigned int row, column;
-	unsigned int iteration;
-	unsigned int color;
-	const unsigned char palette[MAX_COLOR][3] = {
-	/* r g b*/
-	{ 0, 0, 0 },	/* 0, black		 */
-	{ 127, 0, 0 },	/* 1, brown		 */
-	{ 255, 0, 0 },	/* 2, red		 */
-	{ 255, 127, 0 },	/* 3, orange		 */
-	{ 255, 255, 0 },	/* 4, yellow		 */
-	{ 127, 255, 0 },	/* 5, light green	 */
-	{ 0, 255, 0 },	/* 6, green		 */
-	{ 0, 255, 127 },	/* 7, blue green	 */
-	{ 0, 255, 255 },	/* 8, turquoise	 */
-	{ 127, 255, 255 },	/* 9, light blue	 */
-	{ 255, 255, 255 },	/* 10, white		 */
-	{ 255, 127, 255 },	/* 11, pink		 */
-	{ 255, 0, 255 },	/* 12, light pink	 */
-	{ 127, 0, 255 },	/* 13, purple		 */
-	{ 0, 0, 255 },	/* 14, blue		 */
-	{ 0, 0, 127 }	/* 15, dark blue	 */
-};	
+	int	i, j;
 
-	IMAGE *image;
-	image = CreateImage(W, H);
+	assert(image);
+	if (W > image->Width) {
+		W = image->Width;
+	}
+	if (H > image->Height) {
+		H = image->Height;
+	}
+	if (x > image->Width-1) {
+		x = image->Width-1;
+	}
+	if (y > image->Height-1) {
+		y = image->Height-1;
+	}
 
-	/* The following is taken (with very few adaptations) from:	*/
-	 /* http://lodev.org/cgtutor/juliamandelbrot.html		 */
+	IMAGE *image_tmp;
+	if ( (x + W > image->Width) && (y + H < image->Height)) {
+		image_tmp = CreateImage(image->Width-x, H);
+	}
+	else if ( (x + W < image->Width) && (y + H > image->Height)) {
+		image_tmp = CreateImage(W, image->Height-y);
+	}
+	else if ( (x + W > image->Width) && (y + H > image->Height)) {
+		image_tmp = CreateImage(image->Width-x, image->Height-y);		
+	}
+	else {
+		image_tmp = CreateImage(W, H);
+	}
 
-	x0 = -0.7;
-	y0 = 0.27015;
-
-	if (image != NULL)
-	{
-		for(row = 0; row < image->Width; row ++)
-		{
-			for(column = 0; column < image->Height; column ++)
-			{
-				x = ((float) 1.5 * (row - image->Width / 2.0) / (0.5 * zoom * image->Width)) + offset_x;
-				y = ((float) (column - image->Height / 2.0) / (0.5 * zoom * image->Height)) + offset_y;
-  	
-				iteration = 0;
-  	
-				do
-				{
-					xtemp = x*x - y*y + x0;
-					y = 2*x*y + y0;
-					x = xtemp;
-					iteration = iteration + 1;
-				} while ( x*x + y*y < 2*2&&iteration < max_iteration );
-  	
-				color = iteration % 16;
-  	
-				SetPixelR(image, row, column, palette[color][0]);
-				SetPixelG(image, row, column, palette[color][1]);
-				SetPixelB(image, row, column, palette[color][2]);
-			}
+	for (i = 0; i < image_tmp->Width; i++) {
+		for (j = 0; j < image_tmp->Height; j++) {
+				SetPixelR(image_tmp, i, j, GetPixelR(image, i+x, j+y));
+				SetPixelG(image_tmp, i, j, GetPixelG(image, i+x, j+y));
+				SetPixelB(image_tmp, i, j, GetPixelB(image, i+x, j+y));
 		}
 	}
-	return image;
+
+	return image_tmp;
 }

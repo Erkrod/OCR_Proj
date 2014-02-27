@@ -1,15 +1,15 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "ModelStructure.h"
-#include "utstring.h"
+#include "/home/group1/EECS22L/EECS22L_Project2/inc/Model/ImageList.h"
+#include "/home/group1/EECS22L/EECS22L_Project2/inc/Model/Image.h"
+#include "/home/group1/EECS22L/EECS22L_Project2/inc/Model/FileIO.h"
+#include "/home/group1/EECS22L/EECS22L_Project2/inc/Model/Constants.h"
 
-<<<<<<< HEAD
 /* this is the postProcessing function */
 /* where the character is chosen and put into a string to be output */
-UT_string postProcessing(UT_array *)
-=======
-UT_string * postProcessing(UT_array * );
->>>>>>> postPo
+
+ILIST * IsolateCharacter(IMAGE *, int, int);
+
 
 #endif
