@@ -27,11 +27,10 @@ int main()
   char sname[50];
 
   i=0;
-  curr = imglist->First;
-  
 
   image = ReadImage(fname);
   imglist = IsolateCharacter(image, 12, 300);
+  curr = imglist->First;
 
 
   while (curr)

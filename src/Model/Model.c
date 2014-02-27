@@ -25,7 +25,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
       }
   
   char_height = fontsize*(1/72)*scanres; /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
-  i_max = (image->Height)/char_height;
+  i_max = (image->Height-start_y)/char_height;
 
   for ( i=1; i<=i_max; i++)
     {
@@ -46,7 +46,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	    x_border_start = x-1;
 	}
       char_width = x_border_end - x_border_start;
-      for ( x=x_border_start; x < image->Width; x=x+char_width)
+      for ( x=x_border_start; x < image->Width-char_width; x=x+char_width)
 	{
 	  img = Crop(image,x,start_y*i,char_width,char_height);
 	  AppendImage(imglist, img);
