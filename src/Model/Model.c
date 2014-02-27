@@ -24,7 +24,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	  start_y = y; /*record start scan height, to go slices of fontsize down*/
       }
   
-  char_height = fontsize*(1/72)*scanres; /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
+  char_height = (int)((double)fontsize*(1.0/72.0)*(double)scanres); /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
   i_max = (image->Height-start_y)/char_height;
 
   for ( i=1; i<=i_max; i++)
@@ -52,4 +52,6 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	  AppendImage(imglist, img);
 	}
     }
+
+  return imglist;
 }
