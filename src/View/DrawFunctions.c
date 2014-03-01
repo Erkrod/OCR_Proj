@@ -1,16 +1,45 @@
 /******************************************************************/
 /* DrawFunctions.c                                                */
 /******************************************************************/
+#include "View.h"
 
-#include "DrawFunctions.h"
+void drawAllWindows(ViewHandle * MainViewHandle){
+	
+  gtk_init(NULL, NULL);
+  GtkWidget *window           = drawMain(MainViewHandle);  
+  GtkWidget *menubar          = drawMenuBar(MainViewHandle);
+  GtkWidget *vbox             = gtk_vbox_new(FALSE, 0);
+  GtkWidget *hbox             = gtk_hbox_new(FALSE, 0);    
+  GtkWidget *scrollWinImage   = drawImageWindow(MainViewHandle);
+  GtkWidget *scrollWinText    = drawTextWindow(MainViewHandle);
+  GtkWidget *rotateWindow     = drawRotateWindow(MainViewHandle);
+  GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
+  GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
+  GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
+
+
+  gtk_container_add(GTK_CONTAINER(window), vbox);
+  gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
+  gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+  gtk_box_pack_start(GTK_BOX(hbox), scrollWinImage, TRUE, TRUE, 0);
+  gtk_box_pack_start(GTK_BOX(hbox), scrollWinText, TRUE, TRUE, 0);
+        
+  
+  /* show the window*/
+  gtk_widget_show_all(window); 
+  
+  /*invisible all windows*/
+  gtk_widget_hide(rotateWindow);
+  gtk_widget_hide(cropWindow);
+  gtk_widget_hide(filterWindow);
+  gtk_widget_hide(ocrWindow);
+				  
+  
+}
 
 GtkWidget *drawMain(ViewHandle * MainViewHandle){
- ObjectHandle * NewObject;
- 
  GtkWidget *window  = gtk_window_new(GTK_WINDOW_TOPLEVEL);
- NewObject = ObjectHandle_Initialize("MainWindow", window);
- HASH_ADD(HashByName, MainViewHandle->ObjectListByName, Name, sizeof(char) * MAX_HASH_KEY_LENGTH, NewObject);
- HASH_ADD(HashByWidget,MainViewHandle->ObjectListByWidget,Widget,sizeof(GtkWidget *),NewObject);
+  AddWidgetToViewHandle(MainViewHandle, "MainWindow", window);
     
  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
  gtk_window_set_default_size(GTK_WINDOW(window), 1000, 450);
@@ -23,7 +52,7 @@ GtkWidget *drawMain(ViewHandle * MainViewHandle){
 
 GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
 
-  ObjectHandle * NewObject;
+  
   GtkWidget *menubar = gtk_menu_bar_new();
   GtkWidget *separator = gtk_separator_menu_item_new();
 /*****************************************************************************************************************/
@@ -131,6 +160,10 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   return menubar;
 }
 
+void myprintf(GtkWidget *widget, GdkEvent *event, gpointer data){
+	printf("here u go x = %lf; y = %lf\n", event->button.x, event->button.y);
+}
+
 GtkWidget *drawImageWindow(ViewHandle *MainViewHandle){
 
   GtkWidget *scrollWinImage;
@@ -139,7 +172,15 @@ GtkWidget *drawImageWindow(ViewHandle *MainViewHandle){
 				 GTK_POLICY_ALWAYS,
 				 GTK_POLICY_ALWAYS);
   AddWidgetToViewHandle(MainViewHandle, "ImageScrollWindow", scrollWinImage);
-
+#ifdef DEBUG 
+  GtkWidget * event_box = gtk_event_box_new ();
+  
+  GtkWidget * image = gtk_image_new_from_file("/home/group1/Programming/EECS22L_Project2/Images/CourierNew12_300DPI.ppm");
+  gtk_container_add (GTK_CONTAINER (event_box), image);
+  gtk_widget_set_events (event_box, GDK_BUTTON_PRESS_MASK);
+  gtk_signal_connect (GTK_OBJECT(event_box), "button_press_event", GTK_SIGNAL_FUNC (myprintf), NULL);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWinImage), event_box);  
+#endif
   return scrollWinImage;
 }
 
@@ -151,7 +192,6 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
 				 GTK_POLICY_ALWAYS,
 				 GTK_POLICY_ALWAYS);
   AddWidgetToViewHandle(MainViewHandle, "TextScrollWindow", scrollWinText);
-
   return scrollWinText;
 }
 

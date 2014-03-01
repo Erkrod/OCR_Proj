@@ -1,12 +1,16 @@
 #get lib sdl ready to compile
 
 CC	:= gcc
-CFLAGS	:= -g
+CFLAGS	:= -g -Wall
 LDFLAGS := -lm
 
 #take care of test flags
 ifeq ($(TEST_VIEW),y)
-	CFLAGS += -DTEST_VIEW
+	CFLAGS += -DTEST_VIEW -DDEBUG
+endif
+
+ifeq ($(DEBUG),y)
+	CFLAGS += -DDEBUG
 endif
 
 MODULES   := Model Control View
@@ -16,7 +20,7 @@ MODEL_LIB := Model
 
 CONTROL_LIB := Control
 
-VIEW_LIB := DrawFunctions View
+VIEW_LIB := View DrawFunctions 
 
 GUI_CFLAGS := $(shell pkg-config --cflags gtk+-2.0)
 GUI_LFLAGS := $(shell pkg-config --libs gtk+-2.0)
@@ -51,7 +55,7 @@ clean:
 	rm bin/*
 
 build/%.o: %.c	
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(GUI_CFLAGS)
+	$(CC) $(CFLAGS) $(INCLUDES) $(GUI_CFLAGS) -c $< -o $@
 
 build/lib%.a: build/%.o
 	ar rc $@ $<
@@ -68,3 +72,6 @@ TestPostPo: build/postProcessing.o
 
 TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND)
 	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(GUI_LFLAGS) -o bin/$@ 
+	
+OCR: build/OCR.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
+	$(CC) build/OCR.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) -o bin/$@ 

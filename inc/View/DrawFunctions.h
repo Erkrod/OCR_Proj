@@ -25,4 +25,6 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle);
 
 GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle);
 
+void drawAllWindows(ViewHandle * MainViewHandle);
+
 #endif

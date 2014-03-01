@@ -9,10 +9,10 @@
 
 int main (int   argc, char *argv[]){
  
-  ViewHandle * MainViewHandle = View_Initialize();
+  ViewHandle * MainViewHandle = View_Initialize(NULL);
 	
-  gtk_init(&argc, &argv);  
-
+  /*gtk_init(&argc, &argv);  */
+	gtk_init(NULL, NULL);
   GtkWidget *window           = drawMain(MainViewHandle);  
   GtkWidget *menubar          = drawMenuBar(MainViewHandle);
   GtkWidget *vbox             = gtk_vbox_new(FALSE, 0);
@@ -35,6 +35,8 @@ int main (int   argc, char *argv[]){
   gtk_widget_show_all(window); 
   
   gtk_main(); 
+  
+  
   
   return 0;
 }

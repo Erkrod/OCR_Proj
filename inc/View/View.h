@@ -6,22 +6,11 @@
 #include "uthash.h"
 #include "assert.h"
 #include "gtk/gtk.h"
+#include "Control.h"
+#include "DrawFunctions.h"
 
-#define MAX_HASH_KEY_LENGTH 20
-
-typedef struct {
-	char Name[MAX_HASH_KEY_LENGTH];
-	GtkWidget * Widget;
-	UT_hash_handle HashByName;
-	UT_hash_handle HashByWidget;
-} ObjectHandle;
-
-typedef struct {
-	ObjectHandle * ObjectListByName, * ObjectListByWidget;
-} ViewHandle;
-
-ViewHandle * View_Initialize(void);
+ViewHandle * View_Initialize(ControlHandle * MainControlHandle);
 void AddWidgetToViewHandle(ViewHandle * MainViewHandle, const char * NewName, GtkWidget * NewWidget);
 void CatchEvent(GtkWidget *widget, gpointer data);
-ObjectHandle * ObjectHandle_Initialize(const char * name, GtkWidget * widget);
+ObjectHandle * ObjectHandle_Initialize(const char * name, GtkWidget * widget, ViewHandle * MainViewHandle);
 #endif

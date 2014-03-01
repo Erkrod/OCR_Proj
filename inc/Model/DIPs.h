@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "Image.h"
-#include "Constants.h"
+/*#include "Constants.h"*/
 #include <math.h>
 
 
