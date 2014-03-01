@@ -54,7 +54,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	  else /* there exists char here */
 	    {
 	      if ((x > 235) && (x <265))
-	      printf("x coordinate is %d and slice color is %lf\n", x,slice_color);
+		/*printf("x coordinate is %d and slice color is %lf\n", x,slice_color);*/
 	      if (x_border_start == -1)
 		x_border_start = x-1; 
 	    }
@@ -70,7 +70,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	AppendImage(imglist, img);
       }
 
-  printf("The x_border_start is %d. The x_border_end is %d. The char_width is %d.\n", x_border_start, x_border_end, char_width);
-  printf("char height is %d, start_y is %d, image height is %d\n", char_height, start_y, image->Height);
+  /*printf("The x_border_start is %d. The x_border_end is %d. The char_width is %d.\n", x_border_start, x_border_end, char_width);*/
+  /*printf("char height is %d, start_y is %d, image height is %d\n", char_height, start_y, image->Height);*/
   return imglist;
 }
