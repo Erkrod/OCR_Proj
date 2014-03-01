@@ -16,7 +16,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 int main()
 {
-  
+  IMAGE *img = NULL;
   int i;
   int j;
   IMAGE *image = NULL;
@@ -29,8 +29,10 @@ int main()
   i=0;
 
   image = ReadImage(fname);
-  imglist = IsolateCharacter(image, 12, 300);
+  img = Crop(image,50,200,1400,500);
+  imglist = IsolateCharacter(img, 12, 300);
   curr = imglist->First;
+  j = SaveImage("meow", img);
 
 
   while (curr)
