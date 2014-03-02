@@ -18,6 +18,9 @@ typedef struct {
 	/*ModelHandle * MainModelHandle;*/
 	ViewHandle * MainViewHandle;
 	UT_string * InputImageFileName;
+	UT_string * OutputFileName;
+	ILIST * MainImageList;
+	UT_string * MainOutputString;
 } ControlHandle;
 
 typedef struct {

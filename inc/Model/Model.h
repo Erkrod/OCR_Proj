@@ -10,4 +10,7 @@
 UT_string * postProcessing(UT_array * );
 
 
+IMAGE *ReadImage(const char * fname);
+int SaveImage(const char fname[SLEN], IMAGE *image);
+
 #endif

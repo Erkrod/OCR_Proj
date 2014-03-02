@@ -172,15 +172,19 @@ GtkWidget *drawImageWindow(ViewHandle *MainViewHandle){
 				 GTK_POLICY_ALWAYS,
 				 GTK_POLICY_ALWAYS);
   AddWidgetToViewHandle(MainViewHandle, "ImageScrollWindow", scrollWinImage);
-#ifdef DEBUG 
-  GtkWidget * event_box = gtk_event_box_new ();
   
-  GtkWidget * image = gtk_image_new_from_file("/home/group1/Programming/EECS22L_Project2/Images/CourierNew12_300DPI.ppm");
-  gtk_container_add (GTK_CONTAINER (event_box), image);
-  gtk_widget_set_events (event_box, GDK_BUTTON_PRESS_MASK);
-  gtk_signal_connect (GTK_OBJECT(event_box), "button_press_event", GTK_SIGNAL_FUNC (myprintf), NULL);
-  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWinImage), event_box);  
-#endif
+  /*GtkWidget * image = gtk_image_new_from_file("/home/group1/Programming/EECS22L_Project2/Images/CourierNew12_300DPI.ppm");*/
+  GtkWidget * image = gtk_image_new();
+  AddWidgetToViewHandle(MainViewHandle, "MainDisplayImage", image);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWinImage), image);
+ 
+	/*reserved for beta release*/
+  /* GtkWidget * event_box = gtk_event_box_new ();  
+   * gtk_widget_set_events (event_box, GDK_BUTTON_PRESS_MASK);
+   * gtk_container_add (GTK_CONTAINER (event_box), image);
+   * gtk_signal_connect (GTK_OBJECT(event_box), "button_press_event", GTK_SIGNAL_FUNC (myprintf), NULL);
+  gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWinImage), event_box);  */
+
   return scrollWinImage;
 }
 

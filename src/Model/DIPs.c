@@ -10,6 +10,22 @@
 
 #include "DIPs.h"
 
+/*Duplicate image*/
+
+IMAGE * DuplicateImage(IMAGE * image){
+	IMAGE * NewImage = CreateImage(image->Width, image->Height);
+	int i, j;
+	for (i = 0; i < image->Width; i++){
+		for (j = 0; j < image->Height; j++){
+			SetPixelR(NewImage, i, j, GetPixelR(image, i, j));
+			SetPixelG(NewImage, i, j, GetPixelG(image, i, j));
+			SetPixelB(NewImage, i, j, GetPixelB(image, i, j));
+		}
+	}
+	
+	return NewImage;
+}
+
 /* reverse image color */
 void BlackNWhite(IMAGE *image)
 {
@@ -320,72 +336,4 @@ IMAGE* Resize(unsigned int percentage, IMAGE *image)
 	
 	DeleteImage(image);
 	return image_tmp ; 
-}
-
-
-/* Juliaset */
-IMAGE *Juliaset(unsigned int W, unsigned int H, unsigned int max_iteration, long double zoom)
-{
-	float x0, y0, x, y, xtemp;
-	float offset_x = 0.0, offset_y = 0.0;
-	unsigned int row, column;
-	unsigned int iteration;
-	unsigned int color;
-	const unsigned char palette[MAX_COLOR][3] = {
-	/* r g b*/
-	{ 0, 0, 0 },	/* 0, black		 */
-	{ 127, 0, 0 },	/* 1, brown		 */
-	{ 255, 0, 0 },	/* 2, red		 */
-	{ 255, 127, 0 },	/* 3, orange		 */
-	{ 255, 255, 0 },	/* 4, yellow		 */
-	{ 127, 255, 0 },	/* 5, light green	 */
-	{ 0, 255, 0 },	/* 6, green		 */
-	{ 0, 255, 127 },	/* 7, blue green	 */
-	{ 0, 255, 255 },	/* 8, turquoise	 */
-	{ 127, 255, 255 },	/* 9, light blue	 */
-	{ 255, 255, 255 },	/* 10, white		 */
-	{ 255, 127, 255 },	/* 11, pink		 */
-	{ 255, 0, 255 },	/* 12, light pink	 */
-	{ 127, 0, 255 },	/* 13, purple		 */
-	{ 0, 0, 255 },	/* 14, blue		 */
-	{ 0, 0, 127 }	/* 15, dark blue	 */
-};	
-
-	IMAGE *image;
-	image = CreateImage(W, H);
-
-	/* The following is taken (with very few adaptations) from:	*/
-	 /* http://lodev.org/cgtutor/juliamandelbrot.html		 */
-
-	x0 = -0.7;
-	y0 = 0.27015;
-
-	if (image != NULL)
-	{
-		for(row = 0; row < image->Width; row ++)
-		{
-			for(column = 0; column < image->Height; column ++)
-			{
-				x = ((float) 1.5 * (row - image->Width / 2.0) / (0.5 * zoom * image->Width)) + offset_x;
-				y = ((float) (column - image->Height / 2.0) / (0.5 * zoom * image->Height)) + offset_y;
-  	
-				iteration = 0;
-  	
-				do
-				{
-					xtemp = x*x - y*y + x0;
-					y = 2*x*y + y0;
-					x = xtemp;
-					iteration = iteration + 1;
-				} while ( x*x + y*y < 2*2&&iteration < max_iteration );
-  	
-				color = iteration % 16;
-  	
-				SetPixelR(image, row, column, palette[color][0]);
-				SetPixelG(image, row, column, palette[color][1]);
-				SetPixelB(image, row, column, palette[color][2]);
-			}
-		}
-	}
-	return image;
 }

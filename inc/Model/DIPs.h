@@ -17,6 +17,8 @@
 /*#include "Constants.h"*/
 #include <math.h>
 
+/*duplicate image*/
+IMAGE * DuplicateImage(IMAGE * image);
 
 /* reverse image color */
 void BlackNWhite(IMAGE *image) ; 

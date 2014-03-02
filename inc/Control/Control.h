@@ -23,6 +23,8 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject);
 
 /* functions for menu option clicking event */
 void OpenImageFile(UT_string * ImageFileName);
+void SaveTextFile(UT_string * OutputFileName);
+void show_error(const gchar * ErrorMessage);
 /*void on_open_clicked();
 
 void on_save_clicked(GtkWidget *window, gpointer data);

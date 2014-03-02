@@ -31,4 +31,6 @@ typedef struct {
 	char CharChosen;
 } CharProfile;
 
+#define SLEN 80
+
 #endif

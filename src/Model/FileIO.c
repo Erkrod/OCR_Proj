@@ -2,89 +2,115 @@
 /* FileIO.c: program file for I/O module	                     */ 
 /*                                                                   */
 /* History:                                                          */
-/* 10/16/13 Yasaman : updated for EECS22 assignment3 Fall13          */
+/* 10/29/13 Alex Chu  updated for EECS22 assignment4 Fall2013	     */
 /* 10/16/11 Weiwei Chen  updated for EECS22 assignment3 FAll2012     */
 /* 10/07/11 Weiwei Chen: initial solution version                    */
 /*                       for EECS22 assignment3 FAll2011             */
 /*********************************************************************/
-#include "FileIO.h"
-/*** function definitions ***/
+#include <stdio.h> 
+#include <string.h>
+#include <stdlib.h>
+#include "Model.h"
 
-int
-ReadImage(char fname[SLEN], unsigned char R[WIDTH][HEIGHT], unsigned char G[WIDTH][HEIGHT], unsigned char B[WIDTH][HEIGHT])
+/*** function definitions ***/
+/* Read Image */
+IMAGE *ReadImage(const char * fname)
 {
 	FILE           *File;
 	char            Type[SLEN];
-	int             Width, Height, MaxValue;
-	int             x, y;
+	int             W, H, MaxValue;
+	unsigned int    x, y;
 	char            ftype[] = ".ppm";
-        char            fname_tmp[SLEN];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
 
-        strcpy(fname_tmp, fname);
-	strcat(fname_tmp, ftype);
+	IMAGE		*image;
 
-	File = fopen(fname_tmp, "r");
+       File = fopen(fname, "r");
 	if (!File) {
 #ifdef DEBUG
 		printf("\nCan't open file \"%s\" for reading!\n", fname);
 #endif
-		return 1;
+		return NULL;
 	}
+
 	fscanf(File, "%79s", Type);
 	if (Type[0] != 'P' || Type[1] != '6' || Type[2] != 0) {
 #ifdef DEBUG
 		printf("\nUnsupported file format!\n");
 #endif
-		return 2;
+		fclose(File);
+		return NULL;
 	}
-	fscanf(File, "%d", &Width);
-	if (Width != WIDTH) {
+
+	fscanf(File, "%d", &W);
+	if (W <= 0) {
 #ifdef DEBUG
-		printf("\nUnsupported image width %d!\n", Width);
+		printf("\nUnsupported image width %d!\n", W);
 #endif
-		return 3;
+		fclose(File);
+		return NULL;
 	}
-	fscanf(File, "%d", &Height);
-	if (Height != HEIGHT) {
+
+	fscanf(File, "%d", &H);
+	if (H <= 0) {
 #ifdef DEBUG
-		printf("\nUnsupported image height %d!\n", Height);
+		printf("\nUnsupported image height %d!\n", H);
 #endif
-		return 4;
+		fclose(File);
+		return NULL;
 	}
+
 	fscanf(File, "%d", &MaxValue);
 	if (MaxValue != 255) {
 #ifdef DEBUG
 		printf("\nUnsupported image maximum value %d!\n", MaxValue);
 #endif
-		return 5;
+		fclose(File);
+		return NULL;
 	}
 	if ('\n' != fgetc(File)) {
 #ifdef DEBUG
-		printf("\nCarriage return expected!\n");
+		printf("\nCarriage return expected at the end of the file!\n");
 #endif
-		return 6;
+		fclose(File);
+		return NULL;
 	}
-	for (y = 0; y < HEIGHT; y++)
-		for (x = 0; x < WIDTH; x++) {
-			R[x][y] = fgetc(File);
-			G[x][y] = fgetc(File);
-			B[x][y] = fgetc(File);
+
+	image = CreateImage(W, H);
+
+	if (!image) {
+#ifdef DEBUG
+			printf("\nError creating image from %s!\n", fname_tmp);
+#endif		
+		DeleteImage(image);
+		fclose(File);
+		return NULL;
+	}
+	else {
+		for (y = 0; y < image->Height; y++)
+			for (x = 0; x < image->Width; x++) {
+				SetPixelR(image, x, y, fgetc(File));
+				SetPixelG(image, x, y, fgetc(File));
+				SetPixelB(image, x, y, fgetc(File));
+			}
+
+		if (ferror(File)) {
+#ifdef DEBUG
+			printf("\nFile error while reading from file!\n");
+#endif
+			DeleteImage(image);
+			return NULL;
 		}
-	if (ferror(File)) {
+
 #ifdef DEBUG
-		printf("\nFile error while reading from file!\n");
+		printf("%s was read successfully!\n", fname_tmp);
 #endif
-		return 7;
+		fclose(File);
+		return image;
 	}
-#ifdef DEBUG
-	printf("%s was read successfully!\n", fname_tmp);
-#endif
-	fclose(File);
-	return 0;
 }
 
-int
-SaveImage(char fname[SLEN], unsigned char R[WIDTH][HEIGHT], unsigned char G[WIDTH][HEIGHT], unsigned char B[WIDTH][HEIGHT])
+/* Save Image */
+int SaveImage(const char fname[SLEN], IMAGE *image)
 {
 	FILE           *File;
 	int             x, y;
@@ -93,6 +119,9 @@ SaveImage(char fname[SLEN], unsigned char R[WIDTH][HEIGHT], unsigned char G[WIDT
 	char            ftype[] = ".ppm";
 	char            fname_tmp[SLEN];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
         char            fname_tmp2[SLEN];
+
+	unsigned int	WIDTH = image->Width;
+	unsigned int	HEIGHT = image->Height;
 
 	strcpy(fname_tmp, fname);
         strcpy(fname_tmp2, fname);
@@ -111,37 +140,21 @@ SaveImage(char fname[SLEN], unsigned char R[WIDTH][HEIGHT], unsigned char G[WIDT
 
 	for (y = 0; y < HEIGHT; y++)
 		for (x = 0; x < WIDTH; x++) {
-			fputc(R[x][y], File);
-			fputc(G[x][y], File);
-			fputc(B[x][y], File);
+			fputc(GetPixelR(image, x, y), File);
+			fputc(GetPixelG(image, x, y), File);
+			fputc(GetPixelB(image, x, y), File);
 		}
 
 	if (ferror(File)) {
 #ifdef DEBUG
-		printf("\nFile error while writing to file!\n");
+		printf("\nError while writing to file!\n");
 #endif
 		return 2;
 	}
 	fclose(File);
 #ifdef DEBUG
 	printf("%s was saved successfully. \n", fname_tmp2);
-#endif
-	/*
-	 * rename file to image.ppm, convert it to ~/public_html/<fname>.jpg
-	 * and make it world readable
-	 */
-	sprintf(SysCmd, "/users/grad2/doemer/eecs22/bin/pnmtojpeg_hw2.tcsh %s",
-		fname_tmp2);
-	if (system(SysCmd) != 0) {
-#ifdef DEBUG
-		printf("\nError while converting to JPG:\nCommand \"%s\" failed!\n", SysCmd);
-#endif
-		return 3;
-	}
-#ifdef DEBUG
-	printf("%s.jpg was stored for viewing. \n", fname_tmp);
-#endif
-
+#endif	
 	return (0);
 }
 
