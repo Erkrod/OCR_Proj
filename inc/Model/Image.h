@@ -1,3 +1,4 @@
+
 /*********************************************************************/ 
 /* Image.h: header file for basic image manipulations		     */ 
 /*                                                                   */
@@ -10,6 +11,7 @@
 #define IMAGE_H
 
 #include <assert.h>
+
 
 
 typedef struct {
