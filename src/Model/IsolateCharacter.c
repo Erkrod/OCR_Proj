@@ -59,14 +59,16 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
       if (x_border_end != -1) /* border start and end has been defined*/
 	break;
     }
+    
   char_width = x_border_end - x_border_start;
+  IMAGE * TempImage;
   for ( y=start_y; y<(image->Height-start_y-char_height); y=y+char_height )
     for ( x=x_border_start; x < image->Width-char_width; x=x+char_width)
       {
-	img = Crop(image,x,y,char_width,char_height);
+	TempImage = DuplicateImage(image);
+	img = CropImage(TempImage,x,y,x+char_width,y+char_height);
 	AppendImage(imglist, img);
       }
-
   /*printf("The x_border_start is %d. The x_border_end is %d. The char_width is %d.\n", x_border_start, x_border_end, char_width);*/
   /*printf("char height is %d, start_y is %d, image height is %d\n", char_height, start_y, image->Height);*/
   return imglist;

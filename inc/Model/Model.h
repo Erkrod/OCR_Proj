@@ -7,7 +7,7 @@
 #include "Image.h"
 
 
-IsolateCharacter(IMAGE * image, int fontsize, int scanres);
+ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres);
 
 /* this is the postProcessing function */
 /* where the character is chosen and put into a string to be output */

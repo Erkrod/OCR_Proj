@@ -12,7 +12,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 #include <stdlib.h>
 #include <string.h>
 
-#include "/home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h"
+#include "Model.h"
 
 int main()
 {
@@ -22,14 +22,14 @@ int main()
   IMAGE *image = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
-  char fname[50] = "CourierNew12_300DPI";
+  char fname[50] = "Images/CourierNew12_300DPI.ppm";
   char index[20];
   char sname[50];
 
   i=0;
 
   image = ReadImage(fname);
-  img = Crop(image,50,200,1400,500);
+  img = CropImage(image,50,200,1450,700);
   imglist = IsolateCharacter(img, 12, 300);
   curr = imglist->First;
   j = SaveImage("meow", img);
