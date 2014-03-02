@@ -1,3 +1,7 @@
+To compile, please do this:
+	setenv PKG_CONFIG_PATH /usr/share/pkgconfig
+	make OCR
+
 There are bugs at these locations:
 	- Read pgm or pbm or bmp will result in netpbm error
 
