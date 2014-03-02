@@ -16,6 +16,7 @@
 *.exe
 *.out
 *.app
+bin/*
 
 #temporary files of text editors
 *~
