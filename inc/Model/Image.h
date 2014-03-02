@@ -1,4 +1,3 @@
-
 /*********************************************************************/ 
 /* Image.h: header file for basic image manipulations		     */ 
 /*                                                                   */
@@ -10,9 +9,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+
 #include <assert.h>
-
-
 
 typedef struct {
 	unsigned int Width;	/* image width */

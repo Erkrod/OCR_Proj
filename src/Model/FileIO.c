@@ -1,4 +1,3 @@
-
 /*********************************************************************/ 
 /* FileIO.c: program file for I/O module	                     */ 
 /*                                                                   */
@@ -214,7 +213,6 @@ int SaveImage(const char fname[SLEN], IMAGE *image)
 	fclose(File);
 #ifdef DEBUG
 	printf("%s was saved successfully. \n", fname_tmp2);
-
 #endif
 
 	return (0);

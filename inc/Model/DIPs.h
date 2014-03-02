@@ -51,7 +51,7 @@ void AddNoise(IMAGE *image) ;
 /* Resize */
 IMAGE *Resize(	unsigned int percentage, IMAGE *image) ; 
 
-/* Juliaset */
-IMAGE *Juliaset(unsigned int W, unsigned int H, unsigned int max_iteration, long double zoom) ; 
+
+IMAGE *Crop(IMAGE *image, unsigned int x, unsigned int y, unsigned int W, unsigned int H);
 
 #endif

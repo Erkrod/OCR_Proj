@@ -1,3 +1,12 @@
+/*********************************************************************/ 
+/* Image.c: source code for basic image manipulations		     */ 
+/*                                                                   */
+/* 10/29/13 Alex Chu  updated for EECS22 assignment4 Fall2013	     */
+/* 10/30/12 Weiwei Chen  updated for EECS22 assignment4 FAll2012     */
+/* 10/20/11 Weiwei Chen: initial solution version                    */
+/*                       for EECS22 assignment4 FAll2011             */
+/*********************************************************************/
+
 #include "Image.h"
 #include <stdlib.h>
 #include <assert.h>
@@ -122,3 +131,4 @@ void DeleteImage(IMAGE *image)
 		
 	free(image);
 }
+
