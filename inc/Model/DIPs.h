@@ -17,6 +17,12 @@
 /*#include "Constants.h"*/
 #include <math.h>
 
+/*rotate image*/
+IMAGE *Rotate(IMAGE *image, int ClockwiseDegree);
+
+/*crop*/
+IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2);
+
 /*duplicate image*/
 IMAGE * DuplicateImage(IMAGE * image);
 

@@ -217,8 +217,8 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "RotateWindow", rotateWin);
  gtk_window_set_default_size(GTK_WINDOW(rotateWin), 230, 100);
  g_signal_connect (rotateWin, "destroy",
-		   G_CALLBACK (gtk_main_quit),
-		   NULL);
+		   G_CALLBACK (gtk_widget_hide),
+		   rotateWin);
 
  gtk_window_set_title (GTK_WINDOW (rotateWin), "Rotate Image");
  
@@ -274,8 +274,8 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
  closeButton = gtk_button_new_with_label ("Close");
  AddWidgetToViewHandle(MainViewHandle, "RotCloseButton", closeButton);
  g_signal_connect_swapped (closeButton, "clicked",
-			   G_CALLBACK (gtk_widget_destroy),
-			   rotateWin);
+			    G_CALLBACK (gtk_widget_hide),
+				rotateWin);
  gtk_box_pack_start (GTK_BOX (hbox), closeButton, TRUE, TRUE, 5);
 
  gtk_widget_show_all(rotateWin);
@@ -298,8 +298,8 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "CropWindow", cropWin);
  gtk_window_set_default_size(GTK_WINDOW(cropWin), 230, 100);
  g_signal_connect (cropWin, "destroy",
- 		   G_CALLBACK (gtk_main_quit),
- 		   NULL);
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   cropWin);
 
  gtk_window_set_title (GTK_WINDOW (cropWin), "Crop Image");
  
@@ -408,8 +408,8 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  closeButton = gtk_button_new_with_label ("Close");
  AddWidgetToViewHandle(MainViewHandle, "CropCloseButton", closeButton);
  g_signal_connect_swapped (closeButton, "clicked",
- 			   G_CALLBACK (gtk_widget_destroy),
- 			   cropWin);
+ 			   G_CALLBACK (gtk_widget_hide),
+ 		   cropWin);
  gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
 
  gtk_widget_show_all(cropWin); 

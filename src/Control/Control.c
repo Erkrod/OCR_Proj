@@ -45,10 +45,9 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 	
 	ViewHandle * MainViewHandle = ClickedObject->MainViewHandle;
 	ControlHandle * MainControlHandle = MainViewHandle->MainControlHandle;
-	/*ObjectHandle * CurrObject;*/
-	
-	
+	ObjectHandle * CurrObject;
 	IMAGE * NewImage = NULL;
+	int x1, y1, x2, y2, degree;
 		
 	/* char name[MAX_HASH_KEY_LENGTH];*//* = {"MainWindow", "RotateWindow"};*/
 #ifdef DEBUG
@@ -93,12 +92,52 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 		show_error("Not supported yet");
 	} else if (strcmp(ClickedObject->Name,"RemoveWrinkle") == 0){
 		show_error("Not supported yet");
-	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
-		
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){	
+		char nameRotateWindow[MAX_HASH_KEY_LENGTH] =  "RotateWindow";
+		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+		assert(CurrObject);
+		gtk_widget_show(CurrObject->Widget);		
+/*======================================================================*/		
+	} else if (strcmp(ClickedObject->Name,"RotateButton") == 0){	
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {
+			char nameRotateDegreeBox[MAX_HASH_KEY_LENGTH] =  "RotateSpinner";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateDegreeBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			degree = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+			NewImage = Rotate(MainControlHandle->MainImageList->Last->Image, degree);
+			AppendImage(MainControlHandle->MainImageList, NewImage);
+			UpdateDisplayImage(MainControlHandle);
+		}
 	} else if (strcmp(ClickedObject->Name,"LineBoundary") == 0){
 	
-		
+/*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"Crop") == 0){
+		char nameCropWindow[MAX_HASH_KEY_LENGTH] =  "CropWindow";
+		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameCropWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+		assert(CurrObject);
+		gtk_widget_show(CurrObject->Widget);		
+		
+		
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"CropButton") == 0){
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {
+			GetCropCoordinate(MainControlHandle, &x1, &y1, &x2, &y2);
+			if (x1 > MainControlHandle->MainImageList->Last->Image->Width ||
+				x2 > MainControlHandle->MainImageList->Last->Image->Width ||
+				y1 > MainControlHandle->MainImageList->Last->Image->Height ||
+				y2 > MainControlHandle->MainImageList->Last->Image->Height)
+				show_error("Coordinates out of bound");
+			else {
+				NewImage = CropImage(MainControlHandle->MainImageList->Last->Image, x1, y1, x2, y2);
+				AppendImage(MainControlHandle->MainImageList, NewImage);
+				UpdateDisplayImage(MainControlHandle);
+			}
+		}
 		
 		
 	} else if (strcmp(ClickedObject->Name,"PerformOCR") == 0){
@@ -166,6 +205,25 @@ void SaveTextFile(UT_string * OutputFileName){
 	
 }
 
+void GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, int * x2, int * y2){
+	char name1[MAX_HASH_KEY_LENGTH] =  "CropSpin";
+	char name2[MAX_HASH_KEY_LENGTH] =  "CropSpin2";
+	char name3[MAX_HASH_KEY_LENGTH] =  "CropSpin3";
+	char name4[MAX_HASH_KEY_LENGTH] =  "CropSpin4";
+	ObjectHandle * CurrObject;
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name1, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	*x1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	*y1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	*x2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name4, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	*y2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+}
 
 void show_error(const gchar * ErrorMessage)
 {
