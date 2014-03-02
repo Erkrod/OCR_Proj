@@ -330,7 +330,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "Croplabel", label);
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
 
  spinner = gtk_spin_button_new (adj, 0, 0);
  AddWidgetToViewHandle(MainViewHandle, "CropSpin", spinner);
@@ -345,7 +345,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("End :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
 
  spinner2 = gtk_spin_button_new (adj, 0, 0);
  AddWidgetToViewHandle(MainViewHandle, "CropSpin2", spinner2);
@@ -369,7 +369,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("Begin :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
 
  spinner3 = gtk_spin_button_new (adj, 0, 0);
  AddWidgetToViewHandle(MainViewHandle, "CropSpin3", spinner3);
@@ -383,7 +383,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("End :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
 
  spinner4 = gtk_spin_button_new (adj, 0, 0);
  AddWidgetToViewHandle(MainViewHandle, "CropSpin4", spinner4);
