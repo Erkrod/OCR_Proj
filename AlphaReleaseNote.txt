@@ -1,0 +1,5 @@
+There are bugs at these locations:
+	- Read pgm or pbm or bmp will result in netpbm error
+
+Features still under development:
+	- Remove wrinkles + coffee spot

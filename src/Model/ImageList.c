@@ -26,19 +26,20 @@ ILIST *NewImageList(void)
 void DeleteImageList(ILIST *l)
 {
 	IENTRY *curr, *succ;
+	if (l){
+		assert(l);
+		curr = l->First;
+		while(curr){
+			succ = curr->Next;
+			assert(curr->List == l);
+			DeleteImage(curr->Image);
+			curr->Image = NULL;
+			free(curr);
+			curr = succ;
+		}
 
-	assert(l);
-	curr = l->First;
-	while(curr){
-		succ = curr->Next;
-		assert(curr->List == l);
-		DeleteImage(curr->Image);
-		curr->Image = NULL;
-		free(curr);
-		curr = succ;
+		free(l);
 	}
-
-	free(l);
 }
 
 /* insert an image into a list */

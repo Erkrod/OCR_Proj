@@ -26,14 +26,14 @@ void Control_CleanUp(ControlHandle * MainHandle){
 
 void UpdateDisplayImage(ControlHandle * MainControlHandle){
 	ObjectHandle * CurrObject;
-	char name[MAX_HASH_KEY_LENGTH];
-	strcpy(name, "MainDisplayImage");
+	char name[MAX_HASH_KEY_LENGTH] =  "MainDisplayImage";
+	/*strcpy(name, "MainDisplayImage");*/
 	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 	assert(CurrObject);
 	
 	/*save last image to a temp file first*/
 	if (MainControlHandle->MainImageList->Last){
-		assert(SaveImage("Temp", MainControlHandle->MainImageList->Last->Image));
+		assert(!SaveImage("Temp", MainControlHandle->MainImageList->Last->Image));
 		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
 		gtk_widget_show(CurrObject->Widget);
 	}
@@ -57,22 +57,17 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 /*======================================================================*/
 	if (strcmp(ClickedObject->Name,"OpenFile") == 0){
 		OpenImageFile(MainControlHandle->InputImageFileName);
-		
-#ifdef DEBUG
-		printf("Input file name is %s\n", utstring_body(MainControlHandle->InputImageFileName));
-		utstring_printf(MainControlHandle->InputImageFileName, "/home/group1/Programming/EECS22L_Project2/Images/CourierNew12_300DPI.ppm");
-#endif
+		/*NEED TO PUT A FILTER HERE*/
 		/*load the image here*/
-#if JAMIE_READ_IMAGE
-	/*Jamie function*/
-#else
-		/*ReadImage(*/
-		
-#endif
-		DeleteImageList(MainControlHandle->MainImageList);
-		MainControlHandle->MainImageList = NewImageList();
-		AppendImage(MainControlHandle->MainImageList, NewImage);
-		UpdateDisplayImage(MainControlHandle);
+		NewImage = ReadImage(utstring_body(MainControlHandle->InputImageFileName));		
+		if (NewImage){
+			DeleteImageList(MainControlHandle->MainImageList);
+			MainControlHandle->MainImageList = NewImageList();
+			AppendImage(MainControlHandle->MainImageList, NewImage);
+			UpdateDisplayImage(MainControlHandle);
+		} else {
+			show_error("Can't read image");
+		}
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"SaveFile") == 0){
 		SaveTextFile(MainControlHandle->OutputFileName);
@@ -130,9 +125,11 @@ void OpenImageFile(UT_string * ImageFileName){
     {
         char *filename;        
         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (openFile));
+	  utstring_clear(ImageFileName);
         utstring_printf(ImageFileName, "%s", filename);
         g_free (filename);
     } else {
+	  utstring_clear(ImageFileName);
 	  utstring_printf(ImageFileName, "a");
     }
     gtk_widget_destroy (openFile);    
@@ -160,6 +157,7 @@ void SaveTextFile(UT_string * OutputFileName){
 		char *filename;
 
 		filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+		utstring_clear(OutputFileName);
 		utstring_printf(OutputFileName, "%s", filename);
 		g_free (filename);
 	}

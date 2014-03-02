@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model
+MODEL_LIB := Model FileIO DIPs Image ImageList
 
 CONTROL_LIB := Control
 
