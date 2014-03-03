@@ -6,9 +6,8 @@
 int main(void)
 {
   UT_array * CharProbabilities;
-  /*utarray_new(CharProbabilities , &CharProbability_icd);*/
   
-  CharProbability * p;
+  CharProbability * p =  utarray_front(CharProbabilities);
   
   IMAGE *img = NULL;
   int i;
@@ -28,8 +27,8 @@ int main(void)
   curr = imglist->First;
   j = SaveImage("meow", img);
   while (curr)
-  { UT_array * CharProbabilities;
-	CharProbabilities = IdentifyCharacter(curr->Image, imglist);
+  { 
+	/*CharProbabilities = IdentifyCharacter(curr->Image, imglist);*/
 	 for(p=(CharProbability*) utarray_front(CharProbabilities); p!=NULL; p=(CharProbability*)utarray_next(CharProbability,p)) {
    	printf("Chance of %c is %d percent\n", p->Char, p->Probability);
   }

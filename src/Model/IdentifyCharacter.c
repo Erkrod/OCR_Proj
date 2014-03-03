@@ -5,7 +5,7 @@
 UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template )
 {
 	UT_array * CharProbabilities;
-	UT_icd CharProbabilities_icd = {sizeof(CharProbability), NULL, NULL, NULL);
+	UT_icd CharProbabilities_icd = {sizeof(CharProbability), NULL, NULL, NULL};
 	utarray_new(CharProbabilities, &CharProbability_icd);
 	CharProbability * p;
 	char CharTemplate[94] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#$%^&*()_+`-={}|[]\\:\"<>?;',./";
@@ -32,7 +32,7 @@ UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template )
 			GImage = GetPixelG(Image, x, y);
 			
 			BTemplate = GetPixelB(CurrNode->Image, x, y);
-			BIMage = GetPixelB(Image, x, y);
+			BImage = GetPixelB(Image, x, y);
 			
 			if (RTemplate == RImage && GTemplate == GImage && BTemplate == BImage)
 			{
