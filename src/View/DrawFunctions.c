@@ -318,7 +318,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
  /* horizontal frame */
- frame = gtk_frame_new ("Horizontal");
+ frame = gtk_frame_new ("First coordiante");
  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
  
  hbox = gtk_hbox_new (FALSE, 30);
@@ -326,7 +326,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_container_set_border_width (GTK_CONTAINER (hbox), 15);
  gtk_container_add (GTK_CONTAINER (frame), hbox);
 
- label = gtk_label_new ("Begin :");
+ label = gtk_label_new ("X :");
  AddWidgetToViewHandle(MainViewHandle, "Croplabel", label);
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
@@ -342,7 +342,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (vbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox2), spinner, TRUE, TRUE, 0);
 
- label = gtk_label_new ("End :");
+ label = gtk_label_new ("Y :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
@@ -358,7 +358,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (vbox3), spinner2, TRUE, TRUE, 0);
 
  /* vertical frame */
- frame = gtk_frame_new ("Vertical");
+ frame = gtk_frame_new ("Second coordiante");
  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
  
  hbox2 = gtk_hbox_new (FALSE, 30);
@@ -366,7 +366,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_container_set_border_width (GTK_CONTAINER (hbox2), 15);
  gtk_container_add (GTK_CONTAINER (frame), hbox2);
 
- label = gtk_label_new ("Begin :");
+ label = gtk_label_new ("X :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
@@ -380,7 +380,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (vbox3), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), spinner3, TRUE, TRUE, 0);
 
- label = gtk_label_new ("End :");
+ label = gtk_label_new ("Y :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
