@@ -8,3 +8,9 @@ Ryan Morrison
 Jamie Lee
 Andrew Trinh
 Kevin Duong
+
+Note for beta release:
+ - Delete this line
+ - Move OCR.c to src
+ - Move all Test to test
+ - INSTALL
