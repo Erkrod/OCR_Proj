@@ -172,7 +172,7 @@ unsigned int FastImageList(ILIST *l, unsigned int ff_factor)
 	return j ; 
 } 
 
-
+#if 0
 void ResizeImageList(ILIST *l, unsigned int percentage)
 {
 	IENTRY *curr ; 
@@ -189,4 +189,4 @@ void ResizeImageList(ILIST *l, unsigned int percentage)
 		curr = curr->Next ; 
 	}	
 } 		
-
+#endif

@@ -22,14 +22,15 @@ int main()
   IMAGE *image = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
-  char fname[50] = "Images/CourierNew12_300DPI.ppm";
+//  char fname[50] = "Images/CourierNew12_300DPI.ppm";
+  char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
   char index[20];
   char sname[50];
 
   i=0;
 
   image = ReadImage(fname);
-  img = CropImage(image,50,200,1450,700);
+  img = CropImage(image,50,200,1450,1400);
   imglist = IsolateCharacter(img, 12, 300);
   curr = imglist->First;
   j = SaveImage("meow", img);

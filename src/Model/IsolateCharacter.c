@@ -1,4 +1,88 @@
 #include "Model.h"
+
+
+#if 1
+
+int IsPixelBlack(IMAGE * image, int x, int y){
+	if (GetPixelR(image, x, y) < 10 && GetPixelG(image, x, y) < 10 && GetPixelB(image, x, y) < 10) return 1;
+	return 0;
+}
+
+ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
+	/*variables*/
+	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1;
+	ILIST * imglist = NewImageList();
+
+	/*find top margin*/
+	for (i = 0; i < image->Height && TopMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && TopMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				TopMargin = i >= 7 ? i - 7 : 0;
+			}
+		}
+	}
+
+	assert(TopMargin > -1);
+
+	/*find left margin*/
+	for (i = 0; i < image->Width && LeftMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && LeftMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				LeftMargin = i >= 7 ? i - 7 : 0;
+			}
+		}
+	}
+
+	assert(LeftMargin > -1);
+
+	/*start cropping*/
+	int FontHeight = 47, FontWidth = 28;
+	IMAGE * TempImage, *img;
+	int k,l;
+	for (i = TopMargin; i < image->Height - FontHeight; i+=FontHeight+9){
+		for (j = LeftMargin; j < image->Width - FontWidth; j+=FontWidth+2){
+			
+			for (k = j; k < j+FontWidth; k++){
+				l = i;
+				SetPixelR(image, k,l, 30);
+				SetPixelG(image, k,l, 40);
+				SetPixelB(image, k,l, 100);			
+			}
+
+			for (k = j; k < j+FontWidth; k++){
+				l = i+FontHeight;
+				SetPixelR(image, k,l, 30);
+				SetPixelG(image, k,l, 40);
+				SetPixelB(image, k,l, 100);			
+			}
+	
+			for(l = i; l < i+FontHeight; l++){
+				k = j;
+				SetPixelR(image, k,l, 30);
+				SetPixelG(image, k,l, 40);
+				SetPixelB(image, k,l, 100);
+			}
+
+			for(l = i; l < i+FontHeight; l++){
+				k = j + FontWidth;
+				SetPixelR(image, k,l, 30);
+				SetPixelG(image, k,l, 40);
+				SetPixelB(image, k,l, 100);
+			}
+			/*TempImage = DuplicateImage(image);
+			img = CropImage(TempImage,j,i,j+FontWidth,i+FontHeight);
+			AppendImage(imglist, img);*/
+		}
+	}
+	SaveImage("Quan", image);
+	return imglist;
+}
+
+#else
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 {
   IMAGE * img;
@@ -73,3 +157,5 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
   /*printf("char height is %d, start_y is %d, image height is %d\n", char_height, start_y, image->Height);*/
   return imglist;
 }
+#endif
+
