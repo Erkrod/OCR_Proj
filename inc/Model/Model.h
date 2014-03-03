@@ -8,7 +8,7 @@
 
 
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres);
-
+UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
 /* this is the postProcessing function */
 /* where the character is chosen and put into a string to be output */
 UT_string * postProcessing(UT_array * );

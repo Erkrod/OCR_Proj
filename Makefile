@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model IsolateCharacter FileIO DIPs Image ImageList
+MODEL_LIB := Model Identify IsolateCharacter FileIO DIPs Image ImageList
 
 CONTROL_LIB := Control
 
@@ -77,6 +77,10 @@ TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	bin/TestIsolateCharacter
 	eog Quan.ppm
+	
+TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
+	$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	bin/TestIdentifyCharacter
 	
 OCR: build/OCR.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
 	$(CC) build/OCR.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
