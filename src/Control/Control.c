@@ -141,11 +141,11 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 		
 		
 	} else if (strcmp(ClickedObject->Name,"PerformOCR") == 0){
-		
+		show_error("Not supported yet");
 	} else if (strcmp(ClickedObject->Name,"EditText") == 0){
-		
+		show_error("Not supported yet");
 	} else if (strcmp(ClickedObject->Name,"Dictionary") == 0){
-		
+		show_error("Not supported yet");
 	}
 }
 

@@ -70,8 +70,8 @@ TestUTArray: build/utarray_example.o
 TestPostPo: build/TestPostProcessing.o $(MODEL_LIB_DEPEND)
 	$(CC) build/TestPostProcessing.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
 
-TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND)
-	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(GUI_LFLAGS) -o bin/$@ 
+TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
+	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	
 TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 

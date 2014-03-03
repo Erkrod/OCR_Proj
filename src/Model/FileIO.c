@@ -33,7 +33,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     //fprintf(stderr, "Conversion failed!\n");
     //exit(10);
 #ifdef DEBUG
-    printf("Conversion failed!\n";
+    printf("Conversion failed!\n");
 #endif
     return NULL;
    }
@@ -59,7 +59,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     //fprintf(stderr, "Conversion failed!\n");
     //exit(10);
 #ifdef DEBUG
-    printf("Conversion failed!\n";
+    printf("Conversion failed!\n");
 #endif
     return NULL;
     }
@@ -67,7 +67,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     //fprintf(stderr, "Conversion failed!\n");
     //exit(10);
 #ifdef DEBUG
-    printf("Conversion failed!\n";
+    printf("Conversion failed!\n");
 #endif
     return NULL;
     }
@@ -80,7 +80,7 @@ IMAGE * ReadImage(char *ImageFileName) {
      //fprintf(stderr, "Conversion failed!\n");
      //exit(10);
 #ifdef DEBUG
-    printf("Conversion failed!\n";
+    printf("Conversion failed!\n");
 #endif
     return NULL;
     }

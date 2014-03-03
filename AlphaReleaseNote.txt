@@ -1,9 +1,10 @@
-To compile, please do this:
+Before compiling anything, please do this:
 	setenv PKG_CONFIG_PATH /usr/share/pkgconfig
+
+The following make commands works:
+	make TestCharArray
+	make TestUTArray
+	make TestPostPo
+	make TestView
+	make TestIsolateCharacter
 	make OCR
-
-There are bugs at these locations:
-	- Read pgm or pbm or bmp will result in netpbm error
-
-Features still under development:
-	- Remove wrinkles + coffee spot
