@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model Identify IsolateCharacter FileIO DIPs Image ImageList
+MODEL_LIB := Model IdentifyCharacter IsolateCharacter FileIO DIPs Image ImageList
 
 CONTROL_LIB := Control
 

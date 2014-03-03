@@ -1,5 +1,7 @@
 #include "Model.h"
 
+
+
 UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template )
 {
 	UT_array * CharProbabilities;

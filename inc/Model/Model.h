@@ -4,6 +4,7 @@
 #include "ImageList.h"
 #include "ModelStructure.h"
 #include "utstring.h"
+#include "utarray.h"
 #include "Image.h"
 
 
@@ -15,5 +16,7 @@ UT_string * postProcessing(UT_array * );
 
 int SaveImage(const char fname[SLEN], IMAGE *image);
 IMAGE * ReadImage(char *ImageFileName);
+
+/*UT_icd CharProbability_icd = {sizeof(CharProbability), NULL, NULL, NULL };*/
 
 #endif

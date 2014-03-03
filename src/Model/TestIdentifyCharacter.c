@@ -3,10 +3,13 @@
 
 #include "Model.h"
 
-int main()
+int main(void)
 {
   UT_array * CharProbabilities;
+  /*utarray_new(CharProbabilities , &CharProbability_icd);*/
+  
   CharProbability * p;
+  
   IMAGE *img = NULL;
   int i;
   int j;
@@ -25,13 +28,12 @@ int main()
   curr = imglist->First;
   j = SaveImage("meow", img);
   while (curr)
-  {
+  { UT_array * CharProbabilities;
 	CharProbabilities = IdentifyCharacter(curr->Image, imglist);
-	 for(p=(CharProbability*)utarray_front(CharProbabilities);
-      p!=NULL;
-      p=(CharProbability*)utarray_next(CharProbability,p)) {
+	 for(p=(CharProbability*) utarray_front(CharProbabilities); p!=NULL; p=(CharProbability*)utarray_next(CharProbability,p)) {
    	printf("Chance of %c is %d percent\n", p->Char, p->Probability);
   }
 	curr = curr->Next;
   }
+  return 0;
 }
