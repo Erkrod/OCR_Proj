@@ -24,7 +24,7 @@
 typedef struct {
 	char Char;
 	int Probability;
-} CharProbability;
+} CharProbability;	
 
 typedef struct {
 	UT_array * CharChoices;
