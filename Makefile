@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model Identify IsolateCharacter FileIO DIPs Image ImageList
+MODEL_LIB := Model postProcessing IsolateCharacter FileIO DIPs Image ImageList
 
 CONTROL_LIB := Control
 
@@ -67,16 +67,14 @@ TestCharArray: build/ExampleCharArray.o
 TestUTArray: build/utarray_example.o
 	$(CC) $(CFLAGS) $< -o bin/$@
 
-TestPostPo: build/postProcessing.o
-	$(CC) $(CFLAGS) $< -o bin/$@
+TestPostPo: build/TestPostProcessing.o $(MODEL_LIB_DEPEND)
+	$(CC) build/TestPostProcessing.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
 
 TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND)
 	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(GUI_LFLAGS) -o bin/$@ 
 	
 TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
-	bin/TestIsolateCharacter
-	eog Quan.ppm
 	
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 

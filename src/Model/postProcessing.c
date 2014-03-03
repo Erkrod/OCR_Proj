@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "utstring.h"
-#include "utarray.h"
-#include "ModelStructure.h"
+#include "Model.h"
+
 
 void CharProfile_free(void * profile_in){
 	CharProfile * profile = (CharProfile *) profile_in;
