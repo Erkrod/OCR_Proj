@@ -6,7 +6,7 @@ UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template )
 	UT_icd CharProbabilities_icd = {sizeof(CharProbability), NULL, NULL, NULL);
 	utarray_new(CharProbabilities, &CharProbability_icd);
 	CharProbability * p;
-	char CharTemplate[93] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#$%^&*()_+`-={}|[]\\:\"<>?;',./";
+	char CharTemplate[94] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~!@#$%^&*()_+`-={}|[]\\:\"<>?;',./";
 	IENTRY * CurrNode = Template->First;
 	int Index;
 	
