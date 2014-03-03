@@ -3,17 +3,17 @@ clean:
 	-rm -f test*.ppm
 	-rm -f *.o
 
-TestIsolate: DIPs.o FileIO.o Model.o Image.o ImageList.o TestIsolateCharacter.o
-	gcc -o TestIsolateCharacter DIPs.o FileIO.o Model.o Image.o ImageList.o TestIsolateCharacter.o	
+TestIsolate: DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o
+	gcc -o TestIsolateCharacter DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o	
 
-TestIsolateGDB: DIPsGDB.o FileIOGDB.o ModelGDB.o ImageGDB.o ImageListGDB.o TestIsolateCharacterGDB.o
-	gcc -o TestIsolateCharacter DIPs.o FileIO.o Model.o Image.o ImageList.o TestIsolateCharacter.o -g
+TestIsolateGDB: DIPsGDB.o FileIOGDB.o IsolateCharacterGDB.o ImageGDB.o ImageListGDB.o TestIsolateCharacterGDB.o
+	gcc -o TestIsolateCharacter DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o -g
 
 TestIsolateCharacter.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h TestIsolateCharacter.c
 	gcc -c TestIsolateCharacter.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
 
-Model.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h Model.c
-	gcc -c Model.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+IsolateCharacter.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h IsolateCharacter.c
+	gcc -c IsolateCharacter.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
 
 DIPs.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/DIPs.h DIPs.c
 	gcc -c DIPs.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
@@ -30,8 +30,8 @@ ImageList.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/ImageList.h ImageLi
 TestIsolateCharacterGDB.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h TestIsolateCharacter.c
 	gcc -g -c TestIsolateCharacter.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
 
-ModelGDB.o: Model.c /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h
-	gcc -g -c Model.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+IsolateCharacterGDB.o: IsolateCharacter.c /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h
+	gcc -g -c IsolateCharacter.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
 
 DIPsGDB.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/DIPs.h DIPs.c
 	gcc -c DIPs.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model

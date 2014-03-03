@@ -10,20 +10,19 @@
 #include <stdio.h> 
 #include <string.h>
 #include <stdlib.h>
-#include "Constants.h"
 #include "FileIO.h"
 #include "Image.h"
 
 /*** function definitions ***/
 /* Read Image */
-IMAGE *ReadImage(const char fname[SLEN])
+IMAGE *ReadImage(const char fname[80])
 {
 	FILE           *File;
-	char            Type[SLEN];
+	char            Type[80];
 	int             W, H, MaxValue;
 	unsigned int    x, y;
 	char            ftype[] = ".ppm";
-        char            fname_tmp[SLEN];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
+        char            fname_tmp[80];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
 
 	IMAGE		*image;
 
@@ -116,15 +115,15 @@ IMAGE *ReadImage(const char fname[SLEN])
 }
 
 /* Save Image */
-int SaveImage(const char fname[SLEN], IMAGE *image)
+int SaveImage(const char fname[80], IMAGE *image)
 {
 	FILE           *File;
 	int             x, y;
-	char            SysCmd[SLEN * 5];
+	char            SysCmd[80 * 5];
 
 	char            ftype[] = ".ppm";
-	char            fname_tmp[SLEN];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
-        char            fname_tmp2[SLEN];
+	char            fname_tmp[80];  /*avoid to modify on the original pointer, 11/10/10, X.Han*/
+        char            fname_tmp2[80];
 
 	unsigned int	WIDTH = image->Width;
 	unsigned int	HEIGHT = image->Height;
