@@ -1,5 +1,4 @@
 #include "Model.h"
-
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 {
   IMAGE * img;
@@ -78,6 +77,8 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	  if (y_flag > 0)
 	    break;
 	}
+      if (start_y + char_height > (image->Height-1))
+	break;
     }
   /*
   char_width = x_border_end - x_border_start;
