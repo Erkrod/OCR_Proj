@@ -83,7 +83,7 @@ void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
 	specialCharacter[21] = '|';
 	specialCharacter[22] = ';';
 	specialCharacter[23] = ':';
-	specialCharacter[24] = ''';
+	specialCharacter[24] = '\'';
 	specialCharacter[25] = '"';
 	specialCharacter[26] = ',';
 	specialCharacter[27] = '<';
