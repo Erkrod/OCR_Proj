@@ -17,12 +17,14 @@ IMAGE * ReadImage(char *ImageFileName) {
   FILE           *File;
   /*char           *Type, *TypeTest;*/
   char            MagicNum[5];
-  int             W, H, MaxValue;
+  int             W, H, MaxValue, value;
   unsigned int    x, y;
   IMAGE			*image;
-  /*int i;
-  int testFlag = 0;*/
+  int typeFlag;  // 1 = pbm; 2 = pgm; 3 = ppm
+  int i;
+  //int testFlag = 0;
   UT_string       *command;
+  unsigned char temp;
 
 
   // create command to convert image
@@ -37,7 +39,6 @@ IMAGE * ReadImage(char *ImageFileName) {
 #endif
     return NULL;
    }
-
 
   // reading the .ppm file based on FileIO from last qtr
   // includes finding the 'magic number' and calling either pgmtoppm, pbmtopgm then pgmtoppm, or leaving as is
@@ -55,40 +56,19 @@ IMAGE * ReadImage(char *ImageFileName) {
 #ifdef DEBUG
     printf("Case: .pbm\n");
 #endif
-    if(0 != system("pbmtopgm imageToPNM.ppm > imageToPGM.ppm")) {
-    //fprintf(stderr, "Conversion failed!\n");
-    //exit(10);
-#ifdef DEBUG
-    printf("Conversion failed!\n");
-#endif
-    return NULL;
-    }
-    if(0 != system("pgmtoppm imageToPGM.ppm > image.ppm")) {
-    //fprintf(stderr, "Conversion failed!\n");
-    //exit(10);
-#ifdef DEBUG
-    printf("Conversion failed!\n");
-#endif
-    return NULL;
-    }
+    typeFlag = 1;
   }
   else if(MagicNum[0] == 'P' && (MagicNum[1] == '2' || MagicNum[1] == '5')) {
 #ifdef DEBUG
     printf("Case: .pgm\n");
 #endif
-    if(0 != system("pgmtoppm imageToPNM.ppm > image.ppm")) {
-     //fprintf(stderr, "Conversion failed!\n");
-     //exit(10);
-#ifdef DEBUG
-    printf("Conversion failed!\n");
-#endif
-    return NULL;
-    }
+    typeFlag = 2;
   }
   else if(MagicNum[0] == 'P' && (MagicNum[1] == '3' || MagicNum[1] == '6')) {
 #ifdef DEBUG
     printf("Case: .ppm\n");
 #endif
+    typeFlag = 3;
   }
   else {
 #ifdef DEBUG
@@ -116,22 +96,6 @@ IMAGE * ReadImage(char *ImageFileName) {
     return NULL;
   }
 
-  fscanf(File, "%d", &MaxValue);
-  if (MaxValue != 255) {
-#ifdef DEBUG
-    printf("\nUnsupported image maximum value %d!\n", MaxValue);
-#endif
-    fclose(File);
-    return NULL;
-  }
-  if ('\n' != fgetc(File)) {
-#ifdef DEBUG
-    printf("\nCarriage return expected at the end of the file!\n");
-#endif
-    fclose(File);
-    return NULL;
-  }
-
   image = CreateImage(W, H);
 
   if (!image) {
@@ -142,27 +106,111 @@ IMAGE * ReadImage(char *ImageFileName) {
     fclose(File);
     return NULL;
   }
-  else {
-    for (y = 0; y < image->Height; y++)
+
+
+  // case: if image is ppm
+  if(typeFlag == 3) {
+    fscanf(File, "%d", &MaxValue);
+    if (MaxValue != 255) {
+#ifdef DEBUG
+      printf("\nUnsupported image maximum value %d!\n", MaxValue);
+#endif
+      fclose(File);
+      return NULL;
+    }
+    if ('\n' != fgetc(File)) {
+#ifdef DEBUG
+      printf("\nCarriage return expected at the end of the file!\n");
+#endif
+      fclose(File);
+      return NULL;
+    }
+    for (y = 0; y < image->Height; y++) {
       for (x = 0; x < image->Width; x++) {
 	SetPixelR(image, x, y, fgetc(File));
 	SetPixelG(image, x, y, fgetc(File));
 	SetPixelB(image, x, y, fgetc(File));
       }
-
-    if (ferror(File)) {
+    }
+  }
+  // case: if image is pgm
+  else if(typeFlag == 2) {
+    printf("Case PGM\n");
+    fscanf(File, "%d", &MaxValue);
+    if (MaxValue <= 0 || MaxValue > 255) {
 #ifdef DEBUG
-      printf("\nFile error while reading from file!\n");
+      printf("\nUnsupported image maximum value %d!\n", MaxValue);
 #endif
-      DeleteImage(image);
+      fclose(File);
       return NULL;
     }
+    if ('\n' != fgetc(File)) {
+#ifdef DEBUG
+      printf("\nCarriage return expected at the end of the file!\n");
+#endif
+      fclose(File);
+      return NULL;
+    }
+    for (y = 0; y < image->Height; y++) {
+      for (x = 0; x < image->Width; x++) {
+	value = fgetc(File) * 255/MaxValue;
+	SetPixelR(image, x, y, value);
+	SetPixelG(image, x, y, value);
+	SetPixelB(image, x, y, value);
+      }
+    }
+  }
+  // case: if image is pbm
+  else if(typeFlag == 1) {
+
+    if ('\n' != fgetc(File)) {
+#ifdef DEBUG
+      printf("\nCarriage return expected at the end of the file!\n");
+#endif
+      fclose(File);
+      return NULL;
+    }
+    y = 0;
+    while(y < image->Height) {
+      x = 0;
+      while(x < image->Width) {
+	value = fgetc(File);
+	temp = 0x80;
+	for(i = 0; i < 8; i++) {
+	  if(x < image->Width) {
+	  if(value & temp) {
+	    SetPixelR(image, x, y, 0);
+	    SetPixelG(image, x, y, 0);
+	    SetPixelB(image, x, y, 0);
+	  }
+	  else {
+	    SetPixelR(image, x, y, 255);
+	    SetPixelG(image, x, y, 255);
+	    SetPixelB(image, x, y, 255);
+	  }
+	  }
+	x++;
+	temp >>= 1;
+	}
+      }
+      y++;
+    }
+  }
+
+
+
+  if (ferror(File)) {
+#ifdef DEBUG
+    printf("\nFile error while reading from file!\n");
+#endif
+    DeleteImage(image);
+    return NULL;
+  }
 
 #ifdef DEBUG
-    printf("%s was read successfully!\n", ImageFileName);
+  printf("%s was read successfully!\n", ImageFileName);
 #endif
-    fclose(File);
-  }
+  fclose(File);
 
 
   return image;
