@@ -14,8 +14,8 @@ void postProcessingCleanUP(UT_array * , UT_array * );
 UT_string * postProcessing2(UT_array *);
 UT_array * getThreeKeyword(CharProfile *, UT_array *);
 
-CharProbability * getTopProb(UT_array *);
-CharProbability * getSecondProb(UT_array *);
+char * getTopProb(UT_array *);
+char * getSecondProb(UT_array *);
 
 void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
 {
@@ -241,19 +241,28 @@ UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList)
 	char * top;
 	char * second;
 	char * concatWord;
+	CharProfile * tempPosition = currCharProfile;
 	
 	UT_array * wordBank;
 	utarray_new(wordBank, &ut_str_icd);
 	
 	int i, j;
 
-	top = getTopProb(currCharProfile)->Char;
-	second = getSecondProb(currCharProfile)->Char;
-	
 	for (i = 0; i < 3; i++)
 	{
+		top = getTopProb(currCharProfile);
+		second = getSecondProb(currCharProfile);
+	
 		for (j = 0; j < 3; j++)
 		{
+			if (j > 0)
+			{
+				tempPosition = utarray_next(charList, tempPosition);
+			}
+				
+			top = getTopProb(tempPosition);
+			second = getSecondProb(tempPositon);
+			
 			if (i == j)
 			{
 				strcat(concatWord, second);
@@ -266,13 +275,17 @@ UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList)
 		utarray_push_back(wordBank, concatWord);
 	}
 }
-CharProbability * getTopProb(UT_array * currCharProfile)
+char * getTopProb(UT_array * currCharProfile)
 {
-	return utarray_front(currCharProfile);
+	CharProbability * currCharProbability = NULL;
+	currCharProbability = utarray_front(currCharProfile);
+	return currCharProbability->Char;
 }
-CharProbability * getSecondProb(UT_array * currCharProfile)
+char * getSecondProb(UT_array * currCharProfile)
 {
-	return utarray_next(utarray_front(currCharProfile), currCharProfile);
+	CharProbability * currCharProbability = NULL;
+	currCharProbability = utarray_next(utarray_front(currCharProfile), currCharProfile);
+	return currCharProbability->Char;
 }
 
 char *wordCompare(UT_array *);
