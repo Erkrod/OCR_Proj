@@ -79,6 +79,7 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 
 	image_tmp = CreateImage(W, H);
 
+#if 0
 	for (i = x1; i <= x2; i++) {
 		for (j = y1; j <= y2; j++) {
 				SetPixelR(image_tmp, i-x1, j-y1, GetPixelR(image, i, j));
@@ -86,8 +87,15 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 				SetPixelB(image_tmp, i-x1, j-y1, GetPixelB(image, i, j));
 		}
 	}
+#else
+	for (j = y1; j <= y2; j++) {
+		memcpy(image_tmp->R + (j-y1) * image_tmp->Width, image->R + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
+		memcpy(image_tmp->G + (j-y1) * image_tmp->Width, image->G + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
+		memcpy(image_tmp->B + (j-y1) * image_tmp->Width, image->B + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
+	}
+#endif
 
-	DeleteImage(image);
+	/*DeleteImage(image);*/
 	image = NULL;
 	return image_tmp;
 }
