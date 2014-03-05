@@ -14,6 +14,8 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
+#define IMAGE_CHOICE 2
+
 int main()
 {
   IMAGE *img = NULL;
@@ -28,14 +30,18 @@ int main()
   char sname[50];
 
   i=0;
-#if 0
+#if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
   image = ReadImage(fname);
   img = CropImage(image,50,200,1400,750);
-#else
+#elif IMAGE_CHOICE == 1
   char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
   image = ReadImage(fname);
   img = CropImage(image,50,200,1450,1400);
+#elif IMAGE_CHOICE == 2
+  char fname[50] = "Images/31_OCRtest_Courier_Clean300DPI.jpg";
+  image = ReadImage(fname);
+  img = CropImage(image,100,250,2100,2750);
 #endif
   imglist = IsolateCharacter(img, 12, 300);
   DeleteImageList(imglist);
