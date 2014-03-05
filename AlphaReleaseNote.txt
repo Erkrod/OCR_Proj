@@ -1,3 +1,4 @@
+
 Before compiling anything, please do this:
 	setenv PKG_CONFIG_PATH /usr/share/pkgconfig
 

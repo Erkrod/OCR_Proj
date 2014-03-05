@@ -1,0 +1,5 @@
+Before doing any make please do this:
+setenv PKG_CONFIG_PATH /usr/share/pkgconfig
+
+To make program:
+	make OCR

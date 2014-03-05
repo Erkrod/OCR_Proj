@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include "DIPs.h"
+#include "ImageProcessing.h"
 #include "Image.h"
 
 typedef struct ImageList ILIST;

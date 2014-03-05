@@ -97,13 +97,16 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 IMAGE * DuplicateImage(IMAGE * image){
 	IMAGE * NewImage = CreateImage(image->Width, image->Height);
 	int i, j;
-	for (i = 0; i < image->Width; i++){
+	memcpy(NewImage->R, image->R, sizeof(unsigned char) * image->Width * image->Height);
+	memcpy(NewImage->G, image->G, sizeof(unsigned char) * image->Width * image->Height);
+	memcpy(NewImage->B, image->B, sizeof(unsigned char) * image->Width * image->Height);
+	/*for (i = 0; i < image->Width; i++){
 		for (j = 0; j < image->Height; j++){
 			SetPixelR(NewImage, i, j, GetPixelR(image, i, j));
 			SetPixelG(NewImage, i, j, GetPixelG(image, i, j));
 			SetPixelB(NewImage, i, j, GetPixelB(image, i, j));
 		}
-	}
+	}*/
 	
 	return NewImage;
 }
