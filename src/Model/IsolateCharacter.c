@@ -18,7 +18,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 		BlackPixelCount = 0;
 		for (j = 0; j < image->Width && TopMargin == -1; j++){
 			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
-			if (BlackPixelCount > 5) {
+			if (BlackPixelCount > 2) {
 				TopMargin = i >= 7 ? i - 7 : 0;
 			}
 		}
@@ -44,7 +44,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 		BlackPixelCount = 0;
 		for (j = 0; j < image->Height && LeftMargin == -1; j++){
 			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
-			if (BlackPixelCount > 5) {
+			if (BlackPixelCount > 2) {
 				LeftMargin = i >= 7 ? i - 7 : 0;
 			}
 		}
