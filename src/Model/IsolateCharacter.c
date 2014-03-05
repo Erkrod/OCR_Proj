@@ -10,7 +10,7 @@ int IsPixelBlack(IMAGE * image, int x, int y){
 
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 	/*variables*/
-	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1;
+	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	ILIST * imglist = NewImageList();
 
 	/*find top margin*/
@@ -25,6 +25,19 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 	}
 
 	assert(TopMargin > -1);
+	
+	/*find bottom margin*/
+	for (i = image->Height-1; i > TopMargin && BottomMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && BottomMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				BottomMargin = i < (image->Height - 8) ? i + 7 : image->Height - 1;
+			}
+		}
+	}
+
+	assert(BottomMargin > -1);
 
 	/*find left margin*/
 	for (i = 0; i < image->Width && LeftMargin == -1; i++){
@@ -38,47 +51,96 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 	}
 
 	assert(LeftMargin > -1);
-
+	
+	/*find right margin*/
+	/* It seems that this method won't work on right margin
+	 * for (i = image->Width-1; i > LeftMargin  && RightMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && RightMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				RightMargin = i < image->Width - 7 ? i : image->Width - 1;
+			}
+		}
+	}*/
+	
+	RightMargin = image->Width - 1;
+	assert(RightMargin > -1);
+	
 	/*start cropping*/
-	int FontHeight = 47, FontWidth = 28;
+	double FontHeight = 47.4, FontWidth = 28.1;
+	double FontHeightSpace = 9.1, FontWidthSpace = 1.80;
+	int AreaTop, AreaBottom, AreaLeft, AreaRight;
+	int CharCounter, LineCounter;
 	IMAGE * TempImage, *img;
 	int k,l;
-	for (i = TopMargin; i < image->Height - FontHeight; i+=FontHeight+9){
-		for (j = LeftMargin; j < image->Width - FontWidth; j+=FontWidth+2){
+#ifdef DEBUG
+	IMAGE * ToCheckImage = DuplicateImage(image);
+	printf("RightMargin = %d\n", RightMargin);
+	for(l = 0; l < image->Height; l++){
+		SetPixelR(ToCheckImage, RightMargin,l, 200);
+		SetPixelG(ToCheckImage, RightMargin,l, 40);
+		SetPixelB(ToCheckImage, RightMargin,l, 30);
+	}
+	printf("BottomMargin = %d\n", BottomMargin);
+	for(l = 0; l < image->Width; l++){
+		SetPixelR(ToCheckImage, l,BottomMargin, 200);
+		SetPixelG(ToCheckImage, l,BottomMargin, 40);
+		SetPixelB(ToCheckImage, l,BottomMargin, 30);
+	}
+#endif	
+	LineCounter = 0;
+	for (i = TopMargin; i < BottomMargin - FontHeight; i=floor(TopMargin + LineCounter*(FontHeight+FontHeightSpace))){
+		LineCounter++;
+		CharCounter = 0;
+		for (j = LeftMargin; j < RightMargin - (int)FontWidth; j=LeftMargin + floor(CharCounter*(FontWidth+FontWidthSpace))){
+			CharCounter++;
 			
-			for (k = j; k < j+FontWidth; k++){
-				l = i;
-				SetPixelR(image, k,l, 30);
-				SetPixelG(image, k,l, 40);
-				SetPixelB(image, k,l, 100);			
+			AreaTop = i;
+			AreaBottom = ceil(i + FontHeight) < image->Height ? ceil(i + FontHeight) : image->Height - 1;
+			AreaLeft = j;
+			AreaRight = ceil(j + FontWidth) < image->Width ? ceil(j + FontWidth) : image->Width - 1;
+			
+			
+#ifdef DEBUG	
+			/*mark the crop area*/
+			/*top*/
+			for (k = AreaLeft; k <= AreaRight; k++){
+				SetPixelR(ToCheckImage, k,AreaTop, 30);
+				SetPixelG(ToCheckImage, k,AreaTop, 40);
+				SetPixelB(ToCheckImage, k,AreaTop, 100);			
 			}
 
-			for (k = j; k < j+FontWidth; k++){
-				l = i+FontHeight;
-				SetPixelR(image, k,l, 30);
-				SetPixelG(image, k,l, 40);
-				SetPixelB(image, k,l, 100);			
+			/*bottom*/
+			for (k = AreaLeft; k <= AreaRight; k++){
+				SetPixelR(ToCheckImage, k,AreaBottom, 30);
+				SetPixelG(ToCheckImage, k,AreaBottom, 40);
+				SetPixelB(ToCheckImage, k,AreaBottom, 100);			
 			}
 	
-			for(l = i; l < i+FontHeight; l++){
-				k = j;
-				SetPixelR(image, k,l, 30);
-				SetPixelG(image, k,l, 40);
-				SetPixelB(image, k,l, 100);
+			/*left*/
+			for(l = AreaTop; l < AreaBottom; l++){
+				SetPixelR(ToCheckImage, AreaLeft,l, 30);
+				SetPixelG(ToCheckImage, AreaLeft,l, 40);
+				SetPixelB(ToCheckImage, AreaLeft,l, 100);
 			}
 
-			for(l = i; l < i+FontHeight; l++){
-				k = j + FontWidth;
-				SetPixelR(image, k,l, 30);
-				SetPixelG(image, k,l, 40);
-				SetPixelB(image, k,l, 100);
+			for(l = AreaTop; l < AreaBottom; l++){
+				SetPixelR(ToCheckImage, AreaRight,l, 30);
+				SetPixelG(ToCheckImage, AreaRight,l, 40);
+				SetPixelB(ToCheckImage, AreaRight,l, 100);
 			}
-			/*TempImage = DuplicateImage(image);
-			img = CropImage(TempImage,j,i,j+FontWidth,i+FontHeight);
-			AppendImage(imglist, img);*/
+#endif			
+			TempImage = DuplicateImage(image);
+			img = CropImage(TempImage,AreaLeft, AreaTop, AreaRight, AreaBottom);
+			AppendImage(imglist, img);
+
 		}
 	}
-	SaveImage("Quan", image);
+#ifdef DEBUG
+	SaveImage("CheckIsolate", ToCheckImage);
+	DeleteImage(ToCheckImage);
+#endif
 	return imglist;
 }
 
