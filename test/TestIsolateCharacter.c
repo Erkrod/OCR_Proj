@@ -22,32 +22,24 @@ int main()
   IMAGE *image = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
-//  char fname[50] = "Images/CourierNew12_300DPI.ppm";
-  char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
+  
+  
   char index[20];
   char sname[50];
 
   i=0;
-
+#if 0
+  char fname[50] = "Images/CourierNew12_300DPI.ppm";
+  image = ReadImage(fname);
+  img = CropImage(image,50,200,1400,750);
+#else
+  char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
   image = ReadImage(fname);
   img = CropImage(image,50,200,1450,1400);
+#endif
   imglist = IsolateCharacter(img, 12, 300);
-  curr = imglist->First;
-  j = SaveImage("meow", img);
-
-
-  while (curr)
-    {
-      sprintf(index, "%d", i);
-      strcpy(sname, "test");
-      strcat(sname, index);
-      
-      j = SaveImage(sname, curr->Image);
-      curr = curr->Next;
-      i++;
-      
-    }
-
+  DeleteImageList(imglist);
+ 
 
   return 0;
 

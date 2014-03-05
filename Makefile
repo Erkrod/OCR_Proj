@@ -1,7 +1,7 @@
 #get lib sdl ready to compile
 
 CC	:= gcc
-CFLAGS	:= -g -Wall
+CFLAGS	:= -g -Wall -O2
 LDFLAGS := -lm
 
 #take care of test flags
@@ -81,6 +81,8 @@ TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_D
 TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	@bin/TestIsolateCharacter
+	@eog CheckIsolate.ppm
 	
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
