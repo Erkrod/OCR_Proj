@@ -13,17 +13,16 @@ int main()
   IMAGE *image = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
-  char fname[50] = "CourierNew12_300DPI";
-  char index[20];
-  char sname[50];
+  char fname[50] = "Images/CourierNew12_300DPI.ppm";
+
 
   i=0;
 
   image = ReadImage(fname);
-  img = Crop(image,50,200,1400,500);
+  img = CropImage(image,50,200,1400,500);
   imglist = IsolateCharacter(img, 12, 300);
   curr = imglist->First;
-  j = SaveImage("meow", img);
+
   while (curr)
   {
 	CharProbabilities = IdentifyCharacter(curr->Image, imglist);
@@ -34,4 +33,5 @@ int main()
   }
 	curr = curr->Next;
   }
+return 0;
 }

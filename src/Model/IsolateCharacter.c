@@ -73,9 +73,9 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 				SetPixelG(image, k,l, 40);
 				SetPixelB(image, k,l, 100);
 			}
-			/*TempImage = DuplicateImage(image);
+			TempImage = DuplicateImage(image);
 			img = CropImage(TempImage,j,i,j+FontWidth,i+FontHeight);
-			AppendImage(imglist, img);*/
+			AppendImage(imglist, img);
 		}
 	}
 	SaveImage("Quan", image);
