@@ -4,8 +4,12 @@
 #if 1
 
 int IsPixelBlack(IMAGE * image, int x, int y){
-	if (GetPixelR(image, x, y) < 10 && GetPixelG(image, x, y) < 10 && GetPixelB(image, x, y) < 10) return 1;
-	return 0;
+	if (GetPixelR(image, x, y) >= 10) return 0;
+	if (GetPixelG(image, x, y) >= 10) return 0;
+	if (GetPixelB(image, x, y) >= 10) return 0;
+	return 1;
+	/*if (GetPixelR(image, x, y) < 10 && GetPixelG(image, x, y) < 10 && GetPixelB(image, x, y) < 10) return 1;
+	return 0;*/
 }
 
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
@@ -131,8 +135,14 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 				SetPixelB(ToCheckImage, AreaRight,l, 100);
 			}
 #endif			
+	
+#if 0
 			TempImage = DuplicateImage(image);
+#else
+			TempImage = image;
+#endif
 			img = CropImage(TempImage,AreaLeft, AreaTop, AreaRight, AreaBottom);
+			
 			AppendImage(imglist, img);
 
 		}
