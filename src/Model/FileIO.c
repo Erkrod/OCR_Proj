@@ -29,7 +29,14 @@ IMAGE * ReadImage(char *ImageFileName) {
 
   // create command to convert image
   utstring_new(command);
-  utstring_printf(command, "anytopnm %s > imageToPNM.ppm", ImageFileName);
+
+  if(strstr(ImageFileName, ".bmp")) {
+    utstring_printf(command, "bmptoppm %s > imageToPNM.ppm", ImageFileName);
+  }
+  else {
+    utstring_printf(command, "anytopnm %s > imageToPNM.ppm", ImageFileName);
+  }
+
 
   if(0 != system(utstring_body(command))) {
     //fprintf(stderr, "Conversion failed!\n");
@@ -135,7 +142,6 @@ IMAGE * ReadImage(char *ImageFileName) {
   }
   // case: if image is pgm
   else if(typeFlag == 2) {
-    printf("Case PGM\n");
     fscanf(File, "%d", &MaxValue);
     if (MaxValue <= 0 || MaxValue > 255) {
 #ifdef DEBUG
