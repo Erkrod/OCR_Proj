@@ -19,18 +19,11 @@ Output will be multiple ppm files, each file represents a character you isolate,
 int main()
 {
   IMAGE *img = NULL;
-  int i;
-  int j;
+
   IMAGE *image = NULL;
   IMAGE *PreviewImage = NULL;
-  ILIST *imglist = NULL;
-  IENTRY *curr;
-  
-  
-  char index[20];
-  char sname[50];
-
-  i=0;
+  ILIST *imglist = NULL;  
+ 
 #if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
   image = ReadImage(fname);
@@ -67,8 +60,10 @@ int main()
 #endif
   assert(imglist && PreviewImage);
   SaveImage("CheckIsolate", PreviewImage);
-  
+  DeleteImage(PreviewImage);
+/*  
   char Name[50];
+    int i;
   IENTRY * CurrEntry = imglist->First;
   for (i = 0; i < 20 && CurrEntry; i++, CurrEntry = CurrEntry->Next){	  
 #if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
@@ -77,7 +72,7 @@ int main()
 	  sprintf(Name, "AndrewTest/LucidaConsole/Lucida%02d", i);
 #endif
 	  SaveImage(Name, CurrEntry->Image);
-  }
+  }*/
   DeleteImageList(imglist);
    
 

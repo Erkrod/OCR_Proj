@@ -12,92 +12,113 @@ int IsPixelBlack(IMAGE * image, int x, int y){
 	return 0;*/
 }
 
+void GetIsolateCharacterConstant(FontType Font, int fontsize, int scanres, double * FontHeight, double * FontWidth, double * FontHeightSpace, double * FontWidthSpace, int * TopOffset, int * LeftOffset, int * RightOffset, int * BottomOffset){
+	if (Font == CourierNew && fontsize == 12 && scanres == 300){
+		*FontHeight = 47.4; 
+		*FontWidth = 28.1;
+		*FontHeightSpace = 9.1; 
+		*FontWidthSpace = 1.80;
+		*TopOffset = 7;
+		*LeftOffset = 7;
+		*RightOffset = 0;
+		*BottomOffset = 7;
+	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
+		*FontHeight = 40.425; 
+		*FontWidth = 24;
+		*FontHeightSpace = 1.10; 
+		*FontWidthSpace = 1.1;
+		*TopOffset = 4;
+		*LeftOffset = 4;
+		*RightOffset = 0;
+		*BottomOffset = 7;
+	}
+}
+
+void GetMargins(IMAGE * image, int TopOffset, int LeftOffset, int RightOffset, int BottomOffset, int * TopMargin, int * LeftMargin, int * RightMargin, int * BottomMargin){
+	
+	int i, j, BlackPixelCount;
+	
+	/*find top margin*/
+	for (i = 0; i < image->Height && *TopMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && *TopMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				*TopMargin = i >= TopOffset ? i - TopOffset : 0;
+			}
+		}
+	}
+
+	assert(*TopMargin > -1);
+	
+	/*find bottom margin*/
+	for (i = image->Height-1; i > *TopMargin && *BottomMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && *BottomMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				*BottomMargin = i < (image->Height - BottomOffset - 1 ) ? i + BottomOffset : image->Height - 1;
+			}
+		}
+	}
+	//*BottomMargin = image->Height - 1;
+	assert(*BottomMargin > -1);
+	
+	/*find left margin*/
+	for (i = 0; i < image->Width && *LeftMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && *LeftMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				*LeftMargin = i >= LeftOffset ? i - LeftOffset : 0;
+			}
+		}
+	}
+
+	assert(*LeftMargin > -1);
+	
+	/*find right margin*/
+	/* It seems that this method won't work on right margin
+	 * for (i = image->Width-1; i > *LeftMargin  && *RightMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && *RightMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				*RightMargin = i < image->Width - 7 ? i : image->Width - 1;
+			}
+		}
+	}*/
+	
+	*RightMargin = image->Width - 1;
+	assert(*RightMargin > -1);
+}
+
 IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
-	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
+	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;
 	int CharCounter, LineCounter;
 	int k,l;
 	
 	/*Check for supported font and set constants*/
-	double FontHeight, FontWidth;
-	double FontHeightSpace, FontWidthSpace;
-	int TopOffset, LeftOffset, RightOffset, BottomOffset;
-	if (Font == CourierNew && fontsize == 12 && scanres == 300){
-		FontHeight = 47.4; 
-		FontWidth = 28.1;
-		FontHeightSpace = 9.1; 
-		FontWidthSpace = 1.80;
-		TopOffset = 7;
-		LeftOffset = 7;
-		BottomOffset = 7;
-	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
-		FontHeight = 40.425; 
-		FontWidth = 24;
-		FontHeightSpace = 1.10; 
-		FontWidthSpace = 1.1;
-		TopOffset = 4;
-		LeftOffset = 4;
-		BottomOffset = 7;
-	} else return NULL;
+	double FontHeight = 0, FontWidth = 0;
+	double FontHeightSpace = 0, FontWidthSpace = 0;
+	int TopOffset = 0, LeftOffset = 0, RightOffset = 0, BottomOffset = 0;
+	if (!((Font == CourierNew && fontsize == 12 && scanres == 300) || (Font == LucidaConsole && fontsize == 10 && scanres == 300))){
+		printf("Not supported format\n");
+		return NULL;
+	} else {
+		GetIsolateCharacterConstant(Font, fontsize, scanres, &FontHeight, &FontWidth, &FontHeightSpace, &FontWidthSpace, &TopOffset, &LeftOffset, &RightOffset, &BottomOffset);
+	}
 	
 	
 	/*clone the image and overwrite the original with marker*/
 	IMAGE * ToMarkImage = DuplicateImage(image);
-	
-	/*find top margin*/
-	for (i = 0; i < image->Height && TopMargin == -1; i++){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Width && TopMargin == -1; j++){
-			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				TopMargin = i >= TopOffset ? i - TopOffset : 0;
-			}
-		}
-	}
 
-	assert(TopMargin > -1);
+	/*get the margins*/
+	GetMargins(image, TopOffset, LeftOffset, RightOffset, BottomOffset, &TopMargin, &LeftMargin, &RightMargin, &BottomMargin);
 	
-	/*find bottom margin*/
-	for (i = image->Height-1; i > TopMargin && BottomMargin == -1; i--){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Width && BottomMargin == -1; j++){
-			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				BottomMargin = i < (image->Height - BottomOffset - 1 ) ? i + BottomOffset : image->Height - 1;
-			}
-		}
-	}
-	//BottomMargin = image->Height - 1;
-	assert(BottomMargin > -1);
 	
-	/*find left margin*/
-	for (i = 0; i < image->Width && LeftMargin == -1; i++){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Height && LeftMargin == -1; j++){
-			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				LeftMargin = i >= LeftOffset ? i - LeftOffset : 0;
-			}
-		}
-	}
-
-	assert(LeftMargin > -1);
-	
-	/*find right margin*/
-	/* It seems that this method won't work on right margin
-	 * for (i = image->Width-1; i > LeftMargin  && RightMargin == -1; i--){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Height && RightMargin == -1; j++){
-			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
-			if (BlackPixelCount > 5) {
-				RightMargin = i < image->Width - 7 ? i : image->Width - 1;
-			}
-		}
-	}*/
-	
-	RightMargin = image->Width - 1;
-	assert(RightMargin > -1);
 	
 	/*mark margins*/
 	 /*draw top margin*/
@@ -176,90 +197,28 @@ IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int 
 
 ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
-	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
+	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;
 	int CharCounter, LineCounter;
-	int k,l;
+	
 	IMAGE * img;
 	/*Check for supported font and set constants*/
-	double FontHeight, FontWidth;
-	double FontHeightSpace, FontWidthSpace;
-	int TopOffset, LeftOffset, RightOffset, BottomOffset;
-	if (Font == CourierNew && fontsize == 12 && scanres == 300){
-		FontHeight = 47.4; 
-		FontWidth = 28.1;
-		FontHeightSpace = 9.1; 
-		FontWidthSpace = 1.80;
-		TopOffset = 7;
-		LeftOffset = 7;
-		BottomOffset = 7;
-	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
-		FontHeight = 40.425; 
-		FontWidth = 24;
-		FontHeightSpace = 1.10; 
-		FontWidthSpace = 1.1;
-		TopOffset = 4;
-		LeftOffset = 4;
-		BottomOffset = 7;
-	} else return NULL;
-		
+	double FontHeight = 0, FontWidth = 0;
+	double FontHeightSpace = 0, FontWidthSpace = 0;
+	int TopOffset = 0, LeftOffset = 0, RightOffset = 0, BottomOffset = 0;
+	if (!((Font == CourierNew && fontsize == 12 && scanres == 300) || (Font == LucidaConsole && fontsize == 10 && scanres == 300))){
+		printf("Not supported format\n");
+		return NULL;
+	} else {
+		GetIsolateCharacterConstant(Font, fontsize, scanres, &FontHeight, &FontWidth, &FontHeightSpace, &FontWidthSpace, &TopOffset, &LeftOffset, &RightOffset, &BottomOffset);
+	}
+	
 		
 	
 	ILIST * imglist = NewImageList();
 	
-	/*find top margin*/
-	for (i = 0; i < image->Height && TopMargin == -1; i++){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Width && TopMargin == -1; j++){
-			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				TopMargin = i >= TopOffset ? i - TopOffset : 0;
-			}
-		}
-	}
-
-	assert(TopMargin > -1);
-	
-	/*find bottom margin*/
-	for (i = image->Height-1; i > TopMargin && BottomMargin == -1; i--){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Width && BottomMargin == -1; j++){
-			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				BottomMargin = i < (image->Height - BottomOffset - 1 ) ? i + BottomOffset : image->Height - 1;
-			}
-		}
-	}
-	//BottomMargin = image->Height - 1;
-	assert(BottomMargin > -1);
-	
-	/*find left margin*/
-	for (i = 0; i < image->Width && LeftMargin == -1; i++){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Height && LeftMargin == -1; j++){
-			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
-			if (BlackPixelCount > 2) {
-				LeftMargin = i >= LeftOffset ? i - LeftOffset : 0;
-			}
-		}
-	}
-
-	assert(LeftMargin > -1);
-	
-	/*find right margin*/
-	/* It seems that this method won't work on right margin
-	 * for (i = image->Width-1; i > LeftMargin  && RightMargin == -1; i--){
-		BlackPixelCount = 0;
-		for (j = 0; j < image->Height && RightMargin == -1; j++){
-			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
-			if (BlackPixelCount > 5) {
-				RightMargin = i < image->Width - 7 ? i : image->Width - 1;
-			}
-		}
-	}*/
-	
-	RightMargin = image->Width - 1;
-	assert(RightMargin > -1);
+	/*get the margins*/
+	GetMargins(image, TopOffset, LeftOffset, RightOffset, BottomOffset, &TopMargin, &LeftMargin, &RightMargin, &BottomMargin);
 
 	/*start cropping*/	
 	
