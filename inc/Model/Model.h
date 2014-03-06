@@ -6,7 +6,7 @@
 #include "utstring.h"
 #include "Image.h"
 
-
+IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
 ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
 UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
 void CharProfile_free(void * profile_in);

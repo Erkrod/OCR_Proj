@@ -12,7 +12,7 @@ int IsPixelBlack(IMAGE * image, int x, int y){
 	return 0;*/
 }
 
-ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
+IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
 	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;
@@ -40,21 +40,11 @@ ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres
 		LeftOffset = 4;
 		BottomOffset = 7;
 	} else return NULL;
-		
-		
 	
-	ILIST * imglist = NewImageList();
 	
 	/*clone the image and overwrite the original with marker*/
-	IMAGE * img, * ToMarkImage = DuplicateImage(image);
-	IMAGE * TempImage = image;
-	image = ToMarkImage;
-	ToMarkImage = TempImage;
+	IMAGE * ToMarkImage = DuplicateImage(image);
 	
-	
-	
-	
-
 	/*find top margin*/
 	for (i = 0; i < image->Height && TopMargin == -1; i++){
 		BlackPixelCount = 0;
@@ -179,7 +169,112 @@ ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres
 			}
 			
 	
+		}
+	}
+	return ToMarkImage;
+}
 
+ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
+	/*variables*/
+	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
+	int AreaTop, AreaBottom, AreaLeft, AreaRight;
+	int CharCounter, LineCounter;
+	int k,l;
+	IMAGE * img;
+	/*Check for supported font and set constants*/
+	double FontHeight, FontWidth;
+	double FontHeightSpace, FontWidthSpace;
+	int TopOffset, LeftOffset, RightOffset, BottomOffset;
+	if (Font == CourierNew && fontsize == 12 && scanres == 300){
+		FontHeight = 47.4; 
+		FontWidth = 28.1;
+		FontHeightSpace = 9.1; 
+		FontWidthSpace = 1.80;
+		TopOffset = 7;
+		LeftOffset = 7;
+		BottomOffset = 7;
+	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
+		FontHeight = 40.425; 
+		FontWidth = 24;
+		FontHeightSpace = 1.10; 
+		FontWidthSpace = 1.1;
+		TopOffset = 4;
+		LeftOffset = 4;
+		BottomOffset = 7;
+	} else return NULL;
+		
+		
+	
+	ILIST * imglist = NewImageList();
+	
+	/*find top margin*/
+	for (i = 0; i < image->Height && TopMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && TopMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				TopMargin = i >= TopOffset ? i - TopOffset : 0;
+			}
+		}
+	}
+
+	assert(TopMargin > -1);
+	
+	/*find bottom margin*/
+	for (i = image->Height-1; i > TopMargin && BottomMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Width && BottomMargin == -1; j++){
+			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				BottomMargin = i < (image->Height - BottomOffset - 1 ) ? i + BottomOffset : image->Height - 1;
+			}
+		}
+	}
+	//BottomMargin = image->Height - 1;
+	assert(BottomMargin > -1);
+	
+	/*find left margin*/
+	for (i = 0; i < image->Width && LeftMargin == -1; i++){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && LeftMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 2) {
+				LeftMargin = i >= LeftOffset ? i - LeftOffset : 0;
+			}
+		}
+	}
+
+	assert(LeftMargin > -1);
+	
+	/*find right margin*/
+	/* It seems that this method won't work on right margin
+	 * for (i = image->Width-1; i > LeftMargin  && RightMargin == -1; i--){
+		BlackPixelCount = 0;
+		for (j = 0; j < image->Height && RightMargin == -1; j++){
+			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
+			if (BlackPixelCount > 5) {
+				RightMargin = i < image->Width - 7 ? i : image->Width - 1;
+			}
+		}
+	}*/
+	
+	RightMargin = image->Width - 1;
+	assert(RightMargin > -1);
+
+	/*start cropping*/	
+	
+	
+	LineCounter = 0;
+	for (i = TopMargin; i < BottomMargin - FontHeight; i=floor(TopMargin + LineCounter*(FontHeight+FontHeightSpace))){
+		LineCounter++;
+		CharCounter = 0;
+		for (j = LeftMargin; j < RightMargin - (int)FontWidth; j=LeftMargin + floor(CharCounter*(FontWidth+FontWidthSpace))){
+			CharCounter++;
+			
+			AreaTop = i;
+			AreaBottom = ceil(i + FontHeight) < image->Height ? ceil(i + FontHeight) : image->Height - 1;
+			AreaLeft = j;
+			AreaRight = ceil(j + FontWidth) < image->Width ? ceil(j + FontWidth) : image->Width - 1;
 			
 			img = CropImage(image,AreaLeft, AreaTop, AreaRight, AreaBottom);			
 			AppendImage(imglist, img);

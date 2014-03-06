@@ -22,6 +22,7 @@ int main()
   int i;
   int j;
   IMAGE *image = NULL;
+  IMAGE *PreviewImage = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
   
@@ -58,13 +59,27 @@ int main()
 #endif
   
 #if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
-  imglist = IsolateCharacter(img, CourierNew, 12, 300);
+  PreviewImage = PreviewIsolateCharacter(img, CourierNew, 12, 300);
+  imglist = IsolateCharacter(img, CourierNew, 12, 300);  
 #else
+  PreviewImage = PreviewIsolateCharacter(img, LucidaConsole, 10, 300);
   imglist = IsolateCharacter(img, LucidaConsole, 10, 300);
 #endif
-  assert(imglist);
+  assert(imglist && PreviewImage);
+  SaveImage("CheckIsolate", PreviewImage);
+  
+  char Name[50];
+  IENTRY * CurrEntry = imglist->First;
+  for (i = 0; i < 20 && CurrEntry; i++, CurrEntry = CurrEntry->Next){	  
+#if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
+	  sprintf(Name, "AndrewTest/CourierNew/Courier%02d", i);
+#else
+	  sprintf(Name, "AndrewTest/LucidaConsole/Lucida%02d", i);
+#endif
+	  SaveImage(Name, CurrEntry->Image);
+  }
   DeleteImageList(imglist);
-//   SaveImage("Cropped", img);
+   
 
   return 0;
 
