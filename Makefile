@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model postProcessing IsolateCharacter FileIO DIPs Image ImageList
+MODEL_LIB := Model postProcessing IsolateCharacter FileIO ImageProcessing Image ImageList
 
 CONTROL_LIB := Control
 
@@ -40,45 +40,53 @@ VIEW_LIB_COMPILE := $(addprefix -l,$(VIEW_LIB))
 
 INCLUDES  := $(addprefix -Iinc/,$(MODULES)) -Iinc/uthash
 
-VPATH = $(SRC_DIR) src
+VPATH = $(SRC_DIR) src test
 
 
 
 .PHONY: all clean test
 
-all: ChessXIV
+all: OCR test
 
-test: ModelUnitTest
+test: TestCharArray TestUTArray TestPostPo TestView TestIsolateCharacter
 
 clean:
-	rm build/*
-	rm bin/*
+	rm build/* bin/*
 
 build/%.o: %.c	
-	$(CC) $(CFLAGS) $(INCLUDES) $(GUI_CFLAGS) -c $< -o $@
+	$(info Compiling $@)
+	@$(CC) $(CFLAGS) $(INCLUDES) $(GUI_CFLAGS) -c $< -o $@
 
 build/lib%.a: build/%.o
-	ar rc $@ $<
-	ranlib $@
+	$(info Archiving $@)
+	@ar rc $@ $<
+	@ranlib $@
 
 TestCharArray: build/ExampleCharArray.o
-	$(CC) $(CFLAGS) $< -o bin/$@
+	$(info Linking $@)
+	@$(CC) $(CFLAGS) $< -o bin/$@
 
 TestUTArray: build/utarray_example.o
-	$(CC) $(CFLAGS) $< -o bin/$@
+	$(info Linking $@)
+	@$(CC) $(CFLAGS) $< -o bin/$@
 
 TestPostPo: build/TestPostProcessing.o $(MODEL_LIB_DEPEND)
-	$(CC) build/TestPostProcessing.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
+	$(info Linking $@)
+	@$(CC) build/TestPostProcessing.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
 
 TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
-	$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	$(info Linking $@)
+	@$(CC) build/GFXMain.o -Lbuild $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	
 TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
-	$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	$(info Linking $@)
+	@$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
-	$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	$(info Linking $@)
+	@$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	bin/TestIdentifyCharacter
 	
 OCR: build/OCR.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
-	$(CC) build/OCR.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	$(info Linking $@)
+	@$(CC) build/OCR.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
