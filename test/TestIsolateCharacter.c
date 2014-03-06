@@ -14,7 +14,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
-#define IMAGE_CHOICE 3
+#define IMAGE_CHOICE 1
 
 int main()
 {
@@ -38,6 +38,7 @@ int main()
   char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
   image = ReadImage(fname);
   img = CropImage(image,50,200,1450,1400);
+  SaveImage("Images/Cropped_01_HelloWorld_Clean300DPI", img);
 #elif IMAGE_CHOICE == 2
   char fname[50] = "Images/31_OCRtest_Courier_Clean300DPI.jpg";
   image = ReadImage(fname);
