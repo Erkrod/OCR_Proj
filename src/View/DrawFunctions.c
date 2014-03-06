@@ -196,6 +196,12 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
 				 GTK_POLICY_ALWAYS,
 				 GTK_POLICY_ALWAYS);
   AddWidgetToViewHandle(MainViewHandle, "TextScrollWindow", scrollWinText);
+  
+  GtkWidget * TextView = gtk_text_view_new ();
+  gtk_text_view_set_editable(GTK_TEXT_VIEW(TextView), FALSE);
+  AddWidgetToViewHandle(MainViewHandle, "MainTextArea", TextView);
+   gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWinText), TextView);
+  
   return scrollWinText;
 }
 
@@ -633,10 +639,9 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
- AddWidgetToViewHandle(MainViewHandle, "ComboBox", combo);
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 1" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 2" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 3" );
+ AddWidgetToViewHandle(MainViewHandle, "FontComboBox", combo);
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Courier New" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Lucida Console" );
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
@@ -650,11 +655,10 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
-
+ AddWidgetToViewHandle(MainViewHandle, "FontSizeComboBox", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "3" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "10" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "12" );
 
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
@@ -667,11 +671,10 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
-
+ AddWidgetToViewHandle(MainViewHandle, "ScanResComboBox", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "3" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "200 DPI" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "300 DPI" );
 
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
@@ -692,7 +695,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  /* 			   G_CALLBACK (gtk_widget_destroy), */
  /* 			   ocrWin); */
  g_signal_connect_swapped (closeButton, "clicked",
- 			   G_CALLBACK (gtk_widget_destroy),
+ 			   G_CALLBACK (gtk_widget_hide),
  			   ocrWin);
  gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
 

@@ -139,11 +139,106 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 			}
 		}
 		
-		
+/*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"PerformOCR") == 0){
-		show_error("Not supported yet");
-	} else if (strcmp(ClickedObject->Name,"EditText") == 0){
-		show_error("Not supported yet");
+		char nameOCRWindow[MAX_HASH_KEY_LENGTH] =  "OCRWindow";
+		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+		assert(CurrObject);
+		gtk_widget_show(CurrObject->Widget);
+		
+/*======================================================================*/		
+	} else if (strcmp(ClickedObject->Name,"OCRButton") == 0){
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {			
+			/*get information about font, font size and scan resolution*/
+			FontType Font; int FontSize, ScanRes, OCRErrorFlag = 0;
+			char nameOCRComboBox[MAX_HASH_KEY_LENGTH] =  "FontComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);			
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					Font = CourierNew;
+					break;
+				case 1:
+					Font = LucidaConsole;
+					break;
+				default:
+					show_error("Invalid Font choice");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			char nameOCRComboBox3[MAX_HASH_KEY_LENGTH] =  "FontSizeComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					FontSize = 10;
+					break;
+				case 1:
+					FontSize = 12;
+					break;
+				default:
+					show_error("Invalid Font size");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			char nameOCRComboBox2[MAX_HASH_KEY_LENGTH] =  "ScanResComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					ScanRes = 200;
+					break;
+				case 1:
+					ScanRes = 300;
+					break;
+				default:
+					show_error("Invalid scan resolution");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			if (!OCRErrorFlag){
+#ifdef DEBUG
+			printf("%s %d %d\n", Font == CourierNew ? "CourierNew" : "LucidaConsole", FontSize, ScanRes);
+#endif			
+			/*cut the image into pieces and display it*/
+			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
+			ILIST * CutList = IsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+			DeleteImageList(CutList);
+			UpdateDisplayImage(MainControlHandle);
+			/*Identify them into probability*/
+			
+			/*post processing*/
+			
+			/*display the text*/
+			/*a random string for now*/
+			utstring_clear(MainControlHandle->MainOutputString);
+			utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
+			char nameMainText[MAX_HASH_KEY_LENGTH] =  "MainTextArea";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameMainText, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+			GtkTextIter iter;
+			gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
+			gtk_text_buffer_insert(buffer, &iter, utstring_body(MainControlHandle->MainOutputString), -1);
+			}
+			
+		}
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"EditText") == 0){		
+		/*write it to a temp file*/
+		FILE * NewFile = fopen("TempOutputText.txt", "w");
+		if (!NewFile){
+			show_error("Can't write to TempOutputText.txt");
+		} else {
+			fprintf(NewFile, "%s", utstring_body(MainControlHandle->MainOutputString));
+			fclose(NewFile);
+			if (0 != system("gedit TempOutputText.txt &")) show_error("Can't run gedit on TempOutputText.txt");
+		}
 	} else if (strcmp(ClickedObject->Name,"Dictionary") == 0){
 		show_error("Not supported yet");
 	}

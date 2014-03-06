@@ -20,6 +20,7 @@ bin/*
 
 #temporary files of text editors
 *~
+TempOutputText.txt
 
 #temporary ppm files
 *.ppm
