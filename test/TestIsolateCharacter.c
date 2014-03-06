@@ -14,7 +14,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
-#define IMAGE_CHOICE 1
+#define IMAGE_CHOICE 3
 
 int main()
 {
@@ -41,10 +41,27 @@ int main()
 #elif IMAGE_CHOICE == 2
   char fname[50] = "Images/31_OCRtest_Courier_Clean300DPI.jpg";
   image = ReadImage(fname);
-  img = CropImage(image,100,250,2150,2750);
-  
+  img = CropImage(image,100,250,2150,2750);  
+#elif IMAGE_CHOICE == 3
+  char fname[50] = "Images/LucidaConsole10_300DPI.jpg";
+  image = ReadImage(fname);
+  img = CropImage(image,200,200,1000,600); 
+#elif IMAGE_CHOICE == 4
+  char fname[50] = "Images/11_Eratosthenes_Clean300DPI.png";
+  image = ReadImage(fname);
+  img = CropImage(image,200,200,1800,3000); 
+#elif IMAGE_CHOICE == 5
+  char fname[50] = "Images/41_OCRtest_Lucida_Clean300DPI.png";
+  image = ReadImage(fname);
+  img = CropImage(image,280,200,2000,3000);
 #endif
-  imglist = IsolateCharacter(img, 12, 300);
+  
+#if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
+  imglist = IsolateCharacter(img, CourierNew, 12, 300);
+#else
+  imglist = IsolateCharacter(img, LucidaConsole, 10, 300);
+#endif
+  assert(imglist);
   DeleteImageList(imglist);
 //   SaveImage("Cropped", img);
 

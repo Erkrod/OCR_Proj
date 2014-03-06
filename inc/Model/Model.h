@@ -7,7 +7,7 @@
 #include "Image.h"
 
 
-ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres);
+ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
 UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
 void CharProfile_free(void * profile_in);
 /* this is the postProcessing function */
@@ -16,5 +16,7 @@ UT_string * postProcessing(UT_array * );
 
 int SaveImage(const char fname[SLEN], IMAGE *image);
 IMAGE * ReadImage(char *ImageFileName);
+
+
 
 #endif

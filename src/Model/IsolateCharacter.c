@@ -4,17 +4,42 @@
 #if 1
 
 int IsPixelBlack(IMAGE * image, int x, int y){
-	if (GetPixelR(image, x, y) >= 10) return 0;
-	if (GetPixelG(image, x, y) >= 10) return 0;
-	if (GetPixelB(image, x, y) >= 10) return 0;
+	if (GetPixelR(image, x, y) >= 50) return 0;
+	if (GetPixelG(image, x, y) >= 50) return 0;
+	if (GetPixelB(image, x, y) >= 50) return 0;
 	return 1;
 	/*if (GetPixelR(image, x, y) < 10 && GetPixelG(image, x, y) < 10 && GetPixelB(image, x, y) < 10) return 1;
 	return 0;*/
 }
 
-ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
+ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
 	int i,j, BlackPixelCount, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
+	
+	/*Check for supported font and set constants*/
+	double FontHeight, FontWidth;
+	double FontHeightSpace, FontWidthSpace;
+	int TopOffset, LeftOffset, RightOffset, BottomOffset;
+	if (Font == CourierNew && fontsize == 12 && scanres == 300){
+		FontHeight = 47.4; 
+		FontWidth = 28.1;
+		FontHeightSpace = 9.1; 
+		FontWidthSpace = 1.80;
+		TopOffset = 7;
+		LeftOffset = 7;
+		BottomOffset = 7;
+	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
+		FontHeight = 40.425; 
+		FontWidth = 24;
+		FontHeightSpace = 1.10; 
+		FontWidthSpace = 1.1;
+		TopOffset = 4;
+		LeftOffset = 4;
+		BottomOffset = 7;
+	} else return NULL;
+		
+		
+	
 	ILIST * imglist = NewImageList();
 
 	/*find top margin*/
@@ -23,7 +48,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 		for (j = 0; j < image->Width && TopMargin == -1; j++){
 			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
 			if (BlackPixelCount > 2) {
-				TopMargin = i >= 7 ? i - 7 : 0;
+				TopMargin = i >= TopOffset ? i - TopOffset : 0;
 			}
 		}
 	}
@@ -36,7 +61,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 		for (j = 0; j < image->Width && BottomMargin == -1; j++){
 			if (IsPixelBlack(image, j, i)) BlackPixelCount++;
 			if (BlackPixelCount > 5) {
-				BottomMargin = i < (image->Height - 8) ? i + 7 : image->Height - 1;
+				BottomMargin = i < (image->Height - BottomOffset - 1 ) ? i + BottomOffset : image->Height - 1;
 			}
 		}
 	}
@@ -49,7 +74,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 		for (j = 0; j < image->Height && LeftMargin == -1; j++){
 			if (IsPixelBlack(image, i, j)) BlackPixelCount++;
 			if (BlackPixelCount > 2) {
-				LeftMargin = i >= 7 ? i - 7 : 0;
+				LeftMargin = i >= LeftOffset ? i - LeftOffset : 0;
 			}
 		}
 	}
@@ -72,21 +97,33 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres){
 	assert(RightMargin > -1);
 	
 	/*start cropping*/
-	double FontHeight = 47.4, FontWidth = 28.1;
-	double FontHeightSpace = 9.1, FontWidthSpace = 1.80;
+	
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;
 	int CharCounter, LineCounter;
 	IMAGE * TempImage, *img;
 	int k,l;
 #ifdef DEBUG
+	BottomMargin = image->Height - 1;
 	IMAGE * ToCheckImage = DuplicateImage(image);
-	printf("RightMargin = %d\n", RightMargin);
+	/*draw top margin*/
+	for(l = 0; l < image->Width; l++){
+		SetPixelR(ToCheckImage, l,TopMargin, 200);
+		SetPixelG(ToCheckImage, l,TopMargin, 40);
+		SetPixelB(ToCheckImage, l,TopMargin, 30);
+	}
+	/*draw left margin*/
+	for(l = 0; l < image->Height; l++){
+		SetPixelR(ToCheckImage, LeftMargin,l, 200);
+		SetPixelG(ToCheckImage, LeftMargin,l, 40);
+		SetPixelB(ToCheckImage, LeftMargin,l, 30);
+	}
+	/*draw right margin*/
 	for(l = 0; l < image->Height; l++){
 		SetPixelR(ToCheckImage, RightMargin,l, 200);
 		SetPixelG(ToCheckImage, RightMargin,l, 40);
 		SetPixelB(ToCheckImage, RightMargin,l, 30);
 	}
-	printf("BottomMargin = %d\n", BottomMargin);
+	/*draw bottom margin*/
 	for(l = 0; l < image->Width; l++){
 		SetPixelR(ToCheckImage, l,BottomMargin, 200);
 		SetPixelG(ToCheckImage, l,BottomMargin, 40);
