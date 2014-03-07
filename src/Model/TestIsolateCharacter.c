@@ -19,6 +19,7 @@ int main()
   IMAGE *img = NULL;
   int i;
   int j;
+  int k = 0;
   IMAGE *image = NULL;
   ILIST *imglist = NULL;
   IENTRY *curr;
@@ -46,6 +47,11 @@ int main()
 	{
 	  j = SaveImage(sname, curr->Image);
 	  i++;
+	}
+      else /*this 'else' to test if new line NULL indicators are working */
+	{
+	  printf("%d\n", k);
+	  k++;
 	}
       curr = curr->Next;
     }

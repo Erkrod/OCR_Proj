@@ -15,7 +15,6 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
   double slice_color = 0.0;
 
   char_height = (int)((double)fontsize*(1.0/72.0)*(double)scanres); /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
-  max_lines = (image->Height-start_y)/char_height;
 
   imglist = NewImageList();
 
@@ -32,6 +31,10 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
     if (start_y > 0)
       break;
     }
+
+  max_lines = ((image->Height)-start_y)/(1.2*char_height);
+  /* printf("max lines is %d. Image height is %d. Start_y is %d.\n", max_lines, image->Height, start_y); */
+
   /* NOTE: " GETS ISOLATED AS '', SINGLE APOSTROPHES BACK TO BACK. TELL KEVIN OR ANDREW*/
   for ( line=0; line<max_lines; line++)
     {
@@ -88,6 +91,9 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	} /*for x*/
       
       old_border_end = -1;
+      img = NULL;
+      AppendImage(imglist, img);
+
       /*recalibrate start_y*/
       for ( y=start_y + char_height; y<image->Height; y++ )
 	{
@@ -96,6 +102,11 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	    {
 	      if (GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y) < 100)
 		{
+		  if (y-start_y > 1.2*char_height)
+		    {
+		      img = NULL;
+		      AppendImage(imglist, img);
+		    }
 		  start_y = y; /*record start scan height, to go slices of fontsize down*/
 		  y_flag = start_y;
 		  break;
@@ -105,7 +116,9 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	    break;
 	}
       if (start_y + char_height > (image->Height-1))
-	break;
+	{
+	  break;
+	}
     }
   /*printf("The x_border_start is %d. The x_border_end is %d. The char_width is %d.\n", x_border_start, x_border_end, char_width);*/
   /*printf("char height is %d, start_y is %d, image height is %d\n", char_height, start_y, image->Height);*/
