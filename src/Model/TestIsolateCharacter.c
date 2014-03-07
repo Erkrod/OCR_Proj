@@ -42,10 +42,12 @@ int main()
       strcpy(sname, "test");
       strcat(sname, index);
       
-      j = SaveImage(sname, curr->Image);
+      if (curr->Image)
+	{
+	  j = SaveImage(sname, curr->Image);
+	  i++;
+	}
       curr = curr->Next;
-      i++;
-      
     }
 
 
