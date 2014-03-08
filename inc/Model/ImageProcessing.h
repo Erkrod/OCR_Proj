@@ -51,7 +51,7 @@ void AddNoise(IMAGE *image) ;
 /* Resize */
 IMAGE *Resize(	unsigned int percentage, IMAGE *image) ; 
 
+IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter);
 
-IMAGE *Crop(IMAGE *image, unsigned int x, unsigned int y, unsigned int W, unsigned int H);
-
+IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int area_x2, int area_y2, int NewPixelValue, int threshold);
 #endif

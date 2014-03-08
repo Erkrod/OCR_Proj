@@ -4,8 +4,6 @@
 
 #include <gtk/gtk.h>
 #include "View.h"
-#include "Control.h"
-#include "DrawFunctions.h"
 
 int main (int   argc, char *argv[]){
  

@@ -13,7 +13,7 @@
 /*rotate*/
 
 IMAGE *Rotate(IMAGE *image, int ClockwiseDegree){
-	char command[SLEN * 5] = "pnmrotate ";
+	char command[SLEN * 5] = "pnmrotate -background=rgb:ff/ff/ff ";
 	char degrees[4];
 
 	if (ClockwiseDegree == 360)
@@ -27,31 +27,31 @@ IMAGE *Rotate(IMAGE *image, int ClockwiseDegree){
 	if (ClockwiseDegree > 90){
 		if (ClockwiseDegree > 180){
 			if (ClockwiseDegree > 270){
-				system("pamflip -ccw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm");
+				if (0 != system("pamflip -ccw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm")) return NULL;
 				ClockwiseDegree -= 270;
 			}else{
-				system("pamflip -rotate180 pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm");
+				if (0 != system("pamflip -rotate180 pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm")) return NULL;
 				ClockwiseDegree -= 180;
 			}
 		}else{
-			system("pamflip -cw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm");
+			if (0 != system("pamflip -cw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm; mv rot_o.ppm pre_rot.ppm")) return NULL;
 			ClockwiseDegree -= 90;
 		}
 	}
 
 	if (ClockwiseDegree == 90){
-		system("pamflip -cw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm");
+		if (0 != system("pamflip -cw pre_rot.ppm > rot_o.ppm; rm pre_rot.ppm")) return NULL;
 	}else{
 		sprintf(degrees, "%d", ClockwiseDegree * -1);	
 		strcat(command, degrees);
 		strcat(command, " pre_rot.ppm > rot_o.ppm");
-		system(command);
-		system("rm pre_rot.ppm");
+		if (0 != system(command)) return NULL;
+		if (0 != system("rm pre_rot.ppm")) {};
 	}
 
 	DeleteImage(image);
 	image = ReadImage("rot_o.ppm");
-	system("rm rot_o.ppm");
+	if (0 != system("rm rot_o.ppm")) {};
 
 	return image;
 
@@ -59,9 +59,9 @@ IMAGE *Rotate(IMAGE *image, int ClockwiseDegree){
 
 /*crop*/
 IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
-	int i, j;
+	
 	unsigned W, H;
-	int x_c, y_c;
+	int j, x_c, y_c;
 	IMAGE *image_tmp;
 
 	assert(image);
@@ -80,6 +80,7 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 	image_tmp = CreateImage(W, H);
 
 #if 0
+	int i;
 	for (i = x1; i <= x2; i++) {
 		for (j = y1; j <= y2; j++) {
 				SetPixelR(image_tmp, i-x1, j-y1, GetPixelR(image, i, j));
@@ -104,7 +105,7 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 
 IMAGE * DuplicateImage(IMAGE * image){
 	IMAGE * NewImage = CreateImage(image->Width, image->Height);
-	int i, j;
+	/*int i, j;*/
 	memcpy(NewImage->R, image->R, sizeof(unsigned char) * image->Width * image->Height);
 	memcpy(NewImage->G, image->G, sizeof(unsigned char) * image->Width * image->Height);
 	memcpy(NewImage->B, image->B, sizeof(unsigned char) * image->Width * image->Height);
@@ -429,4 +430,80 @@ IMAGE* Resize(unsigned int percentage, IMAGE *image)
 	
 	DeleteImage(image);
 	return image_tmp ; 
+}
+
+IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter){
+	int i, j;
+	int R_samp, G_samp, B_samp;
+	int d_thresh, c1_thresh, c2_thresh, b_thresh;
+	assert(image);
+
+	d_thresh = 5 * darken_limiter;
+	c1_thresh = 5 * c_var1;
+	c2_thresh = 5 * c_var2;
+	b_thresh = 10 * b_threshold;
+
+	for (i = 0; i < image->Width; i++){
+		for (j = 0; j < image->Height; j++){
+			SetPixelR(image, i, j, GetPixelR(image, i, j) > d_thresh ? GetPixelR(image, i, j) - d_thresh : GetPixelR(image, i, j));
+			SetPixelG(image, i, j, GetPixelG(image, i, j) > d_thresh ? GetPixelG(image, i, j) - d_thresh : GetPixelG(image, i, j));
+			SetPixelB(image, i, j, GetPixelB(image, i, j) > d_thresh ? GetPixelB(image, i, j) - d_thresh : GetPixelB(image, i, j));
+
+			R_samp = (int)GetPixelR(image, i, j);
+			G_samp = (int)GetPixelG(image, i, j);
+			B_samp = (int)GetPixelB(image, i, j);
+
+			if( (abs(R_samp - G_samp) > c1_thresh) || (abs(R_samp - B_samp) > c1_thresh) || (abs(G_samp - B_samp) > c1_thresh) ){
+				SetPixelR(image, i, j, 255);
+				SetPixelG(image, i, j, 255);
+				SetPixelB(image, i, j, 255);
+			}
+
+			if ( (R_samp > b_thresh) || (G_samp > b_thresh) || (B_samp > b_thresh)){
+				if( (abs(R_samp - G_samp) > c2_thresh) || (abs(R_samp - B_samp) > c2_thresh) || (abs(G_samp - B_samp) > c2_thresh) ){
+					SetPixelR(image, i, j, 255);
+					SetPixelG(image, i, j, 255);
+					SetPixelB(image, i, j, 255);
+				}
+			}
+		}
+	}
+	return image;
+}
+
+IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int area_x2, int area_y2, int NewPixelValue, int threshold){
+	int i, j;
+	int degree;
+	unsigned char xy_valueR, xy_valueG, xy_valueB, r, g , b;
+	int x_c, y_c;
+
+	x_c = area_x1;
+	area_x1 = (area_x1 < area_x2) ? area_x1 : area_x2;
+	area_x2 = (x_c < area_x2) ? area_x2 : x_c;
+
+	y_c = area_y1;
+	area_y1 = (area_y1 < area_y2) ? area_y1 : area_y2;
+	area_y2 = (y_c < area_y2) ? area_y2 : y_c;
+
+	assert(image);
+
+	xy_valueR = GetPixelR(image, x, y);
+	xy_valueG = GetPixelG(image, x, y);
+	xy_valueB = GetPixelB(image, x, y);
+
+	degree = 5 * threshold;
+
+	for (j = area_y1; j <= area_y2; j++)
+		for (i = area_x1; i < area_x2; i++){
+			r = GetPixelR(image, i, j);
+			g = GetPixelG(image, i, j);
+			b = GetPixelB(image, i, j);
+			if ( ((r > xy_valueR - degree) && (r < xy_valueR + degree)) && ((g > xy_valueG - degree) && (g < xy_valueG + degree)) && ((b > xy_valueB - degree) && (b < xy_valueB + degree))){
+				SetPixelR(image, i, j, NewPixelValue);
+				SetPixelG(image, i, j, NewPixelValue);
+				SetPixelB(image, i, j, NewPixelValue);
+			}
+		}
+
+	return image;
 }

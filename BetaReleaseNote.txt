@@ -1,0 +1,3 @@
+netpbm has function pnmrotate, which has this argument only available at later version:
+-background=rgb:ff/ff/ff 
+If you find that program can't do rotate, that means your netpbm library doesn't support this

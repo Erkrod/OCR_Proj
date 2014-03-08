@@ -54,6 +54,7 @@ test: TestCharArray TestUTArray TestPostPo TestView TestIsolateCharacter
 clean:
 	rm build/* bin/*
 
+#************************ COMMON BUILD ************************		
 build/%.o: %.c	
 	$(info Compiling $@)
 	@$(CC) $(CFLAGS) $(INCLUDES) $(GUI_CFLAGS) -c $< -o $@
@@ -63,6 +64,24 @@ build/lib%.a: build/%.o
 	@ar rc $@ $<
 	@ranlib $@
 
+#************************ TEST OF PRE PROCESSING ************************	
+CFTest:	build/CFTest.o	$(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/CFTest.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
+
+CropTest: build/CropTest.o	$(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/CropTest.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
+	
+RotTest: build/RotTest.o	$(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/RotTest.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@	
+	
+SRTest: build/SRTest.o	$(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/SRTest.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@		
+
+#************************ TEST OF DATA STRUCTURE ************************	
 TestCharArray: build/ExampleCharArray.o
 	$(info Linking $@)
 	@$(CC) $(CFLAGS) $< -o bin/$@
@@ -71,6 +90,8 @@ TestUTArray: build/utarray_example.o
 	$(info Linking $@)
 	@$(CC) $(CFLAGS) $< -o bin/$@
 
+#************************ TEST OF BIG MODULES ************************		
+	
 TestPostPo: build/TestPostProcessing.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestPostProcessing.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
@@ -90,6 +111,17 @@ TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	@$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	bin/TestIdentifyCharacter
 	
+TestGUI: build/TestGUI.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/TestGUI.o -Lbuild  $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
+
+#************************ TEST OF WHOLE SYSTEM WITHOUT GUI ************************		
+TestSystem: build/TestSystem.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/TestSystem.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
+	
+#************************ TEST OF WHOLE SYSTEM WITHOUT GUI ************************
+
 OCR: build/OCR.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/OCR.o -Lbuild $(CONTROL_LIB_COMPILE) $(VIEW_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
