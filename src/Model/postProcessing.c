@@ -9,23 +9,24 @@ void CharProfile_free(void * profile_in){
 	utarray_free(profile->CharChoices);
 }
 
-void postProcessingInitialize(void);
-void postProcessingCleanUP(UT_array * , UT_array * );
-UT_string * postProcessing2(UT_array *);
-UT_array * getThreeKeyword(CharProfile *, UT_array *);
+//void postProcessingInitialize(UT_array * , UT_array *);
+//void postProcessingCleanUP(UT_array * , UT_array * );
+UT_string * postProcessing(UT_array * );
+//UT_string * postProcessing2(UT_array *);
+//UT_array * getThreeKeyword(CharProfile *, UT_array *);
 
-char * getTopProb(UT_array *);
-char * getSecondProb(UT_array *);
+//char * getTopProb(UT_array *);
+//char * getSecondProb(UT_array *);
 
-void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
-{
+//void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
+//{
   /* the actual dictionary */
-  char words[32][15];
-	char specialCharacter[32];
-  int i = 0;
+/*  char *words[32];
+	char *specialCharacter[32];
+  int i = 0;*/
   
   /*all ansi c keyword */	
-  words[0] = "auto";
+ /* words[0] = "auto";
   words[1] = "break";
   words[2] = "case";
   words[3] = "char";
@@ -56,41 +57,41 @@ void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
   words[28] = "unsigned";
   words[29] = "void";
   words[30] = "volatile";
-  words[31] = "while";
+  words[31] = "while";*/
 	
 	/* all the special characters */
-	specialCharacter[0] = '`';
-	specialCharacter[1] = '~';
-	specialCharacter[2] = '!';
-	specialCharacter[3] = '@';
-	specialCharacter[4] = '#';
-	specialCharacter[5] = '$';
-	specialCharacter[6] = '%';
-	specialCharacter[7] = '^';
-	specialCharacter[8] = '&';
-	specialCharacter[9] = '*';
-	specialCharacter[10] = '(';
-	specialCharacter[11] = ')';
-	specialCharacter[12] = '-';
-	specialCharacter[13] = '_';
-	specialCharacter[14] = '=';
-	specialCharacter[15] = '+';
-	specialCharacter[16] = '[';
-	specialCharacter[17] = '{';
-	specialCharacter[18] = ']';
-	specialCharacter[19] = '}';
-	specialCharacter[20] = '\\';
-	specialCharacter[21] = '|';
-	specialCharacter[22] = ';';
-	specialCharacter[23] = ':';
-	specialCharacter[24] = '\'';
-	specialCharacter[25] = '"';
-	specialCharacter[26] = ',';
-	specialCharacter[27] = '<';
-	specialCharacter[28] = '.';
-	specialCharacter[29] = '>';
-	specialCharacter[30] = '/';
-	specialCharacter[31] = '?';
+	/*specialCharacter[0] = "`";
+	specialCharacter[1] = "~";
+	specialCharacter[2] = "!";
+	specialCharacter[3] = "@";
+	specialCharacter[4] = "#";
+	specialCharacter[5] = "$";
+	specialCharacter[6] = "%";
+	specialCharacter[7] = "^";
+	specialCharacter[8] = "&";
+	specialCharacter[9] = "*";
+	specialCharacter[10] = "(";
+	specialCharacter[11] = ")";
+	specialCharacter[12] = "-";
+	specialCharacter[13] = "_";
+	specialCharacter[14] = "=";
+	specialCharacter[15] = "+";
+	specialCharacter[16] = "[";
+	specialCharacter[17] = "{";
+	specialCharacter[18] = "]";
+	specialCharacter[19] = "}";
+	specialCharacter[20] = "\\";
+	specialCharacter[21] = "|";
+	specialCharacter[22] = ";";
+	specialCharacter[23] = ":";
+	specialCharacter[24] = "\"";
+	specialCharacter[25] = "\"";
+	specialCharacter[26] = ",";
+	specialCharacter[27] = "<";
+	specialCharacter[28] = ".";
+	specialCharacter[29] = ">";
+	specialCharacter[30] = "/";
+	specialCharacter[31] = "?";
 
  for (i = 0; i < 32; i++)
  {
@@ -100,15 +101,15 @@ void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
  for (i = 0; i < 32; i++)
  {
    utarray_push_back(specialChar, &specialCharacter[i]);
- }
+ }*/
  
-}
+//}
 
-void postProcessingCleanUP(UT_array * dictionary, UT_array * specialCharacter)
+/*void postProcessingCleanUP(UT_array * dictionary, UT_array * specialCharacter)
 {
 	utarray_free(dictionary);
 	utarray_free(specialCharacter);
-}
+}*/
 
 /* part 1 of the post processing stage */
 UT_string * postProcessing(UT_array * charList)
@@ -162,7 +163,8 @@ UT_string * postProcessing(UT_array * charList)
   return output;
 }
 
-/* ///////////////////////////////// MIGHT WORK //////////////////////// */
+////////////////////////////////// MIGHT WORK //////////////////////// 
+/*
 UT_string * matchKeywords(UT_string *);
 UT_string * matchKeywords(UT_string *output)
 {
@@ -208,9 +210,9 @@ UT_string * matchKeywords(UT_string *output)
 }
 
 
+*/
 
-
-/* WORK IN PROGRESS */
+/* WORK IN PROGRESS 
 UT_string * postProcessing2(UT_array * charList)
 {
 	UT_string * temp;
@@ -224,7 +226,7 @@ UT_string * postProcessing2(UT_array * charList)
   char chosen = 'a';
 
   utstring_new(output);
-	/* NEED A LOOP HERE THAT SENDS CHARACTER UP TO SPECIAL CHARACTER */
+	// NEED A LOOP HERE THAT SENDS CHARACTER UP TO SPECIAL CHARACTER 
   wordBank = getThreeKeyword(currCharProbability, charList);
 	
 	chosen = wordCompare(wordBank);
@@ -235,7 +237,7 @@ UT_string * postProcessing2(UT_array * charList)
     
   return output;
 }
-/* NEED FIXING */
+// NEED FIXING 
 UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList)
 {
 	char * top;
@@ -305,3 +307,4 @@ char *wordCompare(UT_array * charList)
 	}
 	return utarray_front(charList);
 }
+*/
