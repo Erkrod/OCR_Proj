@@ -4,7 +4,10 @@ clean:
 	-rm -f *.o
 
 TestIsolate: DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o
-	gcc -o TestIsolateCharacter DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o	
+	gcc -o TestIsolateCharacter DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o
+
+TestBox: DIPs.o FileIO.o BoxCharacters.o Image.o ImageList.o TestBoxCharacters.o
+	gcc -o TestBoxCharacters DIPs.o FileIO.o BoxCharacters.o Image.o ImageList.o TestBoxCharacters.o	
 
 TestIsolateGDB: DIPsGDB.o FileIOGDB.o IsolateCharacterGDB.o ImageGDB.o ImageListGDB.o TestIsolateCharacterGDB.o
 	gcc -o TestIsolateCharacter DIPs.o FileIO.o IsolateCharacter.o Image.o ImageList.o TestIsolateCharacter.o -g
@@ -14,6 +17,12 @@ TestIsolateCharacter.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h 
 
 IsolateCharacter.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h IsolateCharacter.c
 	gcc -c IsolateCharacter.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+
+TestBoxCharacters.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h TestBoxCharacters.c
+	gcc -c TestBoxCharacters.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+
+BoxCharacters.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h BoxCharacters.c
+	gcc -c BoxCharacters.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
 
 DIPs.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/DIPs.h DIPs.c
 	gcc -c DIPs.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
@@ -44,3 +53,12 @@ ImageGDB.o: Image.c /home/group1/EECS22L/EECS22L_Project2/inc/Model/Image.h
 
 ImageListGDB.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/ImageList.h ImageList.c
 	gcc -g -c ImageList.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+
+TestBoxGDB: DIPsGDB.o FileIOGDB.o BoxCharactersGDB.o ImageGDB.o ImageListGDB.o TestBoxCharactersGDB.o
+	gcc -o TestBoxCharacters DIPs.o FileIO.o BoxCharacters.o Image.o ImageList.o TestBoxCharacters.o -g
+
+TestBoxCharactersGDB.o: /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h TestBoxCharacters.c
+	gcc -g -c TestBoxCharacters.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
+
+BoxCharactersGDB.o: BoxCharacters.c /home/group1/EECS22L/EECS22L_Project2/inc/Model/Model.h
+	gcc -g -c BoxCharacters.c -I /home/group1/EECS22L/EECS22L_Project2/inc/Model
