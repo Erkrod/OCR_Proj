@@ -13,7 +13,7 @@ right. You can assume that the input is checked to be valid.
 }
 */
 IMAGE *Rotate(IMAGE *image, int ClockwiseDegree){
-	char command[SLEN * 5] = "pnmrotate ";
+	char command[SLEN * 5] = "pnmrotate -background=rgb:ff/ff/ff ";
 	char degrees[4];
 
 	if (ClockwiseDegree == 360)
@@ -112,35 +112,34 @@ IMAGE *Resize(IMAGE *image, unsigned int percentage)
 	return image_tmp;
 }
 
-IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int area_x2, int area_y2, int NewPixelValue){
+IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int area_x2, int area_y2, int NewPixelValue, int threshold){
 	int i, j;
-	unsigned int WIDTH;
-	unsigned int HEIGHT;
-	unsigned int xy_valueR, xy_valueG, xy_valueB, r, g , b;
-	int x1, x2, y1, y2;
+	int degree;
+	unsigned char xy_valueR, xy_valueG, xy_valueB, r, g , b;
 	int x_c, y_c;
 
-	x_c = x1;
-	x1 = (x1 < x2) ? x1 : x2;
-	x2 = (x_c < x2) ? x2 : x_c;
+	x_c = area_x1;
+	area_x1 = (area_x1 < area_x2) ? area_x1 : area_x2;
+	area_x2 = (x_c < area_x2) ? area_x2 : x_c;
 
-	y_c = y1;
-	y1 = (y1 < y2) ? y1 : y2;
-	y2 = (y_c < y2) ? y2 : y_c;
+	y_c = area_y1;
+	area_y1 = (area_y1 < area_y2) ? area_y1 : area_y2;
+	area_y2 = (y_c < area_y2) ? area_y2 : y_c;
 
 	assert(image);
-	WIDTH = image->Width;
-	HEIGHT = image->Height;
+
 	xy_valueR = GetPixelR(image, x, y);
 	xy_valueG = GetPixelG(image, x, y);
 	xy_valueB = GetPixelB(image, x, y);
 
-	for (j = y1; j <= y2; j++)
-		for (i = x1; i < x2; i++){
+	degree = 5 * threshold;
+
+	for (j = area_y1; j <= area_y2; j++)
+		for (i = area_x1; i < area_x2; i++){
 			r = GetPixelR(image, i, j);
 			g = GetPixelG(image, i, j);
 			b = GetPixelB(image, i, j);
-			if ( ((r > xy_valueR - 5) && (r < xy_valueR + 5)) && ((g > xy_valueG - 5) && (g < xy_valueG + 5)) && ((b > xy_valueB - 5) && (b < xy_valueB + 5))){
+			if ( ((r > xy_valueR - degree) && (r < xy_valueR + degree)) && ((g > xy_valueG - degree) && (g < xy_valueG + degree)) && ((b > xy_valueB - degree) && (b < xy_valueB + degree))){
 				SetPixelR(image, i, j, NewPixelValue);
 				SetPixelG(image, i, j, NewPixelValue);
 				SetPixelB(image, i, j, NewPixelValue);
@@ -184,3 +183,41 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 	return image_tmp;
 }
 
+IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter){
+	int i, j;
+	int R_samp, G_samp, B_samp;
+	int d_thresh, c1_thresh, c2_thresh, b_thresh;
+	assert(image);
+
+	d_thresh = 5 * darken_limiter;
+	c1_thresh = 5 * c_var1;
+	c2_thresh = 5 * c_var2;
+	b_thresh = 10 * b_threshold;
+
+	for (i = 0; i < image->Width; i++){
+		for (j = 0; j < image->Height; j++){
+			SetPixelR(image, i, j, GetPixelR(image, i, j) > d_thresh ? GetPixelR(image, i, j) - d_thresh : GetPixelR(image, i, j));
+			SetPixelG(image, i, j, GetPixelG(image, i, j) > d_thresh ? GetPixelG(image, i, j) - d_thresh : GetPixelG(image, i, j));
+			SetPixelB(image, i, j, GetPixelB(image, i, j) > d_thresh ? GetPixelB(image, i, j) - d_thresh : GetPixelB(image, i, j));
+
+			R_samp = (int)GetPixelR(image, i, j);
+			G_samp = (int)GetPixelG(image, i, j);
+			B_samp = (int)GetPixelB(image, i, j);
+
+			if( (abs(R_samp - G_samp) > c1_thresh) || (abs(R_samp - B_samp) > c1_thresh) || (abs(G_samp - B_samp) > c1_thresh) ){
+				SetPixelR(image, i, j, 255);
+				SetPixelG(image, i, j, 255);
+				SetPixelB(image, i, j, 255);
+			}
+
+			if ( (R_samp > b_thresh) || (G_samp > b_thresh) || (B_samp > b_thresh)){
+				if( (abs(R_samp - G_samp) > c2_thresh) || (abs(R_samp - B_samp) > c2_thresh) || (abs(G_samp - B_samp) > c2_thresh) ){
+					SetPixelR(image, i, j, 255);
+					SetPixelG(image, i, j, 255);
+					SetPixelB(image, i, j, 255);
+				}
+			}
+		}
+	}
+	return image;
+}
