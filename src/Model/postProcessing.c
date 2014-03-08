@@ -9,8 +9,8 @@ void CharProfile_free(void * profile_in){
 	utarray_free(profile->CharChoices);
 }
 
-//void postProcessingInitialize(UT_array * , UT_array *);
-//void postProcessingCleanUP(UT_array * , UT_array * );
+void postProcessingInitialize(UT_array * , UT_array *);
+void postProcessingCleanUP(UT_array * , UT_array * );
 UT_string * postProcessing(UT_array * );
 //UT_string * postProcessing2(UT_array *);
 //UT_array * getThreeKeyword(CharProfile *, UT_array *);
@@ -18,98 +18,159 @@ UT_string * postProcessing(UT_array * );
 //char * getTopProb(UT_array *);
 //char * getSecondProb(UT_array *);
 
-//void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
-//{
-  /* the actual dictionary */
-/*  char *words[32];
-	char *specialCharacter[32];
-  int i = 0;*/
-  
-  /*all ansi c keyword */	
- /* words[0] = "auto";
-  words[1] = "break";
-  words[2] = "case";
-  words[3] = "char";
-  words[4] = "const";
-  words[5] = "continue";
-  words[6] = "default";
-  words[7] = "do";
-  words[8] = "double";
-  words[9] = "else";
-  words[10] = "enum";
-  words[11] = "extern";
-  words[12] = "float";
-  words[13] = "for";
-  words[14] = "goto";
-  words[15] = "if";
-  words[16] = "int";
-  words[17] = "long";
-  words[18] = "register";
-  words[19] = "return";
-  words[20] = "short";
-  words[21] = "signed";
-  words[22] = "sizeof";
-  words[23] = "static";
-  words[24] = "struct";
-  words[25] = "switch";
-  words[26] = "typedef";
-  words[27] = "union";
-  words[28] = "unsigned";
-  words[29] = "void";
-  words[30] = "volatile";
-  words[31] = "while";*/
-	
-	/* all the special characters */
-	/*specialCharacter[0] = "`";
-	specialCharacter[1] = "~";
-	specialCharacter[2] = "!";
-	specialCharacter[3] = "@";
-	specialCharacter[4] = "#";
-	specialCharacter[5] = "$";
-	specialCharacter[6] = "%";
-	specialCharacter[7] = "^";
-	specialCharacter[8] = "&";
-	specialCharacter[9] = "*";
-	specialCharacter[10] = "(";
-	specialCharacter[11] = ")";
-	specialCharacter[12] = "-";
-	specialCharacter[13] = "_";
-	specialCharacter[14] = "=";
-	specialCharacter[15] = "+";
-	specialCharacter[16] = "[";
-	specialCharacter[17] = "{";
-	specialCharacter[18] = "]";
-	specialCharacter[19] = "}";
-	specialCharacter[20] = "\\";
-	specialCharacter[21] = "|";
-	specialCharacter[22] = ";";
-	specialCharacter[23] = ":";
-	specialCharacter[24] = "\"";
-	specialCharacter[25] = "\"";
-	specialCharacter[26] = ",";
-	specialCharacter[27] = "<";
-	specialCharacter[28] = ".";
-	specialCharacter[29] = ">";
-	specialCharacter[30] = "/";
-	specialCharacter[31] = "?";
-
- for (i = 0; i < 32; i++)
- {
-   utarray_push_back(dictionary, &words[i]);
- }
- 
- for (i = 0; i < 32; i++)
- {
-   utarray_push_back(specialChar, &specialCharacter[i]);
- }*/
- 
-//}
-
-/*void postProcessingCleanUP(UT_array * dictionary, UT_array * specialCharacter)
+int main(void)
 {
-	utarray_free(dictionary);
-	utarray_free(specialCharacter);
-}*/
+  UT_array * dictionary;
+  UT_array * specialChar;
+  
+  UT_array * WholeString = NULL;
+  CharProfile NewCharProfile;
+  CharProbability NewCharProbability;
+  
+  utarray_new(dictionary, &ut_str_icd);
+  utarray_new(specialChar, &ut_str_icd);
+  postProcessingInitialize(dictionary, specialChar);
+  
+  /*initialize string profile*/
+  UT_icd StringProfile_icd = {sizeof(CharProfile), NULL, NULL, CharProfile_free};
+  utarray_new(WholeString, &StringProfile_icd);
+  
+  /*first char spot*/	
+  UT_icd CharProbability_icd = {sizeof(CharProbability), NULL, NULL, NULL};
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  
+  /*first possibility*/
+  NewCharProbability.Char = 'a';
+  NewCharProbability.Probability = 25;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  
+  
+  /*second probability*/
+  NewCharProbability.Char = 'z';
+  NewCharProbability.Probability = 75;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+
+
+  /*second char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  
+  /*first possibility*/
+  NewCharProbability.Char = 'B';
+  NewCharProbability.Probability = 35;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  
+  
+  /*second probability*/
+  NewCharProbability.Char = 'D';
+  NewCharProbability.Probability = 85;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  postProcessing(WholeString);
+  postProcessingCleanUP(dictionary, specialChar);
+  return 0;
+}
+
+
+void postProcessingInitialize(UT_array * dictionary, UT_array * specialChar)
+{
+  char words[32][15];
+	char specialCharacter[32][3];
+  char *temp;
+  char ** p;
+  int i = 0;
+
+  //all ansi c keyword 	
+  strcpy(words[0],"auto");
+  strcpy(words[1],"break");
+  strcpy(words[2],"case");
+  strcpy(words[3],"char");
+  strcpy(words[4],"const");
+  strcpy(words[5],"continue");
+  strcpy(words[6],"default");
+  strcpy(words[7],"do");
+  strcpy(words[8],"double");
+  strcpy(words[9],"else");
+  strcpy(words[10],"enum");
+  strcpy(words[11],"extern");
+  strcpy(words[12],"float");
+  strcpy(words[13],"for");
+  strcpy(words[14],"goto");
+  strcpy(words[15],"if");
+  strcpy(words[16],"int");
+  strcpy(words[17],"long");
+  strcpy(words[18],"register");
+  strcpy(words[19],"return");
+  strcpy(words[20],"short");
+  strcpy(words[21],"signed");
+  strcpy(words[22],"sizeof");
+  strcpy(words[23],"static");
+  strcpy(words[24],"struct");
+  strcpy(words[25],"switch");
+  strcpy(words[26],"typedef");
+  strcpy(words[27],"union");
+  strcpy(words[28],"unsigned");
+  strcpy(words[29],"void");
+  strcpy(words[30],"volatile");
+  strcpy(words[31],"while");
+
+  // all the special characters
+  strcpy(specialCharacter[0],"`");
+  strcpy(specialCharacter[1],"~");
+  strcpy(specialCharacter[2],"!");
+  strcpy(specialCharacter[3],"@");
+  strcpy(specialCharacter[4],"#");
+  strcpy(specialCharacter[5],"$");
+  strcpy(specialCharacter[6],"%");
+  strcpy(specialCharacter[7], "^");
+  strcpy(specialCharacter[8], "&");
+  strcpy(specialCharacter[9], "*");
+  strcpy(specialCharacter[10], "(");
+  strcpy(specialCharacter[11], ")");
+  strcpy(specialCharacter[12], "-");
+  strcpy(specialCharacter[13], "_");
+  strcpy(specialCharacter[14], "=");
+  strcpy(specialCharacter[15], "+");
+  strcpy(specialCharacter[16], "[");
+  strcpy(specialCharacter[17], "{");
+  strcpy(specialCharacter[18], "]");
+  strcpy(specialCharacter[19], "}");
+  strcpy(specialCharacter[20], "\\");
+  strcpy(specialCharacter[21], "|");
+  strcpy(specialCharacter[22], ";");
+  strcpy(specialCharacter[23], ":");
+  strcpy(specialCharacter[24], "\"");
+  strcpy(specialCharacter[25], "\"");
+  strcpy(specialCharacter[26], ",");
+  strcpy(specialCharacter[27], "<");
+  strcpy(specialCharacter[28], ".");
+  strcpy(specialCharacter[29], ">");
+  strcpy(specialCharacter[30], "/");
+  strcpy(specialCharacter[31], "?");
+	
+  for (i = 0; i < 32; i++)
+  {
+    temp = words[i];
+    utarray_push_back(dictionary, &temp);
+  }
+  
+  for (i = 0; i < 32; i++)
+  {
+    temp = specialCharacter[i];
+    utarray_push_back(specialChar, &temp);
+  }
+}
+
+void postProcessingCleanUP(UT_array * dictionary, UT_array * specialCharacter)
+{
+  utarray_free(dictionary);
+  utarray_free(specialCharacter);
+}
 
 /* part 1 of the post processing stage */
 UT_string * postProcessing(UT_array * charList)
@@ -139,14 +200,10 @@ UT_string * postProcessing(UT_array * charList)
       /* found a character with a higher percentage */
       if (percentage < currCharProbability->Probability)
       {
-				percentage = currCharProbability->Probability;
-				chosen = currCharProbability->Char;
-	 
-				if (percentage == 100)
-				{
-					break;
-				}
-			}
+	percentage = currCharProbability->Probability;
+	chosen = currCharProbability->Char;
+
+      }
     }
     
     /* adding the chosen character to a temp string */
