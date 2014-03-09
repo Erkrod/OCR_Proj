@@ -1,6 +1,9 @@
 #include "Model.h"
 
 
+/***********************************************************
+ *			LAZY ISOLATE CHARACTER
+ ***********************************************************/
 int IsPixelBlack(IMAGE * image, int x, int y){
 	if (GetPixelR(image, x, y) >= 50) return 0;
 	if (GetPixelG(image, x, y) >= 50) return 0;
@@ -193,6 +196,59 @@ IMAGE * PreviewLazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, 
 	return ToMarkImage;
 }
 
+
+ILIST * LazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
+	/*variables*/
+	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
+	int AreaTop, AreaBottom, AreaLeft, AreaRight;
+	int CharCounter, LineCounter;
+	
+	IMAGE * img;
+	/*Check for supported font and set constants*/
+	double FontHeight = 0, FontWidth = 0;
+	double FontHeightSpace = 0, FontWidthSpace = 0;
+	int TopOffset = 0, LeftOffset = 0, RightOffset = 0, BottomOffset = 0;
+	if (!((Font == CourierNew && fontsize == 12 && scanres == 300) || (Font == LucidaConsole && fontsize == 10 && scanres == 300))){
+		printf("Not supported format\n");
+		return NULL;
+	} else {
+		GetIsolateCharacterConstant(Font, fontsize, scanres, &FontHeight, &FontWidth, &FontHeightSpace, &FontWidthSpace, &TopOffset, &LeftOffset, &RightOffset, &BottomOffset);
+	}
+	
+		
+	
+	ILIST * imglist = NewImageList();
+	
+	/*get the margins*/
+	GetMargins(image, TopOffset, LeftOffset, RightOffset, BottomOffset, &TopMargin, &LeftMargin, &RightMargin, &BottomMargin);
+
+	/*start cropping*/	
+	
+	
+	LineCounter = 0;
+	for (i = TopMargin; i < BottomMargin - FontHeight; i=floor(TopMargin + LineCounter*(FontHeight+FontHeightSpace))){
+		LineCounter++;
+		CharCounter = 0;
+		for (j = LeftMargin; j < RightMargin - (int)FontWidth; j=LeftMargin + floor(CharCounter*(FontWidth+FontWidthSpace))){
+			CharCounter++;
+			
+			AreaTop = i;
+			AreaBottom = ceil(i + FontHeight) < image->Height ? ceil(i + FontHeight) : image->Height - 1;
+			AreaLeft = j;
+			AreaRight = ceil(j + FontWidth) < image->Width ? ceil(j + FontWidth) : image->Width - 1;
+			
+			img = CropImage(image,AreaLeft, AreaTop, AreaRight, AreaBottom);			
+			AppendImage(imglist, img);
+
+		}
+		AppendImage(imglist, NULL);
+	}
+	return imglist;
+}
+
+/***********************************************************
+ *			ACTIVE ISOLATE CHARACTER
+ ***********************************************************/
 IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres)
 {
   IMAGE * boxed_image;
@@ -360,53 +416,6 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
   return boxed_image;
 }
 
-ILIST * LazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
-	/*variables*/
-	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
-	int AreaTop, AreaBottom, AreaLeft, AreaRight;
-	int CharCounter, LineCounter;
-	
-	IMAGE * img;
-	/*Check for supported font and set constants*/
-	double FontHeight = 0, FontWidth = 0;
-	double FontHeightSpace = 0, FontWidthSpace = 0;
-	int TopOffset = 0, LeftOffset = 0, RightOffset = 0, BottomOffset = 0;
-	if (!((Font == CourierNew && fontsize == 12 && scanres == 300) || (Font == LucidaConsole && fontsize == 10 && scanres == 300))){
-		printf("Not supported format\n");
-		return NULL;
-	} else {
-		GetIsolateCharacterConstant(Font, fontsize, scanres, &FontHeight, &FontWidth, &FontHeightSpace, &FontWidthSpace, &TopOffset, &LeftOffset, &RightOffset, &BottomOffset);
-	}
-	
-		
-	
-	ILIST * imglist = NewImageList();
-	
-	/*get the margins*/
-	GetMargins(image, TopOffset, LeftOffset, RightOffset, BottomOffset, &TopMargin, &LeftMargin, &RightMargin, &BottomMargin);
-
-	/*start cropping*/	
-	
-	
-	LineCounter = 0;
-	for (i = TopMargin; i < BottomMargin - FontHeight; i=floor(TopMargin + LineCounter*(FontHeight+FontHeightSpace))){
-		LineCounter++;
-		CharCounter = 0;
-		for (j = LeftMargin; j < RightMargin - (int)FontWidth; j=LeftMargin + floor(CharCounter*(FontWidth+FontWidthSpace))){
-			CharCounter++;
-			
-			AreaTop = i;
-			AreaBottom = ceil(i + FontHeight) < image->Height ? ceil(i + FontHeight) : image->Height - 1;
-			AreaLeft = j;
-			AreaRight = ceil(j + FontWidth) < image->Width ? ceil(j + FontWidth) : image->Width - 1;
-			
-			img = CropImage(image,AreaLeft, AreaTop, AreaRight, AreaBottom);			
-			AppendImage(imglist, img);
-
-		}
-	}
-	return imglist;
-}
 
 ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres)
 {
