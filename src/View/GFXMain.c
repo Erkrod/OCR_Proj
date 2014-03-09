@@ -25,6 +25,7 @@ int main (int   argc, char *argv[]){
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
 
 
+
   gtk_container_add(GTK_CONTAINER(window), vbox);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
   gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
