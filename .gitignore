@@ -17,10 +17,12 @@
 *.out
 *.app
 bin/*
+run
 
 #temporary files of text editors
 *~
 TempOutputText.txt
+Temp*
 
 #temporary ppm files
 *.ppm
