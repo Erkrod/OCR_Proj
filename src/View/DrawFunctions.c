@@ -82,7 +82,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *undo          = gtk_menu_item_new_with_label("Undo"),
     *convert       = gtk_menu_item_new_with_label("Convert to Black and White"),
     *removeStain   = gtk_menu_item_new_with_label("Stain Removal"),
-    *removeWrinkle = gtk_menu_item_new_with_label("Wrinkle Removal"),
+    *colorFilter   = gtk_menu_item_new_with_label("Color Filter"),
     *rotate        = gtk_menu_item_new_with_label("Rotate  (Level Image)"),
     *lineBound     = gtk_menu_item_new_with_label("Line Boundaries"),
     *crop          = gtk_menu_item_new_with_label("Crop  (Select OCR Region)");
@@ -92,7 +92,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   AddWidgetToViewHandle(MainViewHandle, "UndoPreproc", undo);
   AddWidgetToViewHandle(MainViewHandle, "ConvertBW", convert);
   AddWidgetToViewHandle(MainViewHandle, "RemoveStain", removeStain);
-  AddWidgetToViewHandle(MainViewHandle, "RemoveWrinkle", removeWrinkle);
+  AddWidgetToViewHandle(MainViewHandle, "ColorFilter", colorFilter);
   AddWidgetToViewHandle(MainViewHandle, "Rotate", rotate);
   AddWidgetToViewHandle(MainViewHandle, "LineBoundary", lineBound);
   AddWidgetToViewHandle(MainViewHandle, "Crop", crop);
@@ -103,7 +103,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), separator2);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), convert);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), removeStain);
-  gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), removeWrinkle);
+  gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), colorFilter);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), rotate);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), lineBound);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), crop);
@@ -161,7 +161,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   g_signal_connect(G_OBJECT(undo), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(convert), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(removeStain), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
-  g_signal_connect(G_OBJECT(removeWrinkle), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(colorFilter), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(rotate), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(lineBound), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(crop), "activate", G_CALLBACK(CatchEvent), MainViewHandle);  
