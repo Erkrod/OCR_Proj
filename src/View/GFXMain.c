@@ -23,6 +23,7 @@ int main (int   argc, char *argv[]){
   GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
   GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
+  GtkWidget *stainWindow      = drawStainRemoveWindow(MainViewHandle);
 
 
 

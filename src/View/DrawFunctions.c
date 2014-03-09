@@ -467,7 +467,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  
  vbox = gtk_vbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "vbox", vbox);
- gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 8);
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
  /* reference point frame */
@@ -638,6 +638,136 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  gtk_widget_show_all(filterWin); 
 
  return filterWin;
+}
+
+GtkWidget *drawStainRemoveWindow(ViewHandle * MainViewHandle){
+
+ GtkWidget *stainWin;
+ GtkWidget *vboxMain, *vbox;
+ GtkWidget *hbox;
+ GtkWidget *frame;
+ GtkWidget *spinner;
+ GtkWidget *stainButton, *closeButton;
+ GtkWidget *label;
+ GtkAdjustment *adj;
+
+ stainWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+ AddWidgetToViewHandle(MainViewHandle, "RemoveStainWin", stainWin);
+ gtk_window_set_default_size(GTK_WINDOW(stainWin), 500, 100);
+ gtk_window_set_resizable (GTK_WINDOW(stainWin), FALSE);
+ g_signal_connect (stainWin, "destroy",
+ 		   G_CALLBACK (gtk_main_quit),
+ 		   NULL);
+ gtk_window_set_title (GTK_WINDOW (stainWin), "Stain Removal");
+
+ vboxMain = gtk_vbox_new (FALSE, 5);
+ AddWidgetToViewHandle(MainViewHandle, "vboxMain", vboxMain);
+ gtk_container_set_border_width (GTK_CONTAINER (vboxMain), 10);
+ gtk_container_add (GTK_CONTAINER (stainWin), vboxMain);
+
+ frame = gtk_frame_new (NULL);
+ AddWidgetToViewHandle(MainViewHandle, "StainFrame", frame);
+ gtk_box_pack_start (GTK_BOX (vboxMain), frame, TRUE, TRUE, 0);
+ 
+ vbox = gtk_vbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "StainVbox", vbox);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 8);
+ gtk_container_add (GTK_CONTAINER (frame), vbox);
+
+ /* channel variance 1 selection */
+ hbox = gtk_hbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "StainHbox", hbox);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 10);
+ 
+ label = gtk_label_new ("Channel Variance 1:");
+ AddWidgetToViewHandle(MainViewHandle, "StainLabel", label);
+ gtk_widget_set_size_request(label, 50, 25);
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 255.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Var1Spinner", spinner);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ /* channel variance 2 selection */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 10);
+ 
+ label = gtk_label_new ("Channel Variance 2:  ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 255.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Var2Spinner", spinner);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ /* brightness selection */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 10);
+ 
+ label = gtk_label_new ("Brightness Threshold:      ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 255.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "BrightSpinner", spinner);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ /* darken limiter selectio */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 10);
+ 
+ label = gtk_label_new ("Darken Limiter:  ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 255.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "DarkenSpinner", spinner);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ /* remove stain button */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 15);
+
+ stainButton = gtk_button_new_with_label ("Apply Stain Removal");
+ /* gtk_widget_set_size_request(stainButton, 200, 25); */
+ AddWidgetToViewHandle(MainViewHandle, "RemoveStainButton", stainButton);
+ /* g_signal_connect(ocrButton, "clicked", */
+ /* 		  G_CALLBACK (gtk_widget_destroy), */
+ /* 		  ocrWin); */
+ g_signal_connect(G_OBJECT(stainButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (hbox), stainButton, FALSE, FALSE, 35);
+
+ /* close button */
+ closeButton = gtk_button_new_with_label ("Close");
+ gtk_widget_set_size_request(closeButton, 80, 25);
+ AddWidgetToViewHandle(MainViewHandle, "StainCloseButton", closeButton);
+ /* g_signal_connect_swapped (closeButton, "clicked", */
+ /* 			   G_CALLBACK (gtk_widget_destroy), */
+ /* 			   ocrWin); */
+ g_signal_connect_swapped (closeButton, "clicked",
+ 			   G_CALLBACK (gtk_widget_destroy),
+ 			   stainWin);
+
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vboxMain), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_end (GTK_BOX (hbox), closeButton, FALSE, FALSE, 5);
+
+ gtk_widget_show_all(stainWin); 
+
+ return stainWin;
 }
 
 GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){

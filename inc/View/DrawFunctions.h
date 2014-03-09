@@ -23,6 +23,8 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle);
 
 GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle);
 
+GtkWidget *drawStainRemoveWindow(ViewHandle * MainViewHandle);
+
 GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle);
 
 GtkWidget *drawAboutWindow(ViewHandle * MainViewHandle);
