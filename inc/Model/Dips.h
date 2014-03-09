@@ -1,27 +1,57 @@
+/*********************************************************************/
+/* DIPs.h: homework assignment #3, for EECS 22,  Fall 2011       	 */
+/*                                                                   */
+/* History:                                                          */
+/* 10/07/11 Weiwei Chen  updated for EECS22 assignment3 FAll2011     */
+/* 						 initial version                			 */
+/*********************************************************************/
 #ifndef DIPS_H
 #define DIPS_H
 
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 #include "Image.h"
-#include "FileIO.h"
-#include "Constants.h"
+/*#include "Constants.h"*/
+#include <math.h>
 
-IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2);
-/*This function will crop the image into a smaller area between (x1,
-y1) and (x2, y2). (x1,y1) is on top left and (x2, y2) is on lower
-right. You can assume that the input is checked to be valid.
-*/
-
+/*rotate image*/
 IMAGE *Rotate(IMAGE *image, int ClockwiseDegree);
-/*This function will rotate the image clockwise direction with given
-degree.
-*/
 
-IMAGE *Resize(IMAGE *image, unsigned int percentage);
-/*This function will resize the image into new size. Could use last
-year solution.
-*/
+/*crop*/
+IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2);
 
-IMAGE *ColorFilter(IMAGE *image, int x, int y, int area_x1, int area_y1, int area_x2, int area_y2, int NewPixelValue);
+/*duplicate image*/
+IMAGE * DuplicateImage(IMAGE * image);
+
+/* reverse image color */
+void BlackNWhite(IMAGE *image) ; 
+
+/* flip image vertically */
+void VFlip(IMAGE *image) ;
+
+/* mirror image horizontally */
+void HMirror(IMAGE *image) ; 
+
+
+/* sharpen the image */
+void Sharpen(IMAGE *image) ; 
+
+/* Find the edges in the image */
+void Edge(IMAGE *image) ;
+
+/* Posterization */
+void Posterize(IMAGE *image) ; 
+
+/* add noise to image */
+void AddNoise(IMAGE *image) ;
+
+/* Resize */
+IMAGE *Resize(	unsigned int percentage, IMAGE *image) ; 
+
+
+IMAGE *Crop(IMAGE *image, unsigned int x, unsigned int y, unsigned int W, unsigned int H);
 
 #endif
