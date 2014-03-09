@@ -52,16 +52,9 @@ GtkWidget *drawMain(ViewHandle * MainViewHandle){
 }
 
 GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
-
   
   GtkWidget *menubar = gtk_menu_bar_new();
   GtkWidget *separator = gtk_separator_menu_item_new();
-/*****************************************************************************************************************/
-/*RYAN: here is an example of how you can add a new Widget to the data structure*/
-/*The onlythinng you need to change is "NewName", NewGtkWidget*"*/
-  AddWidgetToViewHandle(MainViewHandle, "MenuBar", menubar);
-  AddWidgetToViewHandle(MainViewHandle, "Separator", separator);
-/*****************************************************************************************************************/  
   
   /* file options for menubar */
   GtkWidget  *filemenu = gtk_menu_new(),
@@ -126,18 +119,15 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   /* postprocessing options for menubar */
   GtkWidget *postProcMenu = gtk_menu_new(),
     *postProc   = gtk_menu_item_new_with_label("Postprocessing"),
-    *edit       = gtk_menu_item_new_with_label("Edit OCR Text Output"),
-    *dictionary =  gtk_menu_item_new_with_label("Dictionary Settings");
- 
+    *edit       = gtk_menu_item_new_with_label("Edit OCR Text Output");
+   
   AddWidgetToViewHandle(MainViewHandle, "PostProcMenu", postProcMenu);
   AddWidgetToViewHandle(MainViewHandle, "Postprocessing", postProc);
   AddWidgetToViewHandle(MainViewHandle, "EditText", edit);
-  AddWidgetToViewHandle(MainViewHandle, "Dictionary", dictionary);
 
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), postProc);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(postProc), postProcMenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), edit);
-  gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), dictionary);
 
   /* help options for menubar */
   GtkWidget *helpMenu = gtk_menu_new(),
@@ -172,7 +162,6 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
 
   g_signal_connect(G_OBJECT(postProc), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(edit), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
-  g_signal_connect(G_OBJECT(dictionary), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
 
   g_signal_connect(G_OBJECT(about), "activate", G_CALLBACK(drawAboutWindow), NULL);
 
