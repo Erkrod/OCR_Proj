@@ -1,6 +1,7 @@
 /******************************************************************/
 /* DrawFunctions.c                                                */
 /******************************************************************/
+
 #include "View.h"
 
 void drawAllWindows(ViewHandle * MainViewHandle){
@@ -138,6 +139,22 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), edit);
   gtk_menu_shell_append(GTK_MENU_SHELL(postProcMenu), dictionary);
 
+  /* help options for menubar */
+  GtkWidget *helpMenu = gtk_menu_new(),
+    *help         = gtk_menu_item_new_with_label("Help"),
+    *userManual   = gtk_menu_item_new_with_label("User Manual"),
+    *about        = gtk_menu_item_new_with_label("About OCR");
+ 
+  AddWidgetToViewHandle(MainViewHandle, "HelpMenu", helpMenu);
+  AddWidgetToViewHandle(MainViewHandle, "Help", help);
+  AddWidgetToViewHandle(MainViewHandle, "UserManual", userManual);
+  AddWidgetToViewHandle(MainViewHandle, "About", about);
+
+  gtk_menu_shell_append(GTK_MENU_SHELL(menubar), help);
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), helpMenu);
+  gtk_menu_shell_append(GTK_MENU_SHELL(helpMenu), userManual);
+  gtk_menu_shell_append(GTK_MENU_SHELL(helpMenu), about);
+
   g_signal_connect(G_OBJECT(quit), "activate", G_CALLBACK(gtk_main_quit), NULL);   
   g_signal_connect(G_OBJECT(open), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(save), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
@@ -156,6 +173,9 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   g_signal_connect(G_OBJECT(postProc), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(edit), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(dictionary), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+
+  g_signal_connect(G_OBJECT(about), "activate", G_CALLBACK(drawAboutWindow), NULL);
+
 
   return menubar;
 }
@@ -699,4 +719,26 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_widget_show_all(ocrWin); 
 
  return ocrWin;
+}
+
+GtkWidget *drawAboutWindow(ViewHandle * MainViewHandle){
+
+  /* GtkWidget *aboutWin; */
+  GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("Images/ocrMedium.png", NULL);
+  GtkWidget *dialog = gtk_about_dialog_new();
+
+  gtk_about_dialog_set_name(GTK_ABOUT_DIALOG(dialog), "OCR");
+  gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), "1.0"); 
+  gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), 
+				 "Quan Chau\nHanchel Cheng\nKevin Duong\n"
+				 "Jamie Lee\nRyan Morrison\nEric Rodriguez\nAndrew Trinh");
+  gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
+				"OCR is a tool for image processing,"
+				"optical character recognition, and text editing.");
+
+  gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), pixbuf);
+  gtk_dialog_run(GTK_DIALOG (dialog));
+  gtk_widget_destroy(dialog);
+
+  return dialog;
 }
