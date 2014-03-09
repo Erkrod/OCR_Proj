@@ -55,6 +55,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   
   GtkWidget *menubar = gtk_menu_bar_new();
   GtkWidget *separator = gtk_separator_menu_item_new();
+  GtkWidget *separator2 = gtk_separator_menu_item_new();
   
   /* file options for menubar */
   GtkWidget  *filemenu = gtk_menu_new(),
@@ -78,6 +79,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   /* preprocessor options for menubar */
   GtkWidget *preProcMenu = gtk_menu_new(),
     *preProc       = gtk_menu_item_new_with_label("Preprocessing"),
+    *undo          = gtk_menu_item_new_with_label("Undo"),
     *convert       = gtk_menu_item_new_with_label("Convert to Black and White"),
     *removeStain   = gtk_menu_item_new_with_label("Stain Removal"),
     *removeWrinkle = gtk_menu_item_new_with_label("Wrinkle Removal"),
@@ -87,6 +89,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
 
   AddWidgetToViewHandle(MainViewHandle, "PreProcessMenu", preProcMenu);
   AddWidgetToViewHandle(MainViewHandle, "Preprocessing", preProc);
+  AddWidgetToViewHandle(MainViewHandle, "UndoPreproc", undo);
   AddWidgetToViewHandle(MainViewHandle, "ConvertBW", convert);
   AddWidgetToViewHandle(MainViewHandle, "RemoveStain", removeStain);
   AddWidgetToViewHandle(MainViewHandle, "RemoveWrinkle", removeWrinkle);
@@ -96,6 +99,8 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
 
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), preProc);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(preProc), preProcMenu);
+  gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), undo);
+  gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), separator2);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), convert);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), removeStain);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), removeWrinkle);
@@ -150,6 +155,7 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   g_signal_connect(G_OBJECT(save), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
 
   g_signal_connect(G_OBJECT(preProc), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
+  g_signal_connect(G_OBJECT(undo), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(convert), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(removeStain), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(removeWrinkle), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
