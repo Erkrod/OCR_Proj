@@ -1,5 +1,11 @@
 #include "Model.h"
 
+int file_exist (char *filename)
+{
+  struct stat   buffer;   
+  return (stat (filename, &buffer) == 0);
+}
+
 UT_string * GetCompileMessage(UT_string * code){
 	FILE * file = fopen("TempCode.c", "w");
 	if (!file) return NULL;
@@ -7,8 +13,10 @@ UT_string * GetCompileMessage(UT_string * code){
 	fprintf(file, "%s", utstring_body(code));
 	fclose(file);
 	
-	system("rm TempGCC_err.txt TempGCC_good.txt");
+	if (file_exist("TempGCC_err.txt")) unlink("TempGCC_err.txt");
+	if (file_exist("TempGCC_good.txt")) unlink("TempGCC_good.txt");
 	system("gcc -o run TempCode.c 2>TempGCC_err.txt 1>TempGCC_good.txt");
+	if (file_exist("TempCode.c")) unlink("TempCode.c");
 	
 	file = fopen("TempGCC_err.txt", "r");
 	if (!file) return NULL;
@@ -33,11 +41,18 @@ UT_string * GetCompileMessage(UT_string * code){
 		
 		free(ReadString);
 		
+		if (file_exist("TempGCC_err.txt")) unlink("TempGCC_err.txt");
+		if (file_exist("TempGCC_good.txt")) unlink("TempGCC_good.txt");
+		if (file_exist("run")) unlink("run");
+		
 		return CompileMsg;
 	} else {
 		fclose(file);
 		utstring_clear(CompileMsg);
 		utstring_printf(CompileMsg, "No error compiling. The code looks good.\n");
+		if (file_exist("TempGCC_err.txt")) unlink("TempGCC_err.txt");
+		if (file_exist("TempGCC_good.txt")) unlink("TempGCC_good.txt");
+		if (file_exist("run")) unlink("run");
 		return CompileMsg;
 	}
 }

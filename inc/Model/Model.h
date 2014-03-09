@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "ImageList.h"
 #include "ModelStructure.h"
@@ -23,6 +24,7 @@ UT_string * postProcessing(UT_array * );
 int SaveImage(const char fname[SLEN], IMAGE *image);
 IMAGE * ReadImage(char *ImageFileName);
 
-
+UT_string * GetCompileMessage(UT_string * code);
+int file_exist (char *filename);
 
 #endif
