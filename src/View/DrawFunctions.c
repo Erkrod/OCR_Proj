@@ -440,7 +440,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  GtkWidget *filterWin;
  GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *hbox;
  GtkWidget *frame;
- GtkWidget *radio1, *radio2;
+ /* GtkWidget *radio1, *radio2; */
  GtkWidget *spinner;
  GtkWidget *filterButton, *closeButton;
  GtkWidget *label;
@@ -449,6 +449,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  filterWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
  AddWidgetToViewHandle(MainViewHandle, "ColorFilterWindow", filterWin);
  gtk_window_set_default_size(GTK_WINDOW(filterWin), 230, 100);
+ gtk_window_set_resizable (GTK_WINDOW(filterWin), FALSE);
  g_signal_connect (filterWin, "destroy",
  		   G_CALLBACK (gtk_main_quit),
  		   NULL);
@@ -466,27 +467,24 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  
  vbox = gtk_vbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "vbox", vbox);
- gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
- /* xy frame */
- frame = gtk_frame_new (NULL);
+ /* reference point frame */
+ frame = gtk_frame_new ("Reference Point");
  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
-
- vbox2 = gtk_vbox_new (FALSE, 0);
- AddWidgetToViewHandle(MainViewHandle, "vbox2", vbox2);
- gtk_container_set_border_width (GTK_CONTAINER (vbox2), 15);
- gtk_container_add (GTK_CONTAINER (frame), vbox2);
 
  hbox = gtk_hbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "hbox", hbox);
- gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
+
+ gtk_container_set_border_width (GTK_CONTAINER (hbox), 15);
+ gtk_container_add (GTK_CONTAINER (frame), hbox);
 
  label = gtk_label_new ("X:    ");
  AddWidgetToViewHandle(MainViewHandle, "label", label);
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  AddWidgetToViewHandle(MainViewHandle, "spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
@@ -499,12 +497,21 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("Y:    ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ /* filter area frame */
+ frame = gtk_frame_new ("Filter Area");
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 10);
+ vbox2 = gtk_vbox_new (FALSE, 0);
+
+ AddWidgetToViewHandle(MainViewHandle, "vbox2", vbox2);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox2), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox2);
 
  hbox = gtk_hbox_new (FALSE, 0);
  gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
@@ -512,7 +519,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("X1:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
@@ -525,7 +532,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("Y1:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
@@ -533,12 +540,12 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
  hbox = gtk_hbox_new (FALSE, 0);
- gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 10);
 
  label = gtk_label_new ("X2:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
@@ -551,15 +558,15 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  label = gtk_label_new ("Y2:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
- adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 1000.0, 1.0, 5.0, 0.0);
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
- /* radio frame */
- frame = gtk_frame_new (NULL);
+ /* color attributes frame */
+ frame = gtk_frame_new ("Color Attributes");
  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
 
  vbox3 = gtk_vbox_new (FALSE, 0);
@@ -567,33 +574,66 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  gtk_container_set_border_width (GTK_CONTAINER (vbox3), 15);
  gtk_container_add (GTK_CONTAINER (frame), vbox3);
 
- radio1 = gtk_radio_button_new_with_label(NULL, "Make Pixel Black");
- AddWidgetToViewHandle(MainViewHandle, "Radio1", radio1);
- g_signal_connect(G_OBJECT(radio1), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
- radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1),
-						       "Make Pixel White");
- AddWidgetToViewHandle(MainViewHandle, "Radio2", radio2);
- g_signal_connect(G_OBJECT(radio2), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ /* radio1 = gtk_radio_button_new_with_label(NULL, "Make Pixel Black"); */
+ /* AddWidgetToViewHandle(MainViewHandle, "Radio1", radio1); */
+ /* g_signal_connect(G_OBJECT(radio1), "clicked", G_CALLBACK(CatchEvent), MainViewHandle); */
+ /* radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1), */
+ /* 						       "Make Pixel White"); */
+ /* AddWidgetToViewHandle(MainViewHandle, "Radio2", radio2); */
+ /* g_signal_connect(G_OBJECT(radio2), "clicked", G_CALLBACK(CatchEvent), MainViewHandle); */
+
+ /* gtk_box_pack_start (GTK_BOX (vbox3), radio1, TRUE, TRUE, 0); */
+ /* gtk_box_pack_start (GTK_BOX (vbox3), radio2, FALSE, TRUE, 0); */
+
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), hbox, TRUE, TRUE, 0);
  
- gtk_box_pack_start (GTK_BOX (vbox3), radio1, TRUE, TRUE, 0);
- gtk_box_pack_start (GTK_BOX (vbox3), radio2, FALSE, TRUE, 0);
+ label = gtk_label_new ("New Pixel Value:  ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox3), hbox, TRUE, TRUE, 10);
+ 
+ label = gtk_label_new ("Threshold Value:  ");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+
+ adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
+ spinner = gtk_spin_button_new (adj, 0, 0);
+ gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
+
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
  /* color filter button */
- filterButton = gtk_button_new_with_label ("Color Filter");
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 10);
+
+ filterButton = gtk_button_new_with_label ("Apply Color Filter");
+ gtk_widget_set_size_request(filterButton, 200, 25);
  AddWidgetToViewHandle(MainViewHandle, "FilterButton", filterButton);
  /* g_signal_connect(filterButton, "clicked", */
  /* 		  G_CALLBACK (gtk_widget_destroy), */
  /* 		  spinner); */
  g_signal_connect(G_OBJECT(filterButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
- gtk_box_pack_start (GTK_BOX (vbox), filterButton, TRUE, TRUE, 5);
+ gtk_box_pack_start (GTK_BOX (hbox), filterButton, TRUE, TRUE, 5);
 
  /* close button */
  closeButton = gtk_button_new_with_label ("Close");
+ gtk_widget_set_size_request(closeButton, 80, 25);
  AddWidgetToViewHandle(MainViewHandle, "CloseButton", closeButton);
  g_signal_connect_swapped (closeButton, "clicked",
  			   G_CALLBACK (gtk_widget_destroy),
  			   filterWin);
- gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vboxMain), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_end (GTK_BOX (hbox), closeButton, FALSE, FALSE, 5);
 
  gtk_widget_show_all(filterWin); 
 
