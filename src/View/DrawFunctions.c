@@ -606,15 +606,17 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
 
  GtkWidget *ocrWin;
  GtkWidget *vboxMain, *vbox, *vbox2;
- GtkWidget *hbox, *hbox2;
+ GtkWidget *hbox, *hbox2, *hboxMain;
+ GtkWidget *radio1, *radio2;
  GtkWidget *frame;
  GtkWidget *combo;
- GtkWidget *ocrButton, *closeButton;
+ GtkWidget *ocrButton, *previewButton, *closeButton;
  GtkWidget *label;
 
  ocrWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
  AddWidgetToViewHandle(MainViewHandle, "OCRWindow", ocrWin);
  gtk_window_set_default_size(GTK_WINDOW(ocrWin), 230, 100);
+ gtk_window_set_resizable (GTK_WINDOW(ocrWin), FALSE);
  g_signal_connect (ocrWin, "destroy",
  		   G_CALLBACK (gtk_main_quit),
  		   NULL);
@@ -634,9 +636,13 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
+ hboxMain = gtk_hbox_new (FALSE, 0);
+ AddWidgetToViewHandle(MainViewHandle, "hboxMain", hboxMain);
+ gtk_box_pack_start (GTK_BOX (vbox), hboxMain, TRUE, TRUE, 0);
+
  /* fonts frame */
- frame = gtk_frame_new (NULL);
- gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+ frame = gtk_frame_new ("Character Attributes");
+ gtk_box_pack_start (GTK_BOX (hboxMain), frame, TRUE, TRUE, 0);
 
  vbox2 = gtk_vbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "vbox2", vbox2);
@@ -696,17 +702,46 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
 
+ frame = gtk_frame_new("Character Isolation");
+ gtk_box_pack_start(GTK_BOX(hboxMain), frame, TRUE, TRUE, 0);
+
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox2), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox2);
+
+ radio1 = gtk_radio_button_new_with_label(NULL, "Lazy Algorithm");
+ radio2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio1),
+ 						       "Active Algorithm");
+
+ AddWidgetToViewHandle(MainViewHandle, "LazyRadio", radio1);
+ AddWidgetToViewHandle(MainViewHandle, "ActiveRadio", radio2);
+ 
+ gtk_box_pack_start (GTK_BOX (vbox2), radio1, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), radio2, FALSE, TRUE, 0);
+
+ previewButton = gtk_button_new_with_label ("Preview Isolate");
+ AddWidgetToViewHandle(MainViewHandle, "PreviewIsolate", previewButton);
+ g_signal_connect(previewButton, "clicked",
+ 		  G_CALLBACK (gtk_widget_destroy),
+ 		  ocrWin);
+ gtk_box_pack_start (GTK_BOX (vbox2), previewButton, TRUE, TRUE, 5);
+
  /* ocr button */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
+
  ocrButton = gtk_button_new_with_label ("Perform OCR");
+ gtk_widget_set_size_request(ocrButton, 200, 25);
  AddWidgetToViewHandle(MainViewHandle, "OCRButton", ocrButton);
  /* g_signal_connect(ocrButton, "clicked", */
  /* 		  G_CALLBACK (gtk_widget_destroy), */
  /* 		  ocrWin); */
  g_signal_connect(G_OBJECT(ocrButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
- gtk_box_pack_start (GTK_BOX (vbox), ocrButton, TRUE, TRUE, 5);
+ gtk_box_pack_start (GTK_BOX (hbox), ocrButton, FALSE, FALSE, 100);
 
  /* close button */
  closeButton = gtk_button_new_with_label ("Close");
+ gtk_widget_set_size_request(closeButton, 80, 25);
  AddWidgetToViewHandle(MainViewHandle, "CloseButton", closeButton);
  /* g_signal_connect_swapped (closeButton, "clicked", */
  /* 			   G_CALLBACK (gtk_widget_destroy), */
@@ -714,7 +749,10 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  g_signal_connect_swapped (closeButton, "clicked",
  			   G_CALLBACK (gtk_widget_destroy),
  			   ocrWin);
- gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
+
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vboxMain), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_end (GTK_BOX (hbox), closeButton, FALSE, FALSE, 5);
 
  gtk_widget_show_all(ocrWin); 
 
