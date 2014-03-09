@@ -1,7 +1,16 @@
-
-
 #include "Control.h"
 #include "DrawFunctions.h"
+
+
+void ClearTextArea(ControlHandle * MainControlHandle);
+
+void AppendTextArea(ControlHandle * MainControlHandle, char * DisplayString);
+
+void UpdateTextArea(ControlHandle * MainControlHandle, char * DisplayString);
+
+char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString);
+
+
 
 ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
 #ifdef DEBUG
@@ -24,7 +33,32 @@ ControlHandle * Control_Initialize(void){
 	utstring_new(ToReturn->MainOutputString);
 	utstring_new(ToReturn->OutputFileName);
 	ToReturn->State = Normal;
+	ToReturn->IsInPreview = 0;
+	ToReturn->InitialState = 1;	
 	drawAllWindows(ToReturn->MainViewHandle);
+	
+	
+	/*set initial image and string here*/
+	ObjectHandle * ImageDisplay = FindObject(ToReturn, "MainDisplayImage");
+	if (file_exist("Images/ocrMedium.png"))
+		gtk_image_set_from_file(GTK_IMAGE(ImageDisplay->Widget), "Images/ocrMedium.png");
+		
+	FILE * file = fopen("README.txt", "r");
+	if (file){
+		fseek( file , 0L , SEEK_END);
+		long lSize = ftell( file );
+		rewind( file );
+		char * ReadString = (char *) malloc(sizeof(char) * lSize);
+		assert(ReadString);
+		
+		if( 1!=fread( ReadString , lSize, sizeof(char) , file) )
+			fclose(file),free(ReadString),fputs("Can't read README.txt",stderr),exit(1);
+		fclose(file);
+		printf("%s\n", ReadString);
+		UpdateTextArea(ToReturn, ReadString);
+		free(ReadString);
+	}
+	
 	return ToReturn;
 }
 
@@ -51,6 +85,9 @@ void Control_MainLoop(ControlHandle * MainHandle){
 }
 
 void Control_CleanUp(ControlHandle * MainHandle){
+	utstring_free(MainHandle->InputImageFileName);
+	utstring_free(MainHandle->MainOutputString);
+	utstring_free(MainHandle->OutputFileName);
 	free(MainHandle);
 }
 
@@ -66,10 +103,49 @@ void UpdateDisplayImage(ControlHandle * MainControlHandle){
 		assert(!SaveImage("Temp", MainControlHandle->MainImageList->Last->Image));
 		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
 		gtk_widget_show(CurrObject->Widget);
+	} else {
+		gtk_image_clear(GTK_IMAGE(CurrObject->Widget));
 	}
 	
 	
 	
+}
+
+void ClearTextArea(ControlHandle * MainControlHandle){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+	GtkTextIter iter1, iter2;
+	gtk_text_buffer_get_start_iter(buffer, &iter1);
+	gtk_text_buffer_get_end_iter(buffer, &iter2);
+	gtk_text_buffer_delete(buffer, &iter1, &iter2);
+}
+
+void AppendTextArea(ControlHandle * MainControlHandle, char * DisplayString){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));
+	GtkTextIter iter;
+	gtk_text_buffer_get_end_iter(buffer, &iter);
+	gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+	gtk_text_buffer_insert(buffer, &iter, DisplayString, -1);
+}
+
+void UpdateTextArea(ControlHandle * MainControlHandle, char * DisplayString){
+	ClearTextArea(MainControlHandle);
+	
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
+	gtk_text_buffer_insert(buffer, &iter, DisplayString, -1);
+}
+
+char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+	GtkTextIter iter1, iter2;
+	gtk_text_buffer_get_start_iter(buffer, &iter1);
+	gtk_text_buffer_get_end_iter(buffer, &iter2);
+	return gtk_text_buffer_get_text(buffer, &iter1, &iter2, FALSE);
 }
 
 void SetSentitiveAllWindows(ControlHandle * MainControlHandle, gboolean Sensitivity){
@@ -104,6 +180,14 @@ void SetSentitiveAllWindows(ControlHandle * MainControlHandle, gboolean Sensitiv
 	assert(CurrObject);
 	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
 	
+}
+
+void PopPreviewImage(ControlHandle * MainControlHandle){
+	if (MainControlHandle->IsInPreview == 1){
+		MainControlHandle->IsInPreview = 0;	
+		PopLastImage(MainControlHandle->MainImageList);
+		UpdateDisplayImage(MainControlHandle);
+	}
 }
 
 /*function to take care of all event*/
@@ -148,6 +232,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
 		} else {
+			PopPreviewImage(MainControlHandle);
 			NewImage = DuplicateImage(MainControlHandle->MainImageList->Last->Image);
 			BlackNWhite(NewImage);
 			AppendImage(MainControlHandle->MainImageList, NewImage);
@@ -155,11 +240,16 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		}
 /*======================================================================*/			
 	} else if (strcmp(ClickedObject->Name,"RemoveStain") == 0){
+		/*put the undo button here for now*/
+		PopLastImage(MainControlHandle->MainImageList);
+		UpdateDisplayImage(MainControlHandle);
 		
 	} else if (strcmp(ClickedObject->Name,"RemoveWrinkle") == 0){
+		PopPreviewImage(MainControlHandle);
 		show_error("Not supported yet");
 /*======================================================================*/	
-	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){	
+	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
+		PopPreviewImage(MainControlHandle);
 		char nameRotateWindow[MAX_HASH_KEY_LENGTH] =  "RotateWindow";
 		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 		assert(CurrObject);
@@ -169,6 +259,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
 		} else {
+			PopPreviewImage(MainControlHandle);
 			char nameRotateDegreeBox[MAX_HASH_KEY_LENGTH] =  "RotateSpinner";
 			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateDegreeBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 			assert(CurrObject);
@@ -181,6 +272,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 	
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"Crop") == 0){
+		PopPreviewImage(MainControlHandle);
 		char nameCropWindow[MAX_HASH_KEY_LENGTH] =  "CropWindow";
 		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameCropWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 		assert(CurrObject);
@@ -192,11 +284,13 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
 		} else {
+			PopPreviewImage(MainControlHandle);
 			GetCropCoordinate(MainControlHandle, &x1, &y1, &x2, &y2);
 			if (x1 > MainControlHandle->MainImageList->Last->Image->Width ||
 				x2 > MainControlHandle->MainImageList->Last->Image->Width ||
 				y1 > MainControlHandle->MainImageList->Last->Image->Height ||
-				y2 > MainControlHandle->MainImageList->Last->Image->Height)
+				y2 > MainControlHandle->MainImageList->Last->Image->Height ||
+				x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0)
 				show_error("Coordinates out of bound");
 			else {
 				NewImage = CropImage(MainControlHandle->MainImageList->Last->Image, x1, y1, x2, y2);
@@ -260,7 +354,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 					break;
 				case 1:
 					ScanRes = 300;
-					break;
+					break;	
 				default:
 					show_error("Invalid scan resolution");
 					OCRErrorFlag = 1;
@@ -273,7 +367,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 #endif			
 			/*cut the image into pieces and display it*/
 			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
-			ILIST * CutList = IsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+			ILIST * CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
 			DeleteImageList(CutList);
 			UpdateDisplayImage(MainControlHandle);
 			/*Identify them into probability*/
@@ -307,6 +401,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		}
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Dictionary") == 0){
+		/*set the cursor here*/
 		/*find the ImageWindow*/		
 		CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
 		
@@ -394,13 +489,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			/*a random string for now*/
 			utstring_clear(MainControlHandle->MainOutputString);
 			utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
-			char nameMainText[MAX_HASH_KEY_LENGTH] =  "MainTextArea";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameMainText, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
-			GtkTextIter iter;
-			gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
-			gtk_text_buffer_insert(buffer, &iter, utstring_body(MainControlHandle->MainOutputString), -1);
+			AppendTextArea(MainControlHandle, utstring_body(MainControlHandle->MainOutputString));
 			}
 			
 		}

@@ -172,6 +172,22 @@ unsigned int FastImageList(ILIST *l, unsigned int ff_factor)
 	return j ; 
 } 
 
+void PopLastImage(ILIST *l){
+	if (l->Last){
+		if (l->Last == l->First){
+			if (l->Last->Image) DeleteImage(l->Last->Image);
+			free(l->Last);
+			l->Last = NULL;
+			l->First = NULL;
+		} else {
+			if (l->Last->Image) DeleteImage(l->Last->Image);
+			l->Last = l->Last->Prev;
+			free(l->Last);
+			l->Last->Next = NULL;			
+		}
+	}
+}
+
 #if 0
 void ResizeImageList(ILIST *l, unsigned int percentage)
 {

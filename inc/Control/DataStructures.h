@@ -24,6 +24,8 @@ typedef struct {
 	ILIST * MainImageList;
 	UT_string * MainOutputString;
 	StateEnum State;
+	int IsInPreview;
+	int InitialState;
 } ControlHandle;
 
 typedef struct {
