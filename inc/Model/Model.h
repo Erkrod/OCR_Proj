@@ -16,5 +16,6 @@ UT_string * postProcessing(UT_array * );
 
 int SaveImage(const char fname[SLEN], IMAGE *image);
 IMAGE * ReadImage(char *ImageFileName);
+extern UT_icd CharProbability_icd;
 
 #endif

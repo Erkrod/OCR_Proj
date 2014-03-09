@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model postProcessing IsolateCharacter FileIO ImageProcessing Image ImageList
+MODEL_LIB := Model postProcessing IsolateCharacter FileIO ImageProcessing Image ImageList IdentifyCharacter
 
 CONTROL_LIB := Control
 
@@ -48,7 +48,7 @@ VPATH = $(SRC_DIR) src test
 
 all: OCR test
 
-test: TestCharArray TestUTArray TestPostPo TestView TestIsolateCharacter
+test: TestCharArray TestUTArray TestPostPo TestView TestIsolateCharacter TestIdentifyCharacter
 
 clean:
 	rm build/* bin/*
