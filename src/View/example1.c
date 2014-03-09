@@ -146,8 +146,12 @@ int main( int   argc,
      /*try to query the button by name*/
      printf("Try to search by name\n");
     CurrObject = NULL;
-    char name[20] = "HelloButton";
-     HASH_FIND(HashByName,ObjectList2, name, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+    //char name[20] = "HelloButton";
+    char name[20];    
+    memset(name, 0, sizeof(char) * 20);
+    strcpy(name, "HelloButton");
+    
+     HASH_FIND(HashByName,ObjectList2, name, sizeof(char) * 20,CurrObject);
     if (CurrObject){
 	printf("Found object with name %s and pointer value %p, expected %p\n", CurrObject->Name, CurrObject->Widget, button);
 	assert(CurrObject->Widget == button);

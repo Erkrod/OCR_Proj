@@ -9,6 +9,8 @@
 
 typedef struct ViewHandleStruct ViewHandle;
 
+typedef enum {SelectCoordinate, Normal} StateEnum;
+
 typedef struct {
 	/*EventClass event;*/
 #ifndef TEST_VIEW
@@ -21,6 +23,7 @@ typedef struct {
 	UT_string * OutputFileName;
 	ILIST * MainImageList;
 	UT_string * MainOutputString;
+	StateEnum State;
 } ControlHandle;
 
 typedef struct {

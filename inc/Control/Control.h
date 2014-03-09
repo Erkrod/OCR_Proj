@@ -19,7 +19,7 @@ void Control_MainLoop(ControlHandle *);
 void Control_CleanUp(ControlHandle *);
 
 /*function to take care of all event*/
-void Control_ProcessEvent(ObjectHandle * ClickedObject);
+void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent *);
 
 /* functions for menu option clicking event */
 void OpenImageFile(UT_string * ImageFileName);

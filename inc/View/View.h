@@ -12,5 +12,6 @@
 ViewHandle * View_Initialize(ControlHandle * MainControlHandle);
 void AddWidgetToViewHandle(ViewHandle * MainViewHandle, const char * NewName, GtkWidget * NewWidget);
 void CatchEvent(GtkWidget *widget, gpointer data);
+void CatchGdkEvent(GtkWidget *widget, GdkEvent * event, gpointer data);
 ObjectHandle * ObjectHandle_Initialize(const char * name, GtkWidget * widget, ViewHandle * MainViewHandle);
 #endif

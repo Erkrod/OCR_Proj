@@ -6,10 +6,23 @@ void CatchEvent(GtkWidget *widget, gpointer data){
 	ObjectHandle * ObjectListByWidget = MainHandle->ObjectListByWidget;
 	HASH_FIND(HashByWidget,ObjectListByWidget, &widget, sizeof(GtkWidget *),CurrObject);
 	if (CurrObject)
-		Control_ProcessEvent(CurrObject);
+		Control_ProcessEvent(CurrObject, NULL);
 	else
 		printf("Can't find object with this GtkWidget value: %p\n", widget);
 }
+
+void CatchGdkEvent(GtkWidget *widget, GdkEvent * event, gpointer data){
+	ViewHandle * MainHandle = (ViewHandle *) data;
+	ObjectHandle * CurrObject;
+	ObjectHandle * ObjectListByWidget = MainHandle->ObjectListByWidget;
+	HASH_FIND(HashByWidget,ObjectListByWidget, &widget, sizeof(GtkWidget *),CurrObject);
+	if (CurrObject)
+		Control_ProcessEvent(CurrObject, event);
+	else
+		printf("Can't find object with this GtkWidget value: %p\n", widget);
+}
+
+
 
 ObjectHandle * ObjectHandle_Initialize(const char * name, GtkWidget * widget, ViewHandle * MainViewHandle){
 	ObjectHandle * NewObject = (ObjectHandle *) malloc(sizeof(ObjectHandle));

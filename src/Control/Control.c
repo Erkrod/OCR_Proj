@@ -3,7 +3,19 @@
 #include "Control.h"
 #include "DrawFunctions.h"
 
-
+ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
+#ifdef DEBUG
+	printf("Finding object with name %s\n", Name);
+#endif
+	char name[MAX_HASH_KEY_LENGTH];
+	ObjectHandle * CurrObject;
+	memset(name, 0, sizeof(char) * MAX_HASH_KEY_LENGTH);
+	strcpy(name, Name);
+	CurrObject = NULL;
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	return CurrObject;
+}
 
 ControlHandle * Control_Initialize(void){
 	ControlHandle * ToReturn = (ControlHandle *) malloc(sizeof(ControlHandle));
@@ -11,8 +23,26 @@ ControlHandle * Control_Initialize(void){
 	utstring_new(ToReturn->InputImageFileName);
 	utstring_new(ToReturn->MainOutputString);
 	utstring_new(ToReturn->OutputFileName);
+	ToReturn->State = Normal;
 	drawAllWindows(ToReturn->MainViewHandle);
 	return ToReturn;
+}
+
+void GetClickCoord(ControlHandle * MainControlHandle, int orig_x, int orig_y, int * ret_x, int * ret_y){
+	if (MainControlHandle->MainImageList->Last){
+		GtkAllocation allocation;
+		ObjectHandle * CurrObject;
+		CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
+		gtk_widget_get_allocation(CurrObject->Widget, &allocation);
+		printf("Image scroll window is x=%d, y=%d, width=%d, height=%d\n",allocation.x, allocation.y, allocation.width, allocation.height);
+		
+		/*get image widht and height*/
+		IMAGE * img = MainControlHandle->MainImageList->Last->Image;
+		if (img->Width >= allocation.width) *ret_x = orig_x;
+		else 	*ret_x = orig_x - (allocation.width - img->Width)/2;
+		if (img->Height >= allocation.height) *ret_y = orig_y;
+		else 	*ret_y = orig_y - (allocation.height - img->Height)/2;
+	}
 }
 
 void Control_MainLoop(ControlHandle * MainHandle){
@@ -38,10 +68,46 @@ void UpdateDisplayImage(ControlHandle * MainControlHandle){
 		gtk_widget_show(CurrObject->Widget);
 	}
 	
+	
+	
+}
+
+void SetSentitiveAllWindows(ControlHandle * MainControlHandle, gboolean Sensitivity){
+	ObjectHandle * CurrObject;
+	char Name1[MAX_HASH_KEY_LENGTH] = "MainWindow";
+	char Name2[MAX_HASH_KEY_LENGTH] = "MenuBar";
+	char Name3[MAX_HASH_KEY_LENGTH] = "RotateWindow";
+	char Name4[MAX_HASH_KEY_LENGTH] = "CropWindow";
+	char Name5[MAX_HASH_KEY_LENGTH] = "ColorFilterWindow";
+	char Name6[MAX_HASH_KEY_LENGTH] = "OCRWindow";
+	/*char Name5[MAX_HASH_KEY_LENGTH] = "OCRWindow";
+	char Name5[MAX_HASH_KEY_LENGTH] = "OCRWindow";
+	char Name5[MAX_HASH_KEY_LENGTH] = "OCRWindow";*/
+	//strcpy(Name, "MainWindow");
+	
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name1, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name4, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name5, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, Name6, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+	assert(CurrObject);
+	gtk_widget_set_sensitive(CurrObject->Widget, Sensitivity);
+	
 }
 
 /*function to take care of all event*/
-void Control_ProcessEvent(ObjectHandle * ClickedObject){
+void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 	
 	ViewHandle * MainViewHandle = ClickedObject->MainViewHandle;
 	ControlHandle * MainControlHandle = MainViewHandle->MainControlHandle;
@@ -49,7 +115,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 	IMAGE * NewImage = NULL;
 	int x1, y1, x2, y2, degree;
 		
-	/* char name[MAX_HASH_KEY_LENGTH];*//* = {"MainWindow", "RotateWindow"};*/
+	char name[MAX_HASH_KEY_LENGTH];/* = {"MainWindow", "RotateWindow"};*/
 #ifdef DEBUG
 	printf("Object clicked has name: %s\n", ClickedObject->Name);
 #endif
@@ -89,7 +155,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 		}
 /*======================================================================*/			
 	} else if (strcmp(ClickedObject->Name,"RemoveStain") == 0){
-		show_error("Not supported yet");
+		
 	} else if (strcmp(ClickedObject->Name,"RemoveWrinkle") == 0){
 		show_error("Not supported yet");
 /*======================================================================*/	
@@ -152,7 +218,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 			show_error("No image loaded yet");
 		} else {			
 			/*get information about font, font size and scan resolution*/
-			FontType Font; int FontSize, ScanRes, OCRErrorFlag = 0;
+			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300, OCRErrorFlag = 0;
 			char nameOCRComboBox[MAX_HASH_KEY_LENGTH] =  "FontComboBox";
 			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 			assert(CurrObject);			
@@ -236,11 +302,116 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject){
 			show_error("Can't write to TempOutputText.txt");
 		} else {
 			fprintf(NewFile, "%s", utstring_body(MainControlHandle->MainOutputString));
-			fclose(NewFile);
-			if (0 != system("gedit TempOutputText.txt &")) show_error("Can't run gedit on TempOutputText.txt");
+			fclose(NewFile);			
+			if (0 != system("gedit TempOutputText.txt")) show_error("Can't run gedit on TempOutputText.txt");
 		}
+/*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Dictionary") == 0){
-		show_error("Not supported yet");
+		/*find the ImageWindow*/		
+		CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
+		
+		/*put the coordinate selection here temporarily*/
+		if (MainControlHandle->State != SelectCoordinate){
+			MainControlHandle->State = SelectCoordinate;
+			/*set cursor to new things*/
+			GdkCursor* CrossCursor = gdk_cursor_new(GDK_CROSSHAIR);			
+			gdk_window_set_cursor(CurrObject->Widget->window, CrossCursor);
+			
+		} else {
+			MainControlHandle->State = Normal;
+			/*set cursor to normal*/
+			gdk_window_set_cursor(CurrObject->Widget->window, NULL);
+		}
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"OCRButton") == 0){
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {			
+			/*get information about font, font size and scan resolution*/
+			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300, OCRErrorFlag = 0;
+			char nameOCRComboBox[MAX_HASH_KEY_LENGTH] =  "FontComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);			
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					Font = CourierNew;
+					break;
+				case 1:
+					Font = LucidaConsole;
+					break;
+				default:
+					show_error("Invalid Font choice");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			char nameOCRComboBox3[MAX_HASH_KEY_LENGTH] =  "FontSizeComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					FontSize = 10;
+					break;
+				case 1:
+					FontSize = 12;
+					break;
+				default:
+					show_error("Invalid Font size");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			char nameOCRComboBox2[MAX_HASH_KEY_LENGTH] =  "ScanResComboBox";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+				case 0:
+					ScanRes = 200;
+					break;
+				case 1:
+					ScanRes = 300;
+					break;
+				default:
+					show_error("Invalid scan resolution");
+					OCRErrorFlag = 1;
+					break;
+			}
+			
+			if (!OCRErrorFlag){
+#ifdef DEBUG
+			printf("%s %d %d\n", Font == CourierNew ? "CourierNew" : "LucidaConsole", FontSize, ScanRes);
+#endif			
+			/*cut the image into pieces and display it*/
+			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
+			ILIST * CutList = IsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+			DeleteImageList(CutList);
+			UpdateDisplayImage(MainControlHandle);
+			/*Identify them into probability*/
+			
+			/*post processing*/
+			
+			/*display the text*/
+			/*a random string for now*/
+			utstring_clear(MainControlHandle->MainOutputString);
+			utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
+			char nameMainText[MAX_HASH_KEY_LENGTH] =  "MainTextArea";
+			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameMainText, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
+			assert(CurrObject);
+			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+			GtkTextIter iter;
+			gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
+			gtk_text_buffer_insert(buffer, &iter, utstring_body(MainControlHandle->MainOutputString), -1);
+			}
+			
+		}
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"DisplayEventBox") == 0){		
+		if (MainControlHandle->State == SelectCoordinate){
+			int XClicked = 0, YClicked = 0;
+			printf("original event data x = %lf; y = %lf\n", event->button.x, event->button.y);
+			GetClickCoord(MainControlHandle, event->button.x, event->button.y, &XClicked, &YClicked);
+			printf("Translated coordinates are x = %d, y = %d\n", XClicked, YClicked);
+		}
 	}
 }
 
