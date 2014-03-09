@@ -304,10 +304,10 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
 GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
 
  GtkWidget *cropWin;
- GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *vbox4;
- GtkWidget *hbox, *hbox2;
+ GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *vbox4, *vbox5, *vbox6;
+ GtkWidget *hbox, *hbox6;
  GtkWidget *spinner, *spinner2, *spinner3, *spinner4;
- GtkWidget *cropButton, *closeButton;
+ GtkWidget *cropButton, *mouseButton1, *mouseButton2, *closeButton;
  GtkWidget *frame;
  GtkWidget *label;
  GtkAdjustment *adj;
@@ -315,6 +315,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  cropWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
  AddWidgetToViewHandle(MainViewHandle, "CropWindow", cropWin);
  gtk_window_set_default_size(GTK_WINDOW(cropWin), 230, 100);
+ gtk_window_set_resizable (GTK_WINDOW(cropWin), FALSE);
  g_signal_connect (cropWin, "destroy",
  		   G_CALLBACK (gtk_widget_hide),
  		   cropWin);
@@ -336,15 +337,16 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
  /* horizontal frame */
- frame = gtk_frame_new ("First coordiante");
+ frame = gtk_frame_new ("Coordinate 1");
  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
  
+ vbox5 = gtk_vbox_new (FALSE, 10);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox5), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox5);
  hbox = gtk_hbox_new (FALSE, 30);
- AddWidgetToViewHandle(MainViewHandle, "CropHbox", hbox);
- gtk_container_set_border_width (GTK_CONTAINER (hbox), 15);
- gtk_container_add (GTK_CONTAINER (frame), hbox);
+ gtk_box_pack_start (GTK_BOX (vbox5), hbox, TRUE, TRUE, 0);
 
- label = gtk_label_new ("X :");
+ label = gtk_label_new ("X1 :");
  AddWidgetToViewHandle(MainViewHandle, "Croplabel", label);
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
@@ -360,7 +362,7 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (vbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox2), spinner, TRUE, TRUE, 0);
 
- label = gtk_label_new ("Y :");
+ label = gtk_label_new ("Y1 :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
@@ -375,16 +377,25 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_box_pack_start (GTK_BOX (vbox3), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), spinner2, TRUE, TRUE, 0);
 
- /* vertical frame */
- frame = gtk_frame_new ("Second coordiante");
- gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
- 
- hbox2 = gtk_hbox_new (FALSE, 30);
- AddWidgetToViewHandle(MainViewHandle, "CropHbox2", hbox2);
- gtk_container_set_border_width (GTK_CONTAINER (hbox2), 15);
- gtk_container_add (GTK_CONTAINER (frame), hbox2);
+ vbox2 = gtk_vbox_new (FALSE, 8);
+ gtk_box_pack_start (GTK_BOX (vbox5), vbox2, TRUE, TRUE, 5);
 
- label = gtk_label_new ("X :");
+ mouseButton1 = gtk_button_new_with_label ("Select Coordinate 1 with Mouse");
+ AddWidgetToViewHandle(MainViewHandle, "CropCoord1", mouseButton1);
+ g_signal_connect(G_OBJECT(mouseButton1), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (vbox2), mouseButton1, TRUE, TRUE, 5);
+
+ /* vertical frame */
+ frame = gtk_frame_new ("Coordinate 2");
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 10);
+
+ vbox6 = gtk_vbox_new (FALSE, 10);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox6), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox6);
+ hbox6 = gtk_hbox_new (FALSE, 30);
+ gtk_box_pack_start (GTK_BOX (vbox6), hbox6, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("X2 :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
@@ -394,11 +405,11 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner3), TRUE);
 
  vbox3 = gtk_vbox_new (FALSE, 0);
- gtk_box_pack_start (GTK_BOX (hbox2), vbox3, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox6), vbox3, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), spinner3, TRUE, TRUE, 0);
 
- label = gtk_label_new ("Y :");
+ label = gtk_label_new ("Y2 :");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
@@ -409,26 +420,41 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
 
  vbox4 = gtk_vbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "CropVbox4", vbox4);
- gtk_box_pack_start (GTK_BOX (hbox2), vbox4, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (hbox6), vbox4, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox4), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (vbox4), spinner4, TRUE, TRUE, 0);
 
+ vbox2 = gtk_vbox_new (FALSE, 8);
+ gtk_box_pack_start (GTK_BOX (vbox6), vbox2, TRUE, TRUE, 5);
+
+ mouseButton2 = gtk_button_new_with_label ("Select Coordinate 2 with Mouse");
+ AddWidgetToViewHandle(MainViewHandle, "CropCoord2", mouseButton2);
+ g_signal_connect(G_OBJECT(mouseButton2), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (vbox2), mouseButton2, TRUE, TRUE, 5);
+
  /* crop button */
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
+
  cropButton = gtk_button_new_with_label ("Crop");
+ gtk_widget_set_size_request(cropButton, 125, 25);
  AddWidgetToViewHandle(MainViewHandle, "CropButton", cropButton);
  /* g_signal_connect(cropButton, "clicked", */
  /* 		  G_CALLBACK (gtk_widget_destroy), /\* temporary, need to fix *\/ */
  /* 		  spinner); */
  g_signal_connect(G_OBJECT(cropButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
- gtk_box_pack_start (GTK_BOX (vbox), cropButton, TRUE, TRUE, 5);
+ gtk_box_pack_start (GTK_BOX (hbox), cropButton, FALSE, TRUE, 60);
 
  /* close button */
  closeButton = gtk_button_new_with_label ("Close");
+ gtk_widget_set_size_request(closeButton, 80, 25);
  AddWidgetToViewHandle(MainViewHandle, "CropCloseButton", closeButton);
  g_signal_connect_swapped (closeButton, "clicked",
  			   G_CALLBACK (gtk_widget_hide),
  		   cropWin);
- gtk_box_pack_start (GTK_BOX (vboxMain), closeButton, TRUE, TRUE, 5);
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vboxMain), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_end (GTK_BOX (hbox), closeButton, FALSE, FALSE, 5);
 
  gtk_widget_show_all(cropWin); 
 
