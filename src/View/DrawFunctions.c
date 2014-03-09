@@ -808,7 +808,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "hboxMain", hboxMain);
  gtk_box_pack_start (GTK_BOX (vbox), hboxMain, TRUE, TRUE, 0);
 
- /* fonts frame */
+ /* character frame */
  frame = gtk_frame_new ("Character Attributes");
  gtk_box_pack_start (GTK_BOX (hboxMain), frame, TRUE, TRUE, 0);
 
@@ -827,7 +827,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
- AddWidgetToViewHandle(MainViewHandle, "ComboBox", combo);
+ AddWidgetToViewHandle(MainViewHandle, "FontCombo", combo);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 1" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 2" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Font 3" );
@@ -844,7 +844,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
-
+ AddWidgetToViewHandle(MainViewHandle, "FontSizeCombo", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
@@ -861,7 +861,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
  
  combo = gtk_combo_box_new_text();
-
+ AddWidgetToViewHandle(MainViewHandle, "FontResCombo", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "1" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "2" );
@@ -893,6 +893,34 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  		  G_CALLBACK (gtk_widget_destroy),
  		  ocrWin);
  gtk_box_pack_start (GTK_BOX (vbox2), previewButton, TRUE, TRUE, 5);
+
+ /* post processing frame */
+ frame = gtk_frame_new("Post Processing");
+ gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 10);
+
+ vbox2 = gtk_vbox_new (FALSE, 0);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox2), 15);
+ gtk_container_add (GTK_CONTAINER (frame), vbox2);
+
+ hbox = gtk_hbox_new (FALSE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("                   ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("Use Dictionary:");
+ gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
+ combo = gtk_combo_box_new_text();
+ AddWidgetToViewHandle(MainViewHandle, "DictionaryCombo", combo);
+ gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Yes" );
+ gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "No" );
+
+ gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
+ label = gtk_label_new ("                   ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
  /* ocr button */
  hbox = gtk_hbox_new (FALSE, 0);
