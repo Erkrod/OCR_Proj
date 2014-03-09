@@ -14,15 +14,15 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
-#define IMAGE_CHOICE 1
+#define IMAGE_CHOICE 2
 
 int main()
 {
   IMAGE *img = NULL;
 
   IMAGE *image = NULL;
-  IMAGE *PreviewImage = NULL;
-  ILIST *imglist = NULL;  
+  IMAGE *PreviewImage = NULL, *PreviewImage2 = NULL;
+  ILIST *imglist = NULL, *imglist2 = NULL;  
  
 #if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
@@ -54,27 +54,27 @@ int main()
 #if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
   PreviewImage = PreviewLazyIsolateCharacter(img, CourierNew, 12, 300);
   imglist = LazyIsolateCharacter(img, CourierNew, 12, 300);  
+  printf("Finished lazy algorithm\n");
+  PreviewImage2 = PreviewActiveIsolateCharacter(img, CourierNew, 12, 300);
+   SaveImage("CheckActiveIsolate", PreviewImage2);
+  printf("Finished preview active algorithm\n");
+  imglist2 = ActiveIsolateCharacter(img, CourierNew, 12, 300);  
+  printf("Finished active algorithm\n");
 #else
   PreviewImage = PreviewLazyIsolateCharacter(img, LucidaConsole, 10, 300);
   imglist = LazyIsolateCharacter(img, LucidaConsole, 10, 300);
+  PreviewImage2 = PreviewActiveIsolateCharacter(img, LucidaConsole, 10, 300);
+  imglist2 = ActiveIsolateCharacter(img, LucidaConsole, 10, 300);
 #endif
-  assert(imglist && PreviewImage);
+  assert(imglist && PreviewImage && PreviewImage2 && imglist2);
   SaveImage("CheckLazyIsolate", PreviewImage);
   DeleteImage(PreviewImage);
-/*  
-  char Name[50];
-    int i;
-  IENTRY * CurrEntry = imglist->First;
-  for (i = 0; i < 20 && CurrEntry; i++, CurrEntry = CurrEntry->Next){	  
-#if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
-	  sprintf(Name, "AndrewTest/CourierNew/Courier%02d", i);
-#else
-	  sprintf(Name, "AndrewTest/LucidaConsole/Lucida%02d", i);
-#endif
-	  SaveImage(Name, CurrEntry->Image);
-  }*/
+  SaveImage("CheckActiveIsolate", PreviewImage2);
+  DeleteImage(PreviewImage2);
+
+  
   DeleteImageList(imglist);
-   
+  DeleteImageList(imglist2);
 
   return 0;
 

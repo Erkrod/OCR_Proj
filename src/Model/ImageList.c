@@ -32,7 +32,7 @@ void DeleteImageList(ILIST *l)
 		while(curr){
 			succ = curr->Next;
 			assert(curr->List == l);
-			DeleteImage(curr->Image);
+			if (curr->Image) DeleteImage(curr->Image);
 			curr->Image = NULL;
 			free(curr);
 			curr = succ;

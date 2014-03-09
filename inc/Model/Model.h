@@ -1,6 +1,8 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <unistd.h>
+
 #include "ImageList.h"
 #include "ModelStructure.h"
 #include "utstring.h"
@@ -8,6 +10,10 @@
 
 IMAGE * PreviewLazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
 ILIST * LazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
+IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
+ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
+
+
 UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
 void CharProfile_free(void * profile_in);
 /* this is the postProcessing function */

@@ -114,7 +114,11 @@ TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 TestGUI: build/TestGUI.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestGUI.o -Lbuild  $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
-
+	
+TestCompile: build/TestCompile.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
+	$(info Linking $@)
+	@$(CC) build/TestCompile.o -Lbuild  $(VIEW_LIB_COMPILE) $(CONTROL_LIB_COMPILE) $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@
+	
 #************************ TEST OF WHOLE SYSTEM WITHOUT GUI ************************		
 TestSystem: build/TestSystem.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
 	$(info Linking $@)

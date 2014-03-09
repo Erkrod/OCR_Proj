@@ -21,6 +21,7 @@
 IMAGE *Rotate(IMAGE *image, int ClockwiseDegree);
 
 /*crop*/
+IMAGE *Crop(IMAGE *image, int x1, int y1, int width, int height);
 IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2);
 
 /*duplicate image*/

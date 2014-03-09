@@ -58,6 +58,10 @@ IMAGE *Rotate(IMAGE *image, int ClockwiseDegree){
 }
 
 /*crop*/
+IMAGE *Crop(IMAGE *image, int x1, int y1, int width, int height){
+	return CropImage(image, x1, y1, x1+width, y1+height);
+}
+
 IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 	
 	unsigned W, H;
