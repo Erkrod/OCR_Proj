@@ -104,7 +104,7 @@ TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
 	@time bin/TestIsolateCharacter
-	@eog CheckIsolate.ppm
+	@eog CheckLazyIsolate.ppm
 	
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)

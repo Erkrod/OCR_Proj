@@ -21,7 +21,7 @@ void GetIsolateCharacterConstant(FontType Font, int fontsize, int scanres, doubl
 		*TopOffset = 7;
 		*LeftOffset = 7;
 		*RightOffset = 0;
-		*BottomOffset = 7;
+		*BottomOffset = 20;
 	} else if (Font == LucidaConsole && fontsize == 10 && scanres == 300){
 		*FontHeight = 40.425; 
 		*FontWidth = 24;
@@ -93,7 +93,7 @@ void GetMargins(IMAGE * image, int TopOffset, int LeftOffset, int RightOffset, i
 	assert(*RightMargin > -1);
 }
 
-IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
+IMAGE * PreviewLazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
 	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;
@@ -195,7 +195,7 @@ IMAGE * PreviewIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int 
 	return ToMarkImage;
 }
 
-ILIST * IsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
+ILIST * LazyIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres){
 	/*variables*/
 	int i,j, TopMargin = -1, LeftMargin = -1, BottomMargin = -1, RightMargin = -1;
 	int AreaTop, AreaBottom, AreaLeft, AreaRight;

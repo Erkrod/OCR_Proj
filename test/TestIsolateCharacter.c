@@ -52,14 +52,14 @@ int main()
 #endif
   
 #if IMAGE_CHOICE == 0 || IMAGE_CHOICE == 1 || IMAGE_CHOICE == 2
-  PreviewImage = PreviewIsolateCharacter(img, CourierNew, 12, 300);
-  imglist = IsolateCharacter(img, CourierNew, 12, 300);  
+  PreviewImage = PreviewLazyIsolateCharacter(img, CourierNew, 12, 300);
+  imglist = LazyIsolateCharacter(img, CourierNew, 12, 300);  
 #else
-  PreviewImage = PreviewIsolateCharacter(img, LucidaConsole, 10, 300);
-  imglist = IsolateCharacter(img, LucidaConsole, 10, 300);
+  PreviewImage = PreviewLazyIsolateCharacter(img, LucidaConsole, 10, 300);
+  imglist = LazyIsolateCharacter(img, LucidaConsole, 10, 300);
 #endif
   assert(imglist && PreviewImage);
-  SaveImage("CheckIsolate", PreviewImage);
+  SaveImage("CheckLazyIsolate", PreviewImage);
   DeleteImage(PreviewImage);
 /*  
   char Name[50];
