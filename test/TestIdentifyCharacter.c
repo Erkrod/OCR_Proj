@@ -12,12 +12,11 @@ int main()
   CharProbability *curr;
   int i;
   char fname[50] = "Fonts/TestFonts/CourierNew_Test/Courier14.ppm";  
-  i=1;		
+  i=0;		
 	while( i < 95 )
 	{
 		char index[50];
 		sprintf(index, "%d", i);
-		
 		char tempname[50] = "Fonts/CourierNew12_300DPI/";
 		strcat(tempname, index);
 		strcat(tempname, ".jpg");

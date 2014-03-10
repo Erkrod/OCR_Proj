@@ -39,20 +39,8 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			assert(newimage);
 			assert(Template);
 			BlackNWhite(Curr2->Image);
-			// if (image->Height > Curr2->Image->Height)
-			// {newy = Curr2->Image->Height;}
-			// else
-			// {newy = image->Height;}
-			
-			// if (image->Width > Curr2->Image->Width)
-			// {newx = Curr2->Image->Width;}
-			// else
-			// {newx = image->Width;}
-			
 			for ( y = 0; y < newimage->Height; y++)
 			for ( x = 0; x < newimage->Width; x++)
-			// for ( y = 0; y < newy; y++ )
-			// for ( x = 0; x < newx; x++ )
 			{
 				RTemplate = GetPixelR(Curr2->Image, x, y);
 				RImage = GetPixelR(newimage, x, y);
@@ -83,19 +71,23 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 
 ILIST * InitializeTemplate(void)
 {
-  ILIST *template = NewImageList();
-  IMAGE *templateimage = NULL;
-  int i;
-	while( i < 95 )
+	ILIST *template = NewImageList();
+	IMAGE *templateimage = NULL;
+	int i;
+	i = 0;
+	while( i < 127 )
 	{
 		char index[50];
 		sprintf(index, "%d", i);
-		
 		char tempname[50] = "Fonts/CourierNew12_300DPI/";
 		strcat(tempname, index);
 		strcat(tempname, ".jpg");
-		templateimage = ReadImage(tempname);
-		AppendImage(template, templateimage);
+		if (file_exist(tempname))
+		{
+			templateimage = ReadImage(tempname);
+			AppendImage(template, templateimage);
+		}
 		i++;
 	}
+	return template;
 }
