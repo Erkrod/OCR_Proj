@@ -31,6 +31,9 @@ typedef struct {
 	
 	/*for post processing*/
 	/*UT_array * KeywordArray, * SpecialCharArray;*/
+	
+	/*for identify character*/
+	ILIST * CourierNewTemplate, * LucidaConsoleTemplate;
 } ControlHandle;
 
 struct ObjectHandleStruct{

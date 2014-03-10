@@ -49,7 +49,7 @@ VPATH = $(SRC_DIR) src test
 
 all: OCR test
 
-test: TestCharArray TestUTArray TestPostPo TestView TestIsolateCharacter
+test: TestCharArray TestUTArray TestPostPo TestGUI TestIsolateCharacter TestCompile CFTest CropTest RotTest SRTest 
 
 clean:
 	rm build/* bin/*
@@ -103,8 +103,8 @@ TestView: build/GFXMain.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_D
 TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestIsolateCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
-	@time bin/TestIsolateCharacter
-	@eog CheckLazyIsolate.ppm
+#	@time bin/TestIsolateCharacter
+#	@eog CheckLazyIsolate.ppm
 	
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
