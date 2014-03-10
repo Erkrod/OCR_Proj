@@ -10,6 +10,21 @@ void UpdateTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
 char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
+ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name);
+
+void show_compilation_msg(const char * CompileMessage);
+
+void UpdateMainOutputString(ControlHandle * MainControlHandle){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+	GtkTextIter iter1, iter2;
+	gtk_text_buffer_get_start_iter(buffer, &iter1);
+	gtk_text_buffer_get_end_iter(buffer, &iter2);
+	utstring_clear(MainControlHandle->MainOutputString);
+	utstring_printf(MainControlHandle->MainOutputString, "%s", gtk_text_buffer_get_text(buffer, &iter1, &iter2, FALSE));
+	
+}
+
 int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * var2, int * b_thres, int * dark_limit);
 
 int GetOCRParams(ControlHandle * MainControlHandle, FontType * Font, int * FontSize, int *ScanRes, int *IsoAlg, int *UseDict);
@@ -526,6 +541,17 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			fclose(NewFile);			
 			if (0 != system("gedit TempOutputText.txt")) show_error("Can't run gedit on TempOutputText.txt");
 		}
+		
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"CompileCode") == 0){
+		UpdateMainOutputString(MainControlHandle);
+		
+		if (utstring_len(MainControlHandle->MainOutputString) > 0){
+			UT_string * msg = GetCompileMessage(MainControlHandle->MainOutputString);
+			show_compilation_msg(utstring_body(msg));
+			utstring_free(msg);
+		}
+	
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"DisplayEventBox") == 0){		
 		if (MainControlHandle->State == SelectCoordinate){
@@ -752,6 +778,19 @@ void show_error(const char * ErrorMessage)
             GTK_MESSAGE_ERROR,
             GTK_BUTTONS_OK,
             ErrorMessage);
+  gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+  gtk_dialog_run(GTK_DIALOG(dialog));
+  gtk_widget_destroy(dialog);
+}
+
+void show_compilation_msg(const char * CompileMessage)
+{
+  GtkWidget *dialog;
+  dialog = gtk_message_dialog_new(NULL,
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_INFO,
+            GTK_BUTTONS_OK,
+            CompileMessage);
   gtk_window_set_title(GTK_WINDOW(dialog), "Error");
   gtk_dialog_run(GTK_DIALOG(dialog));
   gtk_widget_destroy(dialog);
