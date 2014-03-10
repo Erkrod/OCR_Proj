@@ -1,0 +1,41 @@
+
+
+ _____                      _               
+|  _  |                    (_)              
+| | | |_   _____ _ ____   ___  _____      __
+| | | \ \ / / _ \ '__\ \ / / |/ _ \ \ /\ / /
+\ \_/ /\ V /  __/ |   \ V /| |  __/\ V  V / 
+ \___/  \_/ \___|_|    \_/ |_|\___| \_/\_/  
+                                            
+      
+An optical character recognition program (OCR) aims to convert a scanned image of text into a text file.
+This OCR allows the user to input an image (supported file types include .jpeg, .png, .bmp, .ppm. An unsupported image type will pop up an alert), clean the image up during preprocessing, and generate a text file output.
+
+___  ___                 
+|  \/  |                 
+| .  . | ___ _ __  _   _ 
+| |\/| |/ _ \ '_ \| | | |
+| |  | |  __/ | | | |_| |
+\_|  |_/\___|_| |_|\__,_|
+
+
+_________ FILE __________
+Open: Select an image to open from your computer/system. The image should appear on the left side of the window.
+Save: Allows the user to save the progress of the OCR.
+Quit: Exits window.
+
+_____ PREPROCESSING _____
+In order to optimize OCR results, a clean image should be generated. The preprocessing menu allows the user to do that with various functions including:
+Convert image to black and white,
+Stain removal (where the user is prompted to select stained areas to clean up),
+Wrinkle removal,
+Rotate (by degrees to level the image text),
+Line boundaries,
+And crop (where user inputs x and y values).
+
+__________ OCR __________
+Run the OCR based on the image on left side of the window.
+
+____ POSTPROCESSING _____
+Edit OCR text output: Allows the user to open and edit the resultant text file before saving.
+Dictionary settings: In progress.

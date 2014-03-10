@@ -53,7 +53,7 @@ ControlHandle * Control_Initialize(void){
 	if (file_exist("Images/ocrLarge.png"))
 		gtk_image_set_from_file(GTK_IMAGE(ImageDisplay->Widget), "Images/ocrLarge.png");
 		
-	FILE * file = fopen("README.md", "r");
+	FILE * file = fopen("README.txt", "r");
 	if (file){
 		fseek( file , 0L , SEEK_END);
 		long lSize = ftell( file );
@@ -62,7 +62,7 @@ ControlHandle * Control_Initialize(void){
 		assert(ReadString);
 		
 		if( 1!=fread( ReadString , lSize, sizeof(char) , file) )
-			fclose(file),free(ReadString),fputs("Can't read README.md",stderr),exit(1);
+			fclose(file),free(ReadString),fputs("Can't read README.txt",stderr),exit(1);
 		fclose(file);
 		printf("%s\n", ReadString);
 		UpdateTextArea(ToReturn, ReadString);
@@ -547,6 +547,11 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"About") == 0){
 		drawAboutWindow(MainControlHandle->MainViewHandle);
+		
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"UserManual") == 0){		
+		CurrObject = FindObject(MainControlHandle, "HelpWinMain");
+		gtk_widget_show(CurrObject->Widget);
 	}
 }
 
