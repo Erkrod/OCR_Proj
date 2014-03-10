@@ -45,7 +45,7 @@ ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres)
 	    {
 	      slice_color = slice_color+ GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y);
 	    }
-	  if ( slice_color > 37000.0) /* lighter shades, leaning towards white*/
+	  if ( slice_color > (char_height*740)) /* lighter shades, leaning towards white*/
 	    {
 	      if (x_border_start != -1) /*border start has already been defined*/
 		{
