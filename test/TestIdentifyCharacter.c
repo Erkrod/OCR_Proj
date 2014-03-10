@@ -3,34 +3,41 @@
 #include <string.h>
 #include "Model.h"
 
+UT_icd CharProfile_icd = {sizeof(CharProfile), NULL, NULL, NULL};
+
 int main()
 {
-  UT_array * CharProbabilities;
-  IMAGE *image = NULL;
-  ILIST *template = NewImageList();
-  IMAGE *templateimage = NULL;
-  CharProbability *curr;
-  int i;
-  char fname[50] = "Fonts/TestFonts/CourierNew_Test/Courier14.ppm";  
-  i=0;		
-	while( i < 95 )
+	int i;
+	UT_array * CharProfiles;
+	utarray_new(CharProfiles, &CharProfiles_icd);
+	char fname1[50] = "Fonts/TestFonts/CourierNew_Test/Courier08.ppm";
+	char fname2[50] = "Fonts/TestFonts/CourierNew_Test/Courier09.ppm";
+	char fname3[50] = "Fonts/TestFonts/CourierNew_Test/Courier10.ppm";
+	IMAGE * image1 = ReadImage(fname1);
+	IMAGE * image2 = ReadImage(fname2);
+	IMAGE * image3 = ReadImage(fname3);
+	ILIST *template = InitializeTemplate(void);
+	ILIST *testlist = NewImageList();
+	
+	CharProfile *Curr1 = (CharProfile*)utarray_front(CharProfiles);
+	CharProbability * Curr2 = (CharProbability*)utarray_front(CharProfiles->CharChoices);
+	
+	AppendImage(testlist, image1);
+	AppendImage(testlist, image2);
+	AppendImage(testlist, image3);
+	CharProfiles = IdentifyCharacter(testlist, template);
+	
+	i = 0;
+	while ( Curr1 )
 	{
-		char index[50];
-		sprintf(index, "%d", i);
-		char tempname[50] = "Fonts/CourierNew12_300DPI/";
-		strcat(tempname, index);
-		strcat(tempname, ".jpg");
-		templateimage = ReadImage(tempname);
-		AppendImage(template, templateimage);
+		printf("---------- For character of index %d ----------\n", i);
+		while (Curr2)
+		{
+			printf("Chance of %c is %d percent.\n", Curr2->Char, Curr2->Probability);
+			Curr2 = (CharProfile*)utarray_next(CharProfiles->CharChoices, Curr2);
+		}
+		Curr1 = (CharProfile*)utarray_next(CharProfiles, Curr1);
 		i++;
-	}
-    image = ReadImage(fname);
-  	CharProbabilities = IdentifyCharacter(image, template);
-	curr = (CharProbability*)utarray_front(CharProbabilities);
-	while (curr)
-	{
-		printf("Chance of %c is %d percent\n", curr->Char, curr->Probability);
-		curr = (CharProbability*)utarray_next(CharProbabilities, curr);
 	}
 	return 0;
   }
