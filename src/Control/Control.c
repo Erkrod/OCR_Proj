@@ -14,7 +14,7 @@ int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * v
 
 int GetOCRParams(ControlHandle * MainControlHandle, FontType * Font, int * FontSize, int *ScanRes, int *IsoAlg, int *UseDict);
 
-int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int new_value, int thres_value);
+int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int *new_value, int *thres_value);
 
 ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
 #ifdef DEBUG
@@ -43,13 +43,17 @@ ControlHandle * Control_Initialize(void){
 	ToReturn->InitialText = 1;	
 	drawAllWindows(ToReturn->MainViewHandle);
 	
+	/*for post processing*/
+	/*utarray_new(ToReturn->KeywordArray, &ut_str_icd);
+	utarray_new(ToReturn->SpecialCharArray, &ut_str_icd);
+	postProcessingInitialize(ToReturn->KeywordArray, ToReturn->SpecialCharArray);*/
 	
 	/*set initial image and string here*/
 	ObjectHandle * ImageDisplay = FindObject(ToReturn, "MainDisplayImage");
 	if (file_exist("Images/ocrLarge.png"))
 		gtk_image_set_from_file(GTK_IMAGE(ImageDisplay->Widget), "Images/ocrLarge.png");
 		
-	FILE * file = fopen("README.txt", "r");
+	FILE * file = fopen("README.md", "r");
 	if (file){
 		fseek( file , 0L , SEEK_END);
 		long lSize = ftell( file );
@@ -58,7 +62,7 @@ ControlHandle * Control_Initialize(void){
 		assert(ReadString);
 		
 		if( 1!=fread( ReadString , lSize, sizeof(char) , file) )
-			fclose(file),free(ReadString),fputs("Can't read README.txt",stderr),exit(1);
+			fclose(file),free(ReadString),fputs("Can't read README.md",stderr),exit(1);
 		fclose(file);
 		printf("%s\n", ReadString);
 		UpdateTextArea(ToReturn, ReadString);
@@ -297,7 +301,72 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"ColorFilter") == 0){
 		CurrObject = FindObject(MainControlHandle, "ColorFilterWindow");
-		gtk_widget_show(CurrObject->Widget);		
+		gtk_widget_show(CurrObject->Widget);	
+
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"FilterButton") == 0){	
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {
+			int x, y, x1, y1, x2, y2, new_pix, thres;
+			int result = GetColorFilterParams(MainControlHandle, &x, &y, &x1, &y1, &x2, &y2, &new_pix, &thres);
+			IMAGE * NewImage;
+			switch (result){
+				case 1:
+					show_error("Invalid Reference point X coordinate");
+					break;
+				case 2:
+					show_error("Invalid Reference point Y coordinate");
+					break;
+				case 3:
+					show_error("Invalid Area X1 coordinate");
+					break;
+				case 4:
+					show_error("Invalid Area Y1 coordinate");
+					break;
+				case 5:
+					show_error("Invalid Area X2 coordinate");
+					break;
+				case 6:
+					show_error("Invalid Area Y2 coordinate");
+					break;
+				case 7:
+					show_error("Invalid New pixel value");
+					break;
+				case 8:
+					show_error("Invalid threshold value");
+					break;
+				case 0:
+					NewImage = ColorFilter(MainControlHandle->MainImageList->Last->Image, x, y, x1, y1, x2, y2, new_pix, thres);
+					if (!NewImage) show_error("Can't color filter this image");
+					else {
+						AppendImage(MainControlHandle->MainImageList, NewImage);
+						UpdateDisplayImage(MainControlHandle);
+					}
+			}
+		}
+		
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"RefSelCoord") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "Xspinner");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "Yspinner");
+		SetCursorImageBox(MainControlHandle);
+	
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"AreaSelCoord1") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "X1spinner");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "Y1spinner");
+		SetCursorImageBox(MainControlHandle);
+
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"AreaSelCoord2") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "X2spinner");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "Y2spinner");
+		SetCursorImageBox(MainControlHandle);
+		
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
 		PopPreviewImage(MainControlHandle);
@@ -630,11 +699,43 @@ int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * v
 	return 0;
 }
 
-int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int new_value, int thres_value){
-	/*ObjectHandle * CurrObject = FindObject(MainControlHandle, "Var1Spinner");
-	*var1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
-	if (*var1 < 0 || *var1 > 255) return 1;
-	CurrObject = FindObject(MainControlHandle, "Var2Spinner");*/
+int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int * new_value, int * thres_value){
+	if (!MainControlHandle->MainImageList->Last) return 9;
+	
+	IMAGE * CurrImage = MainControlHandle->MainImageList->Last->Image;
+	
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "Xspinner");
+	*x = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*x < 0 || *x >= CurrImage->Width) return 1;
+	
+	CurrObject = FindObject(MainControlHandle, "Yspinner");
+	*y = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*y < 0 || *y >= CurrImage->Height) return 2;
+	
+	CurrObject = FindObject(MainControlHandle, "X1spinner");
+	*x1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*x1 < 0 || *x1 >= CurrImage->Width) return 3;
+	
+	CurrObject = FindObject(MainControlHandle, "Y1spinner");
+	*y1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*y1 < 0 || *y1 >= CurrImage->Height) return 4;
+	
+	CurrObject = FindObject(MainControlHandle, "X2spinner");
+	*x2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*x2 < 0 || *x2 >= CurrImage->Width) return 5;
+	
+	CurrObject = FindObject(MainControlHandle, "Y2spinner");
+	*y2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*y2 < 0 || *y2 >= CurrImage->Height) return 6;
+	
+	
+	CurrObject = FindObject(MainControlHandle, "NewPixSpinner");
+	*new_value = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*new_value < 0 || *new_value > 255) return 7;
+	CurrObject = FindObject(MainControlHandle, "ThresSpinner");
+	*thres_value = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*thres_value < 0 || *thres_value > 255) return 8;
+	
 	return 0;
 }
 

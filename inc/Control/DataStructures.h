@@ -28,6 +28,9 @@ typedef struct {
 	int IsInPreview;
 	int InitialImage, InitialText;
 	ObjectHandle * XCoordObject, * YCoordObject;
+	
+	/*for post processing*/
+	/*UT_array * KeywordArray, * SpecialCharArray;*/
 } ControlHandle;
 
 struct ObjectHandleStruct{

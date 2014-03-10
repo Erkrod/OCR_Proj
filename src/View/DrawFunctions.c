@@ -212,9 +212,9 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
   AddWidgetToViewHandle(MainViewHandle, "TextScrollWindow", scrollWinText);
   
   GtkWidget * TextView = gtk_text_view_new ();
-  /*PangoFontDescription * font_desc = pango_font_description_from_string ("Serif 15");
+  PangoFontDescription * font_desc = pango_font_description_from_string ("Courier New 10");
   gtk_widget_modify_font (TextView, font_desc);
-  pango_font_description_free (font_desc);*/
+  pango_font_description_free (font_desc);
   gtk_text_view_set_editable(GTK_TEXT_VIEW(TextView), TRUE);
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(TextView), GTK_WRAP_WORD_CHAR);
   AddWidgetToViewHandle(MainViewHandle, "MainTextArea", TextView);
@@ -475,11 +475,11 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
 GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  GtkWidget *filterWin;
- GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *hbox;
+ GtkWidget *vboxMain, *vbox, *vbox2, *vbox3, *hbox, *vboxN;
  GtkWidget *frame;
  /* GtkWidget *radio1, *radio2; */
  GtkWidget *spinner;
- GtkWidget *filterButton, *closeButton;
+ GtkWidget *filterButton, *closeButton, *refButton, *area1Button, *area2Button;
  GtkWidget *label;
  GtkAdjustment *adj;
   
@@ -506,42 +506,54 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  
  vbox = gtk_vbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "vbox", vbox);
- gtk_container_set_border_width (GTK_CONTAINER (vbox), 8);
+ gtk_container_set_border_width (GTK_CONTAINER (vbox), 15);
  gtk_container_add (GTK_CONTAINER (frame), vbox);
 
  /* reference point frame */
  frame = gtk_frame_new ("Reference Point");
- gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 10);
+
+ vboxN = gtk_vbox_new (FALSE, 0);
+ gtk_container_set_border_width (GTK_CONTAINER (vboxN), 5); 
+ gtk_container_add (GTK_CONTAINER (frame), vboxN);
 
  hbox = gtk_hbox_new (FALSE, 0);
  AddWidgetToViewHandle(MainViewHandle, "hbox", hbox);
+ gtk_box_pack_start (GTK_BOX (vboxN), hbox, TRUE, TRUE, 20); 
 
- gtk_container_set_border_width (GTK_CONTAINER (hbox), 15);
- gtk_container_add (GTK_CONTAINER (frame), hbox);
-
- label = gtk_label_new ("X:    ");
+ label = gtk_label_new ("  X:");
  AddWidgetToViewHandle(MainViewHandle, "label", label);
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
- AddWidgetToViewHandle(MainViewHandle, "spinner", spinner);
+ AddWidgetToViewHandle(MainViewHandle, "Xspinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
- label = gtk_label_new ("           ");
+ label = gtk_label_new ("  ");
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
- label = gtk_label_new ("Y:    ");
+ label = gtk_label_new ("Y:");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Yspinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ label = gtk_label_new ("      ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
+ refButton = gtk_button_new_with_label ("Select (X, Y) Point with Mouse");
+ gtk_widget_set_size_request(refButton, 200, 25);
+ AddWidgetToViewHandle(MainViewHandle, "RefSelCoord", refButton);
+ g_signal_connect(G_OBJECT(refButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (hbox), refButton, TRUE, TRUE, 10);
 
  /* filter area frame */
  frame = gtk_frame_new ("Filter Area");
@@ -553,19 +565,20 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  gtk_container_add (GTK_CONTAINER (frame), vbox2);
 
  hbox = gtk_hbox_new (FALSE, 0);
- gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 0);
+ gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 20);
 
  label = gtk_label_new ("X1:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "X1spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
- label = gtk_label_new ("           ");
+ label = gtk_label_new ("     ");
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
  label = gtk_label_new ("Y1:  ");
@@ -573,10 +586,20 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Y1spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ label = gtk_label_new ("         ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
+ area1Button = gtk_button_new_with_label ("Select (X1, Y1) Point with Mouse");
+ gtk_widget_set_size_request(area1Button, 220, 25);
+ AddWidgetToViewHandle(MainViewHandle, "AreaSelCoord1", area1Button);
+ g_signal_connect(G_OBJECT(area1Button), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (hbox), area1Button, TRUE, TRUE, 10);
 
  hbox = gtk_hbox_new (FALSE, 0);
  gtk_box_pack_start (GTK_BOX (vbox2), hbox, TRUE, TRUE, 10);
@@ -586,12 +609,13 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "X2spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
- label = gtk_label_new ("           ");
+ label = gtk_label_new ("     ");
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
  label = gtk_label_new ("Y2:  ");
@@ -599,10 +623,21 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Y2spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+
+ label = gtk_label_new ("         ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
+ area2Button = gtk_button_new_with_label ("Select (X2, Y2) Point with Mouse");
+ gtk_widget_set_size_request(area2Button, 220, 25);
+ AddWidgetToViewHandle(MainViewHandle, "AreaSelCoord2", area2Button);
+ g_signal_connect(G_OBJECT(area2Button), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
+ gtk_box_pack_start (GTK_BOX (hbox), area2Button, TRUE, TRUE, 10);
 
  /* color attributes frame */
  frame = gtk_frame_new ("Color Attributes");
@@ -626,6 +661,9 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  hbox = gtk_hbox_new (FALSE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), hbox, TRUE, TRUE, 0);
+
+ label = gtk_label_new ("                      ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  
  label = gtk_label_new ("New Pixel Value:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -633,12 +671,19 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
-
+ AddWidgetToViewHandle(MainViewHandle, "NewPixSpinner", spinner);
+ 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
 
+ label = gtk_label_new ("                              ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+
  hbox = gtk_hbox_new (FALSE, 0);
  gtk_box_pack_start (GTK_BOX (vbox3), hbox, TRUE, TRUE, 10);
+
+ label = gtk_label_new ("                      ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  
  label = gtk_label_new ("Threshold Value:  ");
  gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
@@ -646,9 +691,13 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
-
+ AddWidgetToViewHandle(MainViewHandle, "ThresSpinner", spinner);
+ 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, TRUE, 0);
+
+ label = gtk_label_new ("                              ");
+ gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
  /* color filter button */
  hbox = gtk_hbox_new (FALSE, 0);
@@ -661,7 +710,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  /* 		  G_CALLBACK (gtk_widget_destroy), */
  /* 		  spinner); */
  g_signal_connect(G_OBJECT(filterButton), "clicked", G_CALLBACK(CatchEvent), MainViewHandle);
- gtk_box_pack_start (GTK_BOX (hbox), filterButton, TRUE, TRUE, 5);
+ gtk_box_pack_start (GTK_BOX (hbox), filterButton, FALSE, TRUE, 160);
 
  /* close button */
  closeButton = gtk_button_new_with_label ("Close");
@@ -826,6 +875,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  ocrWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
  AddWidgetToViewHandle(MainViewHandle, "OCRWindow", ocrWin);
  gtk_window_set_default_size(GTK_WINDOW(ocrWin), 230, 100);
+ gtk_window_set_resizable (GTK_WINDOW(ocrWin), FALSE);
  g_signal_connect (ocrWin, "destroy",
  		   G_CALLBACK (gtk_widget_hide),
  		   ocrWin);
@@ -874,6 +924,7 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "FontComboBox", combo);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Courier New" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Lucida Console" );
+ gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
@@ -891,7 +942,8 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "10" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "12" );
-
+ gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 1);
+ 
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
 
@@ -906,7 +958,8 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "ScanResComboBox", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "300 DPI" );
-
+ gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+ 
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
  gtk_box_pack_start (GTK_BOX (hbox2), combo, FALSE, TRUE, 0);
 
@@ -957,7 +1010,8 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "Yes" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "No" );
-
+ gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+ 
  gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
  label = gtk_label_new ("                   ");
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);

@@ -14,7 +14,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
-#define IMAGE_CHOICE 2
+#define IMAGE_CHOICE 5
 
 int main()
 {
