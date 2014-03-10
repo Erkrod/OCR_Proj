@@ -514,7 +514,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
- AddWidgetToViewHandle(MainViewHandle, "spinner", spinner);
+ AddWidgetToViewHandle(MainViewHandle, "Xspinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
@@ -527,6 +527,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Yspinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
@@ -558,6 +559,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "X1spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
@@ -571,6 +573,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Y1spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
@@ -593,6 +596,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "X2spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
@@ -606,6 +610,7 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
 
  adj = (GtkAdjustment *) gtk_adjustment_new (0.0, 0.0, 10000.0, 1.0, 5.0, 0.0);
  spinner = gtk_spin_button_new (adj, 0, 0);
+ AddWidgetToViewHandle(MainViewHandle, "Y2spinner", spinner);
  gtk_spin_button_set_wrap (GTK_SPIN_BUTTON (spinner), TRUE);
 
  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
