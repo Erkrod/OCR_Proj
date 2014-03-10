@@ -24,6 +24,7 @@ int main (int   argc, char *argv[]){
   GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
   GtkWidget *stainWindow      = drawStainRemoveWindow(MainViewHandle);
+  GtkWidget *helpWindow      = drawHelpWindow(MainViewHandle);
 
 
 
