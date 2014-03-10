@@ -11,18 +11,19 @@ int main()
   IMAGE *templateimage = NULL;
   CharProbability *curr;
   int i;
-  char fname[50] = "\Fonts\TestFonts\CourierNew_Test\1.ppm";  
+  char fname[50] = "Fonts/TestFonts/CourierNew_Test/Courier00.ppm";  
   i=1;
 	while( i < 95 )
 	{
-		char index;
+		char index[50];
 		sprintf(index, "%d", i);
 		
-		char tempname[50] = "\Fonts\CourierNew12_300D\\";
+		char tempname[50] = "Fonts/CourierNew12_300DPI/";
 		strcat(tempname, index);
 		strcat(tempname, ".jpg");
 		templateimage = ReadImage(tempname);
 		AppendImage(template, templateimage);
+		i++;
 	}
     image = ReadImage(fname);
   	CharProbabilities = IdentifyCharacter(image, template);
