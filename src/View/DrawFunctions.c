@@ -16,7 +16,8 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
   GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
-
+  GtkWidget *stainWindow	= drawStainRemoveWindow(MainViewHandle);
+  GtkWidget *aboutWindow	= drawAboutWindow(MainViewHandle);
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
@@ -33,7 +34,8 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   gtk_widget_hide(cropWindow);
   gtk_widget_hide(filterWindow);
   gtk_widget_hide(ocrWindow);
-				  
+  gtk_widget_hide(stainWindow);	  
+  gtk_widget_hide(aboutWindow);
   
 }
 
@@ -84,7 +86,6 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
     *removeStain   = gtk_menu_item_new_with_label("Stain Removal"),
     *colorFilter   = gtk_menu_item_new_with_label("Color Filter"),
     *rotate        = gtk_menu_item_new_with_label("Rotate  (Level Image)"),
-    *lineBound     = gtk_menu_item_new_with_label("Line Boundaries"),
     *crop          = gtk_menu_item_new_with_label("Crop  (Select OCR Region)");
 
   AddWidgetToViewHandle(MainViewHandle, "PreProcessMenu", preProcMenu);
@@ -94,7 +95,6 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   AddWidgetToViewHandle(MainViewHandle, "RemoveStain", removeStain);
   AddWidgetToViewHandle(MainViewHandle, "ColorFilter", colorFilter);
   AddWidgetToViewHandle(MainViewHandle, "Rotate", rotate);
-  AddWidgetToViewHandle(MainViewHandle, "LineBoundary", lineBound);
   AddWidgetToViewHandle(MainViewHandle, "Crop", crop);
 
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), preProc);
@@ -105,7 +105,6 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), removeStain);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), colorFilter);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), rotate);
-  gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), lineBound);
   gtk_menu_shell_append(GTK_MENU_SHELL(preProcMenu), crop);
 
   /* ocr options for menubar */
@@ -163,7 +162,6 @@ GtkWidget *drawMenuBar(ViewHandle * MainViewHandle){
   g_signal_connect(G_OBJECT(removeStain), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(colorFilter), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(rotate), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
-  g_signal_connect(G_OBJECT(lineBound), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
   g_signal_connect(G_OBJECT(crop), "activate", G_CALLBACK(CatchEvent), MainViewHandle);  
 
   g_signal_connect(G_OBJECT(ocr), "activate", G_CALLBACK(CatchEvent), MainViewHandle);
@@ -216,6 +214,9 @@ GtkWidget *drawTextWindow(ViewHandle *MainViewHandle){
   AddWidgetToViewHandle(MainViewHandle, "TextScrollWindow", scrollWinText);
   
   GtkWidget * TextView = gtk_text_view_new ();
+  /*PangoFontDescription * font_desc = pango_font_description_from_string ("Serif 15");
+  gtk_widget_modify_font (TextView, font_desc);
+  pango_font_description_free (font_desc);*/
   gtk_text_view_set_editable(GTK_TEXT_VIEW(TextView), TRUE);
   gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(TextView), GTK_WRAP_WORD_CHAR);
   AddWidgetToViewHandle(MainViewHandle, "MainTextArea", TextView);
@@ -1000,8 +1001,8 @@ GtkWidget *drawAboutWindow(ViewHandle * MainViewHandle){
 				"optical character recognition, and text editing.");
 
   gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), pixbuf);
-  gtk_dialog_run(GTK_DIALOG (dialog));
-  gtk_widget_destroy(dialog);
+  //gtk_dialog_run(GTK_DIALOG (dialog));
+  //gtk_widget_destroy(dialog);
 
   return dialog;
 }

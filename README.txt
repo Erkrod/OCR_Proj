@@ -1,12 +1,11 @@
-|Quan Chau|	████████╗███████╗ █████╗ ███╗   ███╗██████╗ 
-|Hanchel Cheng|	╚══██╔══╝██╔════╝██╔══██╗████╗ ████║╚════██╗
-|Kevin Duong|	   ██║   █████╗  ███████║██╔████╔██║ █████╔╝
-|Jamie Lee|	   ██║   ██╔══╝  ██╔══██║██║╚██╔╝██║ ╚═══██╗
-|Ryan Morrison|	   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██████╔╝
-|Eric Rodriguez|   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═════╝ 
+          
+|Quan Chau|	
+|Hanchel Cheng|
+|Kevin Duong|	 
+|Jamie Lee|	 
+|Ryan Morrison|	  
+|Eric Rodriguez|  
 |Andrew Trinh|
-
-ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ	ʕ•ᴥ•ʔ
 
 Want a softcopy of a paper document? With a scan of your 
 document, our Optical Character Recognition (OCR) will turn 
@@ -19,6 +18,3 @@ comprise it, produce the best match for each character, and
 return a text file.
 
 May you enjoy the convenience our product provides!
-
-
-ᕙ(`▽´)ᕗ

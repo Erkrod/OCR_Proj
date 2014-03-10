@@ -50,6 +50,9 @@ void ResizeImageList(ILIST *l, unsigned int percentage) ;
 /*Fast forward the video*/
 unsigned int FastImageList(ILIST *l, unsigned int ff_factor) ; 
 
+/*delete last image*/
+void PopLastImage(ILIST *l);
+
 #endif /* IMAGE_LIST_H */
 
 /* EOF */

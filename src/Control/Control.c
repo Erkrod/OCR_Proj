@@ -10,7 +10,7 @@ void UpdateTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
 char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
-
+int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * var2, int * b_thres, int * dark_limit);
 
 ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
 #ifdef DEBUG
@@ -29,19 +29,21 @@ ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
 ControlHandle * Control_Initialize(void){
 	ControlHandle * ToReturn = (ControlHandle *) malloc(sizeof(ControlHandle));
 	ToReturn->MainViewHandle = View_Initialize(ToReturn);
+	ToReturn->MainImageList = NewImageList();
 	utstring_new(ToReturn->InputImageFileName);
 	utstring_new(ToReturn->MainOutputString);
 	utstring_new(ToReturn->OutputFileName);
 	ToReturn->State = Normal;
 	ToReturn->IsInPreview = 0;
-	ToReturn->InitialState = 1;	
+	ToReturn->InitialImage = 1;	
+	ToReturn->InitialText = 1;	
 	drawAllWindows(ToReturn->MainViewHandle);
 	
 	
 	/*set initial image and string here*/
 	ObjectHandle * ImageDisplay = FindObject(ToReturn, "MainDisplayImage");
-	if (file_exist("Images/ocrMedium.png"))
-		gtk_image_set_from_file(GTK_IMAGE(ImageDisplay->Widget), "Images/ocrMedium.png");
+	if (file_exist("Images/ocrLarge.png"))
+		gtk_image_set_from_file(GTK_IMAGE(ImageDisplay->Widget), "Images/ocrLarge.png");
 		
 	FILE * file = fopen("README.txt", "r");
 	if (file){
@@ -60,6 +62,22 @@ ControlHandle * Control_Initialize(void){
 	}
 	
 	return ToReturn;
+}
+
+void SetCursorImageBox(ControlHandle * MainControlHandle){
+	/*set the cursor here*/
+	/*find the ImageWindow*/		
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
+	
+	/*put the coordinate selection here temporarily*/
+	if (MainControlHandle->State == SelectCoordinate){
+		GdkCursor* CrossCursor = gdk_cursor_new(GDK_CROSSHAIR);			
+		gdk_window_set_cursor(CurrObject->Widget->window, CrossCursor);
+		
+	} else {
+		/*set cursor to normal*/
+		gdk_window_set_cursor(CurrObject->Widget->window, NULL);
+	}
 }
 
 void GetClickCoord(ControlHandle * MainControlHandle, int orig_x, int orig_y, int * ret_x, int * ret_y){
@@ -199,7 +217,6 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 	IMAGE * NewImage = NULL;
 	int x1, y1, x2, y2, degree;
 		
-	char name[MAX_HASH_KEY_LENGTH];/* = {"MainWindow", "RotateWindow"};*/
 #ifdef DEBUG
 	printf("Object clicked has name: %s\n", ClickedObject->Name);
 #endif
@@ -239,14 +256,13 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			UpdateDisplayImage(MainControlHandle);
 		}
 /*======================================================================*/			
-	} else if (strcmp(ClickedObject->Name,"RemoveStain") == 0){
-		/*put the undo button here for now*/
+	} else if (strcmp(ClickedObject->Name,"UndoPreproc") == 0){
 		PopLastImage(MainControlHandle->MainImageList);
 		UpdateDisplayImage(MainControlHandle);
 		
-	} else if (strcmp(ClickedObject->Name,"RemoveWrinkle") == 0){
-		PopPreviewImage(MainControlHandle);
-		show_error("Not supported yet");
+	} else if (strcmp(ClickedObject->Name,"RemoveStain") == 0){
+		CurrObject = FindObject(MainControlHandle, "RemoveStainWin");
+		gtk_widget_show(CurrObject->Widget);
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
 		PopPreviewImage(MainControlHandle);
@@ -400,24 +416,6 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			if (0 != system("gedit TempOutputText.txt")) show_error("Can't run gedit on TempOutputText.txt");
 		}
 /*======================================================================*/	
-	} else if (strcmp(ClickedObject->Name,"Dictionary") == 0){
-		/*set the cursor here*/
-		/*find the ImageWindow*/		
-		CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
-		
-		/*put the coordinate selection here temporarily*/
-		if (MainControlHandle->State != SelectCoordinate){
-			MainControlHandle->State = SelectCoordinate;
-			/*set cursor to new things*/
-			GdkCursor* CrossCursor = gdk_cursor_new(GDK_CROSSHAIR);			
-			gdk_window_set_cursor(CurrObject->Widget->window, CrossCursor);
-			
-		} else {
-			MainControlHandle->State = Normal;
-			/*set cursor to normal*/
-			gdk_window_set_cursor(CurrObject->Widget->window, NULL);
-		}
-/*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"OCRButton") == 0){
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
@@ -478,7 +476,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 #endif			
 			/*cut the image into pieces and display it*/
 			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
-			ILIST * CutList = IsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+			ILIST * CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
 			DeleteImageList(CutList);
 			UpdateDisplayImage(MainControlHandle);
 			/*Identify them into probability*/
@@ -497,10 +495,54 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 	} else if (strcmp(ClickedObject->Name,"DisplayEventBox") == 0){		
 		if (MainControlHandle->State == SelectCoordinate){
 			int XClicked = 0, YClicked = 0;
-			printf("original event data x = %lf; y = %lf\n", event->button.x, event->button.y);
+			//printf("original event data x = %lf; y = %lf\n", event->button.x, event->button.y);
 			GetClickCoord(MainControlHandle, event->button.x, event->button.y, &XClicked, &YClicked);
-			printf("Translated coordinates are x = %d, y = %d\n", XClicked, YClicked);
+			if (MainControlHandle->MainImageList->Last){
+				if (XClicked >= 0 && XClicked < MainControlHandle->MainImageList->Last->Image->Width &&
+					YClicked >= 0 && YClicked < MainControlHandle->MainImageList->Last->Image->Height){
+					gtk_spin_button_set_value(GTK_SPIN_BUTTON (MainControlHandle->XCoordObject->Widget), XClicked); 
+					gtk_spin_button_set_value(GTK_SPIN_BUTTON (MainControlHandle->YCoordObject->Widget), YClicked); 
+				}
+			}
+			MainControlHandle->State = Normal;
+			SetCursorImageBox(MainControlHandle);
+			//printf("Translated coordinates are x = %d, y = %d\n", XClicked, YClicked);
 		}
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"CropCoord1") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin2");
+		SetCursorImageBox(MainControlHandle);
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"CropCoord2") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin3");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin4");
+		SetCursorImageBox(MainControlHandle);
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"RemoveStainButton") == 0){
+		if (MainControlHandle->MainImageList->Last){		
+			int var1, var2, b_thres, dark_limit;
+			int result = GetStainRemovalParams(MainControlHandle, &var1, &var2, &b_thres, &dark_limit);
+			if (result == 0){
+				PopPreviewImage(MainControlHandle);
+				IMAGE * NewImage = StainRemoval(MainControlHandle->MainImageList->Last->Image, var1, var2, b_thres, dark_limit);
+				AppendImage(MainControlHandle->MainImageList, NewImage);
+				UpdateDisplayImage(MainControlHandle);
+			} else if (result == 1){
+				show_error("Invalid Variance 1");
+			} else if (result == 2){
+				show_error("Invalid Variance 2");
+			} else if (result == 3){
+				show_error("Invalid Black threshold");
+			} else if (result == 4){
+				show_error("Invalid dark limiter");
+			}
+		}
+		
+		
+		
 	}
 }
 
@@ -578,6 +620,22 @@ void GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, in
 	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name4, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
 	assert(CurrObject);
 	*y2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+}
+
+int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * var2, int * b_thres, int * dark_limit){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "Var1Spinner");
+	*var1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*var1 < 0 || *var1 > 255) return 1;
+	CurrObject = FindObject(MainControlHandle, "Var2Spinner");
+	*var2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*var2 < 0 || *var2 > 255) return 2;
+	CurrObject = FindObject(MainControlHandle, "BrightSpinner");
+	*b_thres = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*b_thres < 0 || *b_thres > 255) return 3;
+	CurrObject = FindObject(MainControlHandle, "DarkenSpinner");
+	*dark_limit = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*dark_limit < 0 || *dark_limit > 255) return 4;
+	return 0;
 }
 
 void show_error(const gchar * ErrorMessage)
