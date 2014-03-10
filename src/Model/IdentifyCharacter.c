@@ -21,6 +21,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			temp.Probability = 100;
 			temp.Char = "\n";
 			Curr1 = Curr1->Next;
+			utarray_push_back(CharProbabilities, &temp);
 			continue;
 		}
 		char CharTemplate[100] = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
@@ -48,13 +49,13 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 				RTemplate = GetPixelR(Curr2->Image, x, y);
 				RImage = GetPixelR(newimage, x, y);
 				
-				GTemplate = GetPixelG(Curr2->Image, x, y);
+				/*GTemplate = GetPixelG(Curr2->Image, x, y);
 				GImage = GetPixelG(newimage, x, y);
 				
 				BTemplate = GetPixelB(Curr2->Image, x, y);
-				BImage = GetPixelB(newimage, x, y);
+				BImage = GetPixelB(newimage, x, y);*/
 				
-				if (RImage == RTemplate)
+				if (abs(RImage - RTemplate) < 20)
 				{
 					counter++;
 				}

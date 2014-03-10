@@ -63,6 +63,9 @@ ControlHandle * Control_Initialize(void){
 	utarray_new(ToReturn->SpecialCharArray, &ut_str_icd);
 	postProcessingInitialize(ToReturn->KeywordArray, ToReturn->SpecialCharArray);*/
 	
+	/*read templates*/
+	ToReturn->CourierNewTemplate = InitializeTemplate();
+	
 	/*set initial image and string here*/
 	ObjectHandle * ImageDisplay = FindObject(ToReturn, "MainDisplayImage");
 	if (file_exist("Images/ocrLarge.png"))
@@ -482,15 +485,21 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 				else if (IsolateAlgorithm == 1) CutList = ActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
 				if (!CutList) show_error("Can't perform OCR on this image.");
 				else {
-					DeleteImageList(CutList);
 					/*Identify them into probability*/
-					
+					UT_array * temp_array = IdentifyCharacter(CutList, MainControlHandle->CourierNewTemplate);
+					DeleteImageList(CutList);
+										
 					/*post processing*/
+					UT_string * temp_string = postProcessing(temp_array);
+					utstring_clear(MainControlHandle->MainOutputString);
+					utstring_printf(MainControlHandle->MainOutputString, "%s", utstring_body(temp_string));
 					
 					/*display the text*/
+					
+					
 					/*a random string for now*/
-					utstring_clear(MainControlHandle->MainOutputString);
-					utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
+					/*utstring_clear(MainControlHandle->MainOutputString);
+					utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");*/
 					AppendTextArea(MainControlHandle,utstring_body(MainControlHandle->MainOutputString));
 				}
 			}
