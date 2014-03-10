@@ -19,6 +19,11 @@ Phase 2: The algorithm should be able to match C syntax as much as possible
 
 int main(void)
 {
+  UT_array * dictionary;
+  UT_array * specialChar;
+  //postProcessingInitialize(dictionary, specialChar);
+  
+  
   UT_array * WholeString = NULL;
   CharProfile NewCharProfile;
   CharProbability NewCharProbability;
@@ -61,6 +66,6 @@ int main(void)
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
   
   postProcessing(WholeString);
-  
+  //postProcessingCleanUP(dictionary, specialChar);
   return 0;
 }
