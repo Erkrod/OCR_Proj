@@ -15,7 +15,8 @@ UT_string * GetCompileMessage(UT_string * code){
 	
 	if (file_exist("TempGCC_err.txt")) unlink("TempGCC_err.txt");
 	if (file_exist("TempGCC_good.txt")) unlink("TempGCC_good.txt");
-	system("gcc -o run TempCode.c 2>TempGCC_err.txt 1>TempGCC_good.txt");
+	int a = system("gcc -o run TempCode.c 2>TempGCC_err.txt 1>TempGCC_good.txt");
+	if (a == 0) a = 1;
 	if (file_exist("TempCode.c")) unlink("TempCode.c");
 	
 	file = fopen("TempGCC_err.txt", "r");

@@ -254,7 +254,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
   IMAGE * boxed_image;
   int x,y;
   int a,b;
-  unsigned char temp_R, temp_G, temp_B;
+  /*unsigned char temp_R, temp_G, temp_B;*/
   int start_y = 0;
   int x_border_start=-1, x_border_end=-2, old_border_end=-1;
   int char_width = 0, space_width = 0;

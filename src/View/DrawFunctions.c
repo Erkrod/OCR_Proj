@@ -17,7 +17,6 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
   GtkWidget *stainWindow	= drawStainRemoveWindow(MainViewHandle);
-  GtkWidget *aboutWindow	= drawAboutWindow(MainViewHandle);
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
@@ -35,7 +34,6 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   gtk_widget_hide(filterWindow);
   gtk_widget_hide(ocrWindow);
   gtk_widget_hide(stainWindow);	  
-  gtk_widget_hide(aboutWindow);
   
 }
 
@@ -245,6 +243,9 @@ GtkWidget *drawRotateWindow(ViewHandle * MainViewHandle){
  g_signal_connect (rotateWin, "destroy",
 		   G_CALLBACK (gtk_widget_hide),
 		   rotateWin);
+ g_signal_connect (rotateWin, "delete-event",
+		   G_CALLBACK (gtk_widget_hide),
+		   rotateWin);
 
  gtk_window_set_title (GTK_WINDOW (rotateWin), "Rotate Image");
  
@@ -327,7 +328,9 @@ GtkWidget *drawCropWindow(ViewHandle * MainViewHandle){
  g_signal_connect (cropWin, "destroy",
  		   G_CALLBACK (gtk_widget_hide),
  		   cropWin);
-
+  g_signal_connect (cropWin, "delete-event",
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   cropWin);
  gtk_window_set_title (GTK_WINDOW (cropWin), "Crop Image");
  
  vboxMain = gtk_vbox_new (FALSE, 5);
@@ -485,9 +488,11 @@ GtkWidget *drawColorFilterWindow(ViewHandle * MainViewHandle){
  gtk_window_set_default_size(GTK_WINDOW(filterWin), 230, 100);
  gtk_window_set_resizable (GTK_WINDOW(filterWin), FALSE);
  g_signal_connect (filterWin, "destroy",
- 		   G_CALLBACK (gtk_main_quit),
- 		   NULL);
-
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   filterWin);
+ g_signal_connect (filterWin, "delete-event",
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   filterWin);
  gtk_window_set_title (GTK_WINDOW (filterWin), "Color Filter");
  
  vboxMain = gtk_vbox_new (FALSE, 5);
@@ -690,8 +695,11 @@ GtkWidget *drawStainRemoveWindow(ViewHandle * MainViewHandle){
  gtk_window_set_default_size(GTK_WINDOW(stainWin), 500, 100);
  gtk_window_set_resizable (GTK_WINDOW(stainWin), FALSE);
  g_signal_connect (stainWin, "destroy",
- 		   G_CALLBACK (gtk_main_quit),
- 		   NULL);
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   stainWin);
+  g_signal_connect (stainWin, "delete-event",
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   stainWin);
  gtk_window_set_title (GTK_WINDOW (stainWin), "Stain Removal");
 
  vboxMain = gtk_vbox_new (FALSE, 5);
@@ -792,7 +800,7 @@ GtkWidget *drawStainRemoveWindow(ViewHandle * MainViewHandle){
  /* 			   G_CALLBACK (gtk_widget_destroy), */
  /* 			   ocrWin); */
  g_signal_connect_swapped (closeButton, "clicked",
- 			   G_CALLBACK (gtk_widget_destroy),
+ 			   G_CALLBACK (gtk_widget_hide),
  			   stainWin);
 
  hbox = gtk_hbox_new (FALSE, 0);
@@ -819,8 +827,11 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  AddWidgetToViewHandle(MainViewHandle, "OCRWindow", ocrWin);
  gtk_window_set_default_size(GTK_WINDOW(ocrWin), 230, 100);
  g_signal_connect (ocrWin, "destroy",
- 		   G_CALLBACK (gtk_main_quit),
- 		   NULL);
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   ocrWin);
+ g_signal_connect (ocrWin, "delete-event",
+ 		   G_CALLBACK (gtk_widget_hide),
+ 		   ocrWin);
  gtk_window_set_title (GTK_WINDOW (ocrWin), "OCR");
  
  vboxMain = gtk_vbox_new (FALSE, 5);
@@ -894,7 +905,6 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  combo = gtk_combo_box_new_text();
  AddWidgetToViewHandle(MainViewHandle, "ScanResComboBox", combo);
  gtk_widget_set_size_request(GTK_WIDGET(combo), 72, -1);
- gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "200 DPI" );
  gtk_combo_box_append_text(GTK_COMBO_BOX(combo), "300 DPI" );
 
  gtk_box_pack_start (GTK_BOX (hbox2), label, TRUE, TRUE, 0);
@@ -920,8 +930,8 @@ GtkWidget *drawOCRWindow(ViewHandle * MainViewHandle){
  previewButton = gtk_button_new_with_label ("Preview Isolate");
  AddWidgetToViewHandle(MainViewHandle, "PreviewIsolate", previewButton);
  g_signal_connect(previewButton, "clicked",
- 		  G_CALLBACK (gtk_widget_destroy),
- 		  ocrWin);
+ 		  G_CALLBACK (CatchEvent),
+ 		  MainViewHandle);
  gtk_box_pack_start (GTK_BOX (vbox2), previewButton, TRUE, TRUE, 5);
 
  /* post processing frame */
@@ -1001,8 +1011,8 @@ GtkWidget *drawAboutWindow(ViewHandle * MainViewHandle){
 				"optical character recognition, and text editing.");
 
   gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), pixbuf);
-  //gtk_dialog_run(GTK_DIALOG (dialog));
-  //gtk_widget_destroy(dialog);
+  gtk_dialog_run(GTK_DIALOG (dialog));
+  gtk_widget_destroy(dialog);
 
   return dialog;
 }

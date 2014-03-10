@@ -12,6 +12,10 @@ char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
 int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * var2, int * b_thres, int * dark_limit);
 
+int GetOCRParams(ControlHandle * MainControlHandle, FontType * Font, int * FontSize, int *ScanRes, int *IsoAlg, int *UseDict);
+
+int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int new_value, int thres_value);
+
 ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name){
 #ifdef DEBUG
 	printf("Finding object with name %s\n", Name);
@@ -139,6 +143,7 @@ void ClearTextArea(ControlHandle * MainControlHandle){
 }
 
 void AppendTextArea(ControlHandle * MainControlHandle, char * DisplayString){
+	if (MainControlHandle->InitialText) ClearTextArea(MainControlHandle);
 	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));
 	GtkTextIter iter;
@@ -223,12 +228,14 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 /*======================================================================*/
 	if (strcmp(ClickedObject->Name,"OpenFile") == 0){
 		OpenImageFile(MainControlHandle->InputImageFileName);
-		/*NEED TO PUT A FILTER HERE*/
+		
 		/*load the image here*/
 		NewImage = ReadImage(utstring_body(MainControlHandle->InputImageFileName));		
 		if (NewImage){
 			DeleteImageList(MainControlHandle->MainImageList);
 			MainControlHandle->MainImageList = NewImageList();
+			MainControlHandle->IsInPreview = 0;
+			MainControlHandle->State = Normal;
 			AppendImage(MainControlHandle->MainImageList, NewImage);
 			UpdateDisplayImage(MainControlHandle);
 		} else {
@@ -244,6 +251,13 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		} else {
 			printf("Can't open file %s\n", utstring_body(MainControlHandle->MainOutputString));
 		}
+		
+/*======================================================================*/			
+	} else if (strcmp(ClickedObject->Name,"UndoPreproc") == 0){
+		if (MainControlHandle->IsInPreview == 1) MainControlHandle->IsInPreview = 0;
+		PopLastImage(MainControlHandle->MainImageList);
+		UpdateDisplayImage(MainControlHandle);
+		
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"ConvertBW") == 0){
 		if (!MainControlHandle->MainImageList->Last){
@@ -255,14 +269,35 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			AppendImage(MainControlHandle->MainImageList, NewImage);
 			UpdateDisplayImage(MainControlHandle);
 		}
-/*======================================================================*/			
-	} else if (strcmp(ClickedObject->Name,"UndoPreproc") == 0){
-		PopLastImage(MainControlHandle->MainImageList);
-		UpdateDisplayImage(MainControlHandle);
 		
+/*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"RemoveStain") == 0){
 		CurrObject = FindObject(MainControlHandle, "RemoveStainWin");
 		gtk_widget_show(CurrObject->Widget);
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"RemoveStainButton") == 0){
+		if (MainControlHandle->MainImageList->Last){		
+			int var1, var2, b_thres, dark_limit;
+			int result = GetStainRemovalParams(MainControlHandle, &var1, &var2, &b_thres, &dark_limit);
+			if (result == 0){
+				PopPreviewImage(MainControlHandle);
+				IMAGE * NewImage = StainRemoval(MainControlHandle->MainImageList->Last->Image, var1, var2, b_thres, dark_limit);
+				AppendImage(MainControlHandle->MainImageList, NewImage);
+				UpdateDisplayImage(MainControlHandle);
+			} else if (result == 1){
+				show_error("Invalid Variance 1");
+			} else if (result == 2){
+				show_error("Invalid Variance 2");
+			} else if (result == 3){
+				show_error("Invalid Black threshold");
+			} else if (result == 4){
+				show_error("Invalid dark limiter");
+			}
+		}		
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"ColorFilter") == 0){
+		CurrObject = FindObject(MainControlHandle, "ColorFilterWindow");
+		gtk_widget_show(CurrObject->Widget);		
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
 		PopPreviewImage(MainControlHandle);
@@ -289,9 +324,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"Crop") == 0){
 		PopPreviewImage(MainControlHandle);
-		char nameCropWindow[MAX_HASH_KEY_LENGTH] =  "CropWindow";
-		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameCropWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-		assert(CurrObject);
+		CurrObject = FindObject(MainControlHandle, "CropWindow");		
 		gtk_widget_show(CurrObject->Widget);		
 		
 		
@@ -301,19 +334,35 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			show_error("No image loaded yet");
 		} else {
 			PopPreviewImage(MainControlHandle);
-			GetCropCoordinate(MainControlHandle, &x1, &y1, &x2, &y2);
-			if (x1 > MainControlHandle->MainImageList->Last->Image->Width ||
-				x2 > MainControlHandle->MainImageList->Last->Image->Width ||
-				y1 > MainControlHandle->MainImageList->Last->Image->Height ||
-				y2 > MainControlHandle->MainImageList->Last->Image->Height ||
-				x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0)
-				show_error("Coordinates out of bound");
-			else {
+			int result = GetCropCoordinate(MainControlHandle, &x1, &y1, &x2, &y2);
+			if (result == 5){
+				show_error("No image loaded yet");
+			} else if (result == 1){
+				show_error("Invalid X1");
+			} else if (result == 2){
+				show_error("Invalid Y1");
+			} else if (result == 3){
+				show_error("Invalid X2");
+			} else if (result == 4){
+				show_error("Invalid Y2");
+			} else {
 				NewImage = CropImage(MainControlHandle->MainImageList->Last->Image, x1, y1, x2, y2);
 				AppendImage(MainControlHandle->MainImageList, NewImage);
 				UpdateDisplayImage(MainControlHandle);
 			}
 		}
+/*======================================================================*/
+	} else if (strcmp(ClickedObject->Name,"CropCoord1") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin2");
+		SetCursorImageBox(MainControlHandle);
+/*======================================================================*/	
+	} else if (strcmp(ClickedObject->Name,"CropCoord2") == 0){	
+		MainControlHandle->State = SelectCoordinate;
+		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin3");
+		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin4");
+		SetCursorImageBox(MainControlHandle);
 		
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"PerformOCR") == 0){
@@ -328,81 +377,74 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			show_error("No image loaded yet");
 		} else {			
 			/*get information about font, font size and scan resolution*/
-			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300, OCRErrorFlag = 0;
-			char nameOCRComboBox[MAX_HASH_KEY_LENGTH] =  "FontComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);			
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					Font = CourierNew;
-					break;
-				case 1:
-					Font = LucidaConsole;
-					break;
-				default:
-					show_error("Invalid Font choice");
-					OCRErrorFlag = 1;
-					break;
+			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300;
+			int IsolateAlgorithm = 0, UseDictionary = 0;
+			int result = GetOCRParams(MainControlHandle, &Font, &FontSize, &ScanRes, &IsolateAlgorithm, &UseDictionary);
+			if (result == 1){
+				show_error("Invalid Font");
+			} else if (result == 2){
+				show_error("Invalid FontSize");
+			} else if (result == 3){
+				show_error("Invalid Scan resolution");
+			} else if (result == 4){
+				show_error("Invalid Isolate Algorithm");
+			} else if (result == 5){
+				show_error("Invalid PostProcessing option");
+			} else {
+				/*cut the image into pieces and display it*/
+				
+				ILIST * CutList = NULL;
+				if (IsolateAlgorithm == 0) CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				else if (IsolateAlgorithm == 1) CutList = ActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				if (!CutList) show_error("Can't perform OCR on this image.");
+				else {
+					DeleteImageList(CutList);
+					/*Identify them into probability*/
+					
+					/*post processing*/
+					
+					/*display the text*/
+					/*a random string for now*/
+					utstring_clear(MainControlHandle->MainOutputString);
+					utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
+					AppendTextArea(MainControlHandle,utstring_body(MainControlHandle->MainOutputString));
+				}
 			}
 			
-			char nameOCRComboBox3[MAX_HASH_KEY_LENGTH] =  "FontSizeComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					FontSize = 10;
-					break;
-				case 1:
-					FontSize = 12;
-					break;
-				default:
-					show_error("Invalid Font size");
-					OCRErrorFlag = 1;
-					break;
+			
+			
+			
+		}
+/*======================================================================*/		
+	} else if (strcmp(ClickedObject->Name,"PreviewIsolate") == 0){
+		if (!MainControlHandle->MainImageList->Last){
+			show_error("No image loaded yet");
+		} else {			
+			/*get information about font, font size and scan resolution*/
+			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300;
+			int IsolateAlgorithm = 0, UseDictionary = 0;
+			int result = GetOCRParams(MainControlHandle, &Font, &FontSize, &ScanRes, &IsolateAlgorithm, &UseDictionary);
+			if (result == 1){
+				show_error("Invalid Font");
+			} else if (result == 2){
+				show_error("Invalid FontSize");
+			} else if (result == 3){
+				show_error("Invalid Scan resolution");
+			} else if (result == 4){
+				show_error("Invalid Isolate Algorithm");
+			} else if (result == 5){
+				show_error("Invalid PostProcessing option");
+			} else {	
+				IMAGE * PreviewImage = NULL;
+				if (IsolateAlgorithm == 0) PreviewImage = PreviewLazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				else if (IsolateAlgorithm == 1) PreviewImage = PreviewActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);				
+				if(!PreviewImage){show_error("Can't perform Isolate character on this image");}
+				else {
+					AppendImage(MainControlHandle->MainImageList, PreviewImage);
+					MainControlHandle->IsInPreview = 1;
+					UpdateDisplayImage(MainControlHandle);				
+				}
 			}
-			
-			char nameOCRComboBox2[MAX_HASH_KEY_LENGTH] =  "ScanResComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					ScanRes = 200;
-					break;
-				case 1:
-					ScanRes = 300;
-					break;	
-				default:
-					show_error("Invalid scan resolution");
-					OCRErrorFlag = 1;
-					break;
-			}
-			
-			if (!OCRErrorFlag){
-#ifdef DEBUG
-			printf("%s %d %d\n", Font == CourierNew ? "CourierNew" : "LucidaConsole", FontSize, ScanRes);
-#endif			
-			/*cut the image into pieces and display it*/
-			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
-			ILIST * CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
-			DeleteImageList(CutList);
-			UpdateDisplayImage(MainControlHandle);
-			/*Identify them into probability*/
-			
-			/*post processing*/
-			
-			/*display the text*/
-			/*a random string for now*/
-			utstring_clear(MainControlHandle->MainOutputString);
-			utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
-			char nameMainText[MAX_HASH_KEY_LENGTH] =  "MainTextArea";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameMainText, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
-			GtkTextIter iter;
-			gtk_text_buffer_get_iter_at_offset(buffer, &iter, 0);
-			gtk_text_buffer_insert(buffer, &iter, utstring_body(MainControlHandle->MainOutputString), -1);
-			}
-			
 		}
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"EditText") == 0){		
@@ -414,82 +456,6 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			fprintf(NewFile, "%s", utstring_body(MainControlHandle->MainOutputString));
 			fclose(NewFile);			
 			if (0 != system("gedit TempOutputText.txt")) show_error("Can't run gedit on TempOutputText.txt");
-		}
-/*======================================================================*/	
-	} else if (strcmp(ClickedObject->Name,"OCRButton") == 0){
-		if (!MainControlHandle->MainImageList->Last){
-			show_error("No image loaded yet");
-		} else {			
-			/*get information about font, font size and scan resolution*/
-			FontType Font = CourierNew; int FontSize = 12, ScanRes = 300, OCRErrorFlag = 0;
-			char nameOCRComboBox[MAX_HASH_KEY_LENGTH] =  "FontComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);			
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					Font = CourierNew;
-					break;
-				case 1:
-					Font = LucidaConsole;
-					break;
-				default:
-					show_error("Invalid Font choice");
-					OCRErrorFlag = 1;
-					break;
-			}
-			
-			char nameOCRComboBox3[MAX_HASH_KEY_LENGTH] =  "FontSizeComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					FontSize = 10;
-					break;
-				case 1:
-					FontSize = 12;
-					break;
-				default:
-					show_error("Invalid Font size");
-					OCRErrorFlag = 1;
-					break;
-			}
-			
-			char nameOCRComboBox2[MAX_HASH_KEY_LENGTH] =  "ScanResComboBox";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRComboBox2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
-			switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
-				case 0:
-					ScanRes = 200;
-					break;
-				case 1:
-					ScanRes = 300;
-					break;
-				default:
-					show_error("Invalid scan resolution");
-					OCRErrorFlag = 1;
-					break;
-			}
-			
-			if (!OCRErrorFlag){
-#ifdef DEBUG
-			printf("%s %d %d\n", Font == CourierNew ? "CourierNew" : "LucidaConsole", FontSize, ScanRes);
-#endif			
-			/*cut the image into pieces and display it*/
-			AppendImage(MainControlHandle->MainImageList, DuplicateImage(MainControlHandle->MainImageList->Last->Image));
-			ILIST * CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
-			DeleteImageList(CutList);
-			UpdateDisplayImage(MainControlHandle);
-			/*Identify them into probability*/
-			
-			/*post processing*/
-			
-			/*display the text*/
-			/*a random string for now*/
-			utstring_clear(MainControlHandle->MainOutputString);
-			utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");
-			AppendTextArea(MainControlHandle, utstring_body(MainControlHandle->MainOutputString));
-			}
-			
 		}
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"DisplayEventBox") == 0){		
@@ -508,41 +474,10 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			SetCursorImageBox(MainControlHandle);
 			//printf("Translated coordinates are x = %d, y = %d\n", XClicked, YClicked);
 		}
-/*======================================================================*/
-	} else if (strcmp(ClickedObject->Name,"CropCoord1") == 0){	
-		MainControlHandle->State = SelectCoordinate;
-		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin");
-		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin2");
-		SetCursorImageBox(MainControlHandle);
+
 /*======================================================================*/	
-	} else if (strcmp(ClickedObject->Name,"CropCoord2") == 0){	
-		MainControlHandle->State = SelectCoordinate;
-		MainControlHandle->XCoordObject = FindObject(MainControlHandle, "CropSpin3");
-		MainControlHandle->YCoordObject = FindObject(MainControlHandle, "CropSpin4");
-		SetCursorImageBox(MainControlHandle);
-/*======================================================================*/	
-	} else if (strcmp(ClickedObject->Name,"RemoveStainButton") == 0){
-		if (MainControlHandle->MainImageList->Last){		
-			int var1, var2, b_thres, dark_limit;
-			int result = GetStainRemovalParams(MainControlHandle, &var1, &var2, &b_thres, &dark_limit);
-			if (result == 0){
-				PopPreviewImage(MainControlHandle);
-				IMAGE * NewImage = StainRemoval(MainControlHandle->MainImageList->Last->Image, var1, var2, b_thres, dark_limit);
-				AppendImage(MainControlHandle->MainImageList, NewImage);
-				UpdateDisplayImage(MainControlHandle);
-			} else if (result == 1){
-				show_error("Invalid Variance 1");
-			} else if (result == 2){
-				show_error("Invalid Variance 2");
-			} else if (result == 3){
-				show_error("Invalid Black threshold");
-			} else if (result == 4){
-				show_error("Invalid dark limiter");
-			}
-		}
-		
-		
-		
+	} else if (strcmp(ClickedObject->Name,"About") == 0){
+		drawAboutWindow(MainControlHandle->MainViewHandle);
 	}
 }
 
@@ -602,24 +537,81 @@ void SaveTextFile(UT_string * OutputFileName){
 	
 }
 
-void GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, int * x2, int * y2){
-	char name1[MAX_HASH_KEY_LENGTH] =  "CropSpin";
-	char name2[MAX_HASH_KEY_LENGTH] =  "CropSpin2";
-	char name3[MAX_HASH_KEY_LENGTH] =  "CropSpin3";
-	char name4[MAX_HASH_KEY_LENGTH] =  "CropSpin4";
-	ObjectHandle * CurrObject;
-	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name1, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-	assert(CurrObject);
+int GetOCRParams(ControlHandle * MainControlHandle, FontType * Font, int * FontSize, int *ScanRes, int *IsoAlg, int *UseDict){
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "FontComboBox");
+	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+		case 0:
+			*Font = CourierNew;
+			break;
+		case 1:
+			*Font = LucidaConsole;
+			break;
+		default:					
+			return 1;
+			break;
+	}
+	CurrObject = FindObject(MainControlHandle, "FontSizeComboBox");
+	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+		case 0:
+			*FontSize = 10;
+			break;
+		case 1:
+			*FontSize = 12;
+			break;
+		default:
+			return 2;
+			break;
+	}
+	CurrObject = FindObject(MainControlHandle, "ScanResComboBox");
+	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+		case 0:
+			*ScanRes = 300;
+			break;		
+		default:
+			return 3;
+			break;
+	}
+	CurrObject = FindObject(MainControlHandle, "LazyRadio");
+	ObjectHandle * CurrObject2 = FindObject(MainControlHandle, "ActiveRadio");
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CurrObject->Widget))){
+		*IsoAlg = 0;
+	} else if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(CurrObject2->Widget))) {
+		*IsoAlg = 1;
+	} else return 4;
+	
+	CurrObject = FindObject(MainControlHandle, "DictionaryCombo");
+	switch(gtk_combo_box_get_active(GTK_COMBO_BOX(CurrObject->Widget))){
+		case 0:
+			*UseDict = 1;
+			break;
+		case 1:
+			*UseDict = 0;
+			break;
+		default:
+			return 5;
+			break;
+	}
+	return 0;
+}
+
+int GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, int * x2, int * y2){
+	if (!MainControlHandle->MainImageList->Last) return 5;
+	
+	IMAGE * CurrImage = MainControlHandle->MainImageList->Last->Image;
+	
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "CropSpin");
 	*x1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
-	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name2, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-	assert(CurrObject);
+	if (*x1 < 0 || *x1 >= CurrImage->Width) return 1;
+	CurrObject = FindObject(MainControlHandle, "CropSpin2");
 	*y1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
-	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name3, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-	assert(CurrObject);
+	if (*y1 < 0 || *y1 >= CurrImage->Height) return 2;
+	CurrObject = FindObject(MainControlHandle, "CropSpin3");
 	*x2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
-	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name4, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-	assert(CurrObject);
+	if (*x2 < 0 || *x2 >= CurrImage->Width) return 3;
+	CurrObject = FindObject(MainControlHandle, "CropSpin4");
 	*y2 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*y2 < 0 || *y2 >= CurrImage->Height) return 4;
+	return 0;
 }
 
 int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * var2, int * b_thres, int * dark_limit){
@@ -638,7 +630,15 @@ int GetStainRemovalParams(ControlHandle * MainControlHandle, int * var1, int * v
 	return 0;
 }
 
-void show_error(const gchar * ErrorMessage)
+int GetColorFilterParams(ControlHandle * MainControlHandle, int * x, int * y, int *x1, int *y1, int *x2, int *y2, int new_value, int thres_value){
+	/*ObjectHandle * CurrObject = FindObject(MainControlHandle, "Var1Spinner");
+	*var1 = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
+	if (*var1 < 0 || *var1 > 255) return 1;
+	CurrObject = FindObject(MainControlHandle, "Var2Spinner");*/
+	return 0;
+}
+
+void show_error(const char * ErrorMessage)
 {
   GtkWidget *dialog;
   dialog = gtk_message_dialog_new(NULL,
@@ -655,19 +655,3 @@ void on_rotate_clicked(){
 
 
 }
-
-#if 0		/*reserved for beta release: get coordinate by clickon on screen*/
-CurrObject = NULL;
-GtkRequisition requisition;
-	GtkAllocation allocation;
-		HASH_FIND(HashByName,MainViewHandle->ObjectListByName, name, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-		if (CurrObject) {	
-			/*printf("%d %d\n", CurrObject->Widget->allocation.x, CurrObject->Widget->allocation.y);
-			gtk_widget_size_request(CurrObject->Widget, &requisition);
-			printf("Image scroll window is %d wide\n",requisition.width);*/
-			gtk_widget_get_allocation(CurrObject->Widget, &allocation);
-			printf("Image scroll window is %d wide\n",allocation.width);
-			
-		}
-		else printf("Can't find ImageScrollWindow\n");
-#endif

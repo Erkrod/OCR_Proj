@@ -25,7 +25,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent *);
 void OpenImageFile(UT_string * ImageFileName);
 void SaveTextFile(UT_string * OutputFileName);
 void show_error(const gchar * ErrorMessage);
-void GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, int * x2, int * y2);
+int GetCropCoordinate(ControlHandle * MainControlHandle, int * x1, int * y1, int * x2, int * y2);
 /*void on_open_clicked();
 
 void on_save_clicked(GtkWidget *window, gpointer data);
