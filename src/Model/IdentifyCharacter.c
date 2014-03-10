@@ -6,7 +6,9 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 {
 	UT_array * CharProfiles;
 	utarray_new(CharProfiles, &CharProfile_icd);
-	IENTRY * Curr1 = imglist;
+	CharProfile NewCharProfile;
+	IENTRY * Curr1 = imglist->First;
+
 	while (Curr1)
 	{
 		UT_array * CharProbabilities;
@@ -20,7 +22,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			Curr1 = Curr1->Next;
 			continue;
 		}
-		char CharTemplate[62] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		char CharTemplate[100] = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 		IENTRY * Curr2 = Template->First;
 		int Index;
 		IMAGE *newimage = Resize(image, Curr2->Image->Width, Curr2->Image->Height);
@@ -51,7 +53,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 				BTemplate = GetPixelB(Curr2->Image, x, y);
 				BImage = GetPixelB(newimage, x, y);
 				
-				if (RImage > 220 && RTemplate > 220 && GImage > 220 && GTemplate > 220 && BImage > 220 && BTemplate > 220)
+				if (RImage == RTemplate)
 				{
 					counter++;
 				}
@@ -63,7 +65,8 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			Curr2 = Curr2->Next;
 			Index++;
 		}
-		utarray_push_back(CharProfiles, CharProbabilities);
+		NewCharProfile.CharChoices = CharProbabilities;
+		utarray_push_back(CharProfiles, &NewCharProfile);
 		Curr1 = Curr1->Next;
 	}
 	return CharProfiles;

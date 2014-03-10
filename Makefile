@@ -16,7 +16,7 @@ endif
 MODULES   := Model Control View
 SRC_DIR   := $(addprefix src/,$(MODULES))
 
-MODEL_LIB := Model postProcessing IdentifyCharacter IsolateCharacter FileIO ImageProcessing Image ImageList
+MODEL_LIB := postProcessing IdentifyCharacter Model IsolateCharacter FileIO ImageProcessing Image ImageList
 
 CONTROL_LIB := Control
 
