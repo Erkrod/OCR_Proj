@@ -11,8 +11,8 @@ int main()
   IMAGE *templateimage = NULL;
   CharProbability *curr;
   int i;
-  char fname[50] = "Fonts/TestFonts/CourierNew_Test/Courier00.ppm";  
-  i=1;
+  char fname[50] = "Fonts/TestFonts/CourierNew_Test/Courier14.ppm";  
+  i=1;		
 	while( i < 95 )
 	{
 		char index[50];

@@ -49,7 +49,7 @@ void Posterize(IMAGE *image) ;
 void AddNoise(IMAGE *image) ;
 
 /* Resize */
-IMAGE *Resize(	unsigned int percentage, IMAGE *image) ; 
+IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight);
 
 
 IMAGE *Crop(IMAGE *image, unsigned int x, unsigned int y, unsigned int W, unsigned int H);

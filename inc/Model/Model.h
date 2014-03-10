@@ -5,6 +5,7 @@
 #include "ModelStructure.h"
 #include "utstring.h"
 #include "Image.h"
+#include "ImageProcessing.h"
 
 
 ILIST * IsolateCharacter(IMAGE * image, int fontsize, int scanres);

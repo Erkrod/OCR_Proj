@@ -366,59 +366,63 @@ void AddNoise(IMAGE *image)
 
 
 /* Resize */
-IMAGE* Resize(unsigned int percentage, IMAGE *image)
-{
-	unsigned int x, y, x1, y1, x2, y2, i, j, tmpR, tmpG, tmpB;
-	unsigned int NEW_WIDTH, NEW_HEIGHT;
-	unsigned int WIDTH;
-	unsigned int HEIGHT;
-	IMAGE *image_tmp;
-
-	assert(image);
-	WIDTH	 = image->Width;
-	HEIGHT = image->Height;
-
-	if(percentage <= 0 || percentage > 500){
-		printf("Resizing percentage %d%% is out of the range, Sorry! \n", percentage);
-		return image;
+static unsigned char enlarge_compute_intensity(IMAGE * image, int x_big, int y_big, int xpercentage, int ypercentage, int intensity_type){
+	double x_small = x_big * 100.0 / xpercentage;
+	double y_small = y_big * 100.0 / ypercentage;
+	unsigned char temp[4];
+	unsigned char return_value;	
+	double x_factor = 1 - fmod(x_small, 1.0); double y_factor = 1 - fmod(y_small, 1.0);
+	switch (intensity_type){
+		case 0:
+			temp[0] = GetPixelR(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[1] = GetPixelR(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[2] = GetPixelR(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[3] = GetPixelR(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			break;
+		case 1:
+			temp[0] = GetPixelG(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[1] = GetPixelG(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[2] = GetPixelG(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[3] = GetPixelG(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			break;
+		case 2:
+			temp[0] = GetPixelB(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[1] = GetPixelB(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[2] = GetPixelB(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
+			temp[3] = GetPixelB(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			break;
 	}
-
-	NEW_WIDTH = WIDTH * percentage / 100;
-	NEW_HEIGHT = HEIGHT * percentage / 100;
-	image_tmp = CreateImage(NEW_WIDTH, NEW_HEIGHT);
+		
+	return_value = temp[0] * x_factor * y_factor + temp[1] * (1 - x_factor) * y_factor + temp[2] * x_factor * (1 - y_factor) + temp[3] * (1-x_factor) * (1-y_factor);
+	return return_value;
 	
-	if (image_tmp != NULL)
-	{
-		for(x = 0; x < NEW_WIDTH; x ++){
-			for(y = 0; y < NEW_HEIGHT; y++){
-				x1 = (unsigned int)(x / (percentage / 100.00));
-				y1 = (unsigned int)(y / (percentage / 100.00));
-				x2 = (unsigned int)((x + 1) / (percentage / 100.00));
-				y2 = (unsigned int)((y + 1) / (percentage / 100.00));
-				tmpR = tmpB = tmpG = 0;
+}
+
+/*Resize*/
+IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
+	unsigned int out_height = newHeight;
+	unsigned int out_width = newWidth;
+	int ypercentage = newHeight*100/image->Height;
+	int xpercentage = newWidth*100/image->Width;
+	IMAGE * image_out = CreateImage(out_width, out_height);
+	if (image_out == NULL) {printf("ERROR: Out of memory\n"); return image;}
+	int i,j;
+	
+	for (i = 0; i < image_out->Width; i++){
+		for (j = 0; j < image_out->Height; j++){			
+			if (newWidth != image->Width || newHeight != image->Height){
+				/*enlarge*/
+				SetPixelR(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 0));
+				SetPixelG(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 1));
+				SetPixelB(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 2));
 				
-				if(percentage < 100){
-					for(i = x1; i < x2; i ++){
-						for(j = y1; j < y2; j ++){
-							tmpR += GetPixelR(image, i, j);
-							tmpG += GetPixelG(image, i, j);
-							tmpB += GetPixelB(image, i, j);
-						}
-					}
-					SetPixelR(image_tmp, x, y, tmpR / ((x2 - x1) * (y2 - y1)));
-					SetPixelG(image_tmp, x, y, tmpG / ((x2 - x1) * (y2 - y1)));
-					SetPixelB(image_tmp, x, y, tmpB / ((x2 - x1) * (y2 - y1)));
-  	
-				}
-				else{
-					SetPixelR(image_tmp, x, y, GetPixelR(image, x1, y1));
-					SetPixelG(image_tmp, x, y, GetPixelG(image, x1, y1));
-					SetPixelB(image_tmp, x, y, GetPixelB(image, x1, y1));
-				}
+			} else {
+				DeleteImage(image_out);
+				return DuplicateImage(image);
 			}
+
 		}
 	}
-	
-	DeleteImage(image);
-	return image_tmp ; 
+	/*DeleteImage(image);*/
+	return image_out;
 }
