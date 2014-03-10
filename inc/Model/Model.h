@@ -15,7 +15,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
 ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int scanres);
 
 
-UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
+//UT_array * IdentifyCharacter( IMAGE * Image, ILIST * Template );
 void CharProfile_free(void * profile_in);
 /* this is the postProcessing function */
 /* where the character is chosen and put into a string to be output */
@@ -27,4 +27,11 @@ IMAGE * ReadImage(char *ImageFileName);
 UT_string * GetCompileMessage(UT_string * code);
 int file_exist (char *filename);
 
+
+UT_icd CharProbability_icd;
+UT_icd CharProfile_icd; 
+
+
+UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template );
+ILIST * InitializeTemplate(void);
 #endif

@@ -1,37 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "Model.h"
 
 int main()
 {
-  UT_array * CharProbabilities;
-  CharProbability * p;
-  IMAGE *img = NULL;
-  int i;
-  int j;
-  IMAGE *image = NULL;
-  ILIST *imglist = NULL;
-  IENTRY *curr;
-  char fname[50] = "CourierNew12_300DPI";
-  char index[20];
-  char sname[50];
+	int i;
+	UT_array * CharProfiles;
+	utarray_new(CharProfiles, &CharProfile_icd);
+	char fname1[50] = "Fonts/CourierNew12_300DPI/48.jpg";	/*Comparing with 0*/
+	char fname2[50] = "Fonts/CourierNew12_300DPI/79.jpg";	/*Comparing with O*/
+	char fname3[50] = "Fonts/CourierNew12_300DPI/111.jpg";	/*Comparing with o*/
+	IMAGE * image1 = ReadImage(fname1);
+	IMAGE * image2 = ReadImage(fname2);
+	IMAGE * image3 = ReadImage(fname3);
+	ILIST *template = InitializeTemplate();
+	ILIST *testlist = NewImageList();
 
-  i=0;
-
-  image = ReadImage(fname);
-  img = Crop(image,50,200,1400,500);
-  imglist = IsolateCharacter(img, 12, 300);
-  curr = imglist->First;
-  j = SaveImage("meow", img);
-  while (curr)
-  {
-	CharProbabilities = IdentifyCharacter(curr->Image, imglist);
-	 for(p=(CharProbability*)utarray_front(CharProbabilities);
-      p!=NULL;
-      p=(CharProbability*)utarray_next(CharProbability,p)) {
-   	printf("Chance of %c is %d percent\n", p->Char, p->Probability);
+	AppendImage(testlist, image1);
+	AppendImage(testlist, image2);
+	AppendImage(testlist, image3);
+	CharProfiles = IdentifyCharacter(testlist, template);
+	
+	CharProfile *Curr1 = (CharProfile*)utarray_front(CharProfiles);
+	i = 0;
+	while ( Curr1 )
+	{
+		printf("---------- For character of index %d ----------\n", i);
+		CharProbability * Curr2 = (CharProbability*)utarray_front(Curr1->CharChoices);
+		while (Curr2)
+		{
+			printf("Chance of %c is %d percent.\n", Curr2->Char, Curr2->Probability);
+			Curr2 = (CharProbability*)utarray_next(Curr1->CharChoices, Curr2);
+		}
+		Curr1 = (CharProfile*)utarray_next(CharProfiles, Curr1);
+		i++;
+	}
+	return 0;
   }
-	curr = curr->Next;
-  }
-}

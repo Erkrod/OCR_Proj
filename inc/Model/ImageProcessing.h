@@ -50,7 +50,7 @@ void Posterize(IMAGE *image) ;
 void AddNoise(IMAGE *image) ;
 
 /* Resize */
-IMAGE *Resize(	unsigned int percentage, IMAGE *image) ; 
+IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight);
 
 IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter);
 
