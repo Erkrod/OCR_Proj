@@ -23,6 +23,8 @@ int main()
   IMAGE *image = NULL;
   IMAGE *PreviewImage = NULL, *PreviewImage2 = NULL;
   ILIST *imglist = NULL, *imglist2 = NULL;  
+
+  IENTRY *curr = NULL;
  
 #if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
@@ -56,7 +58,7 @@ int main()
   imglist = LazyIsolateCharacter(img, CourierNew, 12, 300);  
   printf("Finished lazy algorithm\n");
   PreviewImage2 = PreviewActiveIsolateCharacter(img, CourierNew, 12, 300);
-   SaveImage("CheckActiveIsolate", PreviewImage2);
+  SaveImage("CheckActiveIsolate", PreviewImage2);
   printf("Finished preview active algorithm\n");
   imglist2 = ActiveIsolateCharacter(img, CourierNew, 12, 300);  
   printf("Finished active algorithm\n");
@@ -72,6 +74,10 @@ int main()
   SaveImage("CheckActiveIsolate", PreviewImage2);
   DeleteImage(PreviewImage2);
 
+  curr = imglist2->First->Image;
+
+  while (curr)
+    SaveImage(
   
   DeleteImageList(imglist);
   DeleteImageList(imglist2);
