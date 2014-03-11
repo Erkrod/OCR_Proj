@@ -280,7 +280,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
       }*/
 
   char_height = (int)((double)fontsize*(1.0/72.0)*(double)scanres); /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
-
+  printf("char_height is %d\n", char_height);
   for ( y=0; y<image->Height; y++ )
     {
     for ( x=0; x<image->Width; x++ )
@@ -326,6 +326,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
 			  SetPixelR(boxed_image, a, start_y, 0);
 			  SetPixelG(boxed_image, a, start_y, 0);
 			  SetPixelB(boxed_image, a, start_y, 0);
+			  printf("HIHI HI \n");
 
 			  /* blacken bottom border */
 			  SetPixelR(boxed_image, a, start_y+char_height, 0);
