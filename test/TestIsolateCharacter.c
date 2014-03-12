@@ -25,6 +25,10 @@ int main()
   ILIST *imglist = NULL, *imglist2 = NULL;  
 
   IENTRY *curr = NULL;
+  int i=0;
+  int k=0;
+  char sname[50];
+  char index[50];
  
 #if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
@@ -74,10 +78,26 @@ int main()
   SaveImage("CheckActiveIsolate", PreviewImage2);
   DeleteImage(PreviewImage2);
 
-  curr = imglist2->First->Image;
+  curr = imglist2->First;
 
   while (curr)
-    SaveImage(
+    {
+      sprintf(index, "%d", i);
+      strcpy(sname, "test");
+      strcat(sname, index);
+      
+      if (curr->Image)
+	{
+	  SaveImage(sname, curr->Image);
+	  i++;
+	}
+      else /*this 'else' to test if new line NULL indicators are working */
+	{
+	  printf("%d\n", k);
+	  k++;
+	}
+      curr = curr->Next;
+    }
   
   DeleteImageList(imglist);
   DeleteImageList(imglist2);
