@@ -14,7 +14,7 @@ Output will be multiple ppm files, each file represents a character you isolate,
 
 #include "Model.h"
 
-#define IMAGE_CHOICE 5
+#define IMAGE_CHOICE 2
 
 int main()
 {
@@ -78,26 +78,26 @@ int main()
   SaveImage("CheckActiveIsolate", PreviewImage2);
   DeleteImage(PreviewImage2);
 
-  curr = imglist2->First;
+  /* curr = imglist2->First; */
 
-  while (curr)
-    {
-      sprintf(index, "%d", i);
-      strcpy(sname, "test");
-      strcat(sname, index);
+  /* while (curr) */
+  /*   { */
+  /*     sprintf(index, "%d", i); */
+  /*     strcpy(sname, "test"); */
+  /*     strcat(sname, index); */
       
-      if (curr->Image)
-	{
-	  SaveImage(sname, curr->Image);
-	  i++;
-	}
-      else /*this 'else' to test if new line NULL indicators are working */
-	{
-	  printf("%d\n", k);
-	  k++;
-	}
-      curr = curr->Next;
-    }
+  /*     if (curr->Image) */
+  /* 	{ */
+  /* 	  SaveImage(sname, curr->Image); */
+  /* 	  i++; */
+  /* 	} */
+  /*     else /\*this 'else' to test if new line NULL indicators are working *\/ */
+  /* 	{ */
+  /* 	  printf("%d\n", k); */
+  /* 	  k++; */
+  /* 	} */
+  /*     curr = curr->Next; */
+  /*   } */
   
   DeleteImageList(imglist);
   DeleteImageList(imglist2);

@@ -280,7 +280,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
       }*/
 
   char_height = (int)((double)fontsize*(1.0/72.0)*(double)scanres); /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
-  printf("char_height is %d\n", char_height);
+  char_height = char_height - 2;
   for ( y=0; y<image->Height; y++ )
     {
     for ( x=0; x<image->Width; x++ )
@@ -310,7 +310,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
 	    {
 	      slice_color = slice_color+ GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y);
 	    }
-	  if ( slice_color > 37000.0) /* lighter shades, leaning towards white*/
+	  if ( slice_color > (char_height*740)) /* lighter shades, leaning towards white*/
 	    {
 	      if (x_border_start != -1) /*border start has already been defined*/
 		{
@@ -330,7 +330,6 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
 			  SetPixelR(boxed_image, a, start_y, 0);
 			  SetPixelG(boxed_image, a, start_y, 0);
 			  SetPixelB(boxed_image, a, start_y, 0);
-			  printf("HIHI HI \n");
 
 			  /* blacken bottom border */
 			  SetPixelR(boxed_image, a, start_y+char_height, 0);
@@ -442,6 +441,7 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
   double slice_color = 0.0;
 
   char_height = (int)((double)fontsize*(1.0/72.0)*(double)scanres); /*  height of each char = fontsize * (1 inch/ 72 points) * (300 pixels / 1 inch ) */
+  char_height = char_height-2;
 
   imglist = NewImageList();
 
