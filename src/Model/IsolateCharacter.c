@@ -255,7 +255,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
   int x,y;
   int a,b;
   /*unsigned char temp_R, temp_G, temp_B;*/
-  int start_y = 0;
+  int start_y = 0, start_y_check = 0;
   int x_border_start=-1, x_border_end=-2, old_border_end=-1;
   int char_width = 0, space_width = 0;
   int width = 0;
@@ -287,8 +287,12 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
       {
 	if (GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y) < 100)
 	  {
-	    start_y = y; /*record start scan height, to go slices of fontsize down*/
-	    break;
+	    start_y_check++; /*avoid starting y scan on small specks of black that aren't tops of characters*/
+	    if (start_y_check > 5)
+	      {
+		start_y = y; /*record start scan height, to go slices of fontsize down*/
+		break;
+	      }
 	  }
       }
     if (start_y > 0)
@@ -393,6 +397,7 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
       space_width = 0;
 
       /*recalibrate start_y*/
+      start_y_check = 0;
       for ( y=start_y + char_height; y<image->Height; y++ )
 	{
 	  y_flag = 0;
@@ -400,9 +405,13 @@ IMAGE * PreviewActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize
 	    {
 	      if (GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y) < 100)
 		{
-		  start_y = y; /*record start scan height, to go slices of fontsize down*/
-		  y_flag = start_y;
-		  break;
+		  start_y_check++; /*avoid starting y scan on small specks of black that aren't tops of characters*/
+		  if (start_y_check > 5)
+		    {
+		      start_y = y; /*record start scan height, to go slices of fontsize down*/
+		      y_flag = start_y;
+		      break;
+		    }
 		}
 	    }
 	  if (y_flag > 0)
@@ -423,7 +432,7 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
   IMAGE * img;
   ILIST * imglist;
   int x,y;
-  int start_y = 0;
+  int start_y = 0, start_y_check=0;
   int x_border_start=-1, x_border_end=-2, old_border_end=-1;
   int char_width = 0, space_width = 0;
   int width = 0;
@@ -442,8 +451,12 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
       {
 	if (GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y) < 100)
 	  {
-	    start_y = y; /*record start scan height, to go slices of fontsize down*/
-	    break;
+	    start_y_check++; /*avoid starting y scan on small specks of black that aren't tops of characters*/
+	    if (start_y_check > 5)
+	      {
+	      start_y = y; /*record start scan height, to go slices of fontsize down*/
+	      break;
+	      }
 	  }
       }
     if (start_y > 0)
@@ -463,7 +476,7 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
 	    {
 	      slice_color = slice_color+ GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y);
 	    }
-	  if ( slice_color > 37000.0) /* lighter shades, leaning towards white*/
+	  if ( slice_color > (char_height*740)) /* lighter shades, leaning towards white*/
 	    {
 	      if (x_border_start != -1) /*border start has already been defined*/
 		{
@@ -513,6 +526,7 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
       AppendImage(imglist, img);
 
       /*recalibrate start_y*/
+      start_y_check=0;
       for ( y=start_y + char_height; y<image->Height; y++ )
 	{
 	  y_flag = 0;
@@ -520,14 +534,18 @@ ILIST * ActiveIsolateCharacter(IMAGE * image, FontType Font, int fontsize, int s
 	    {
 	      if (GetPixelR(image,x,y) + GetPixelG(image,x,y) + GetPixelB(image,x,y) < 100)
 		{
-		  if (y-start_y > 1.2*char_height)
+		  start_y_check++; /*avoid starting y scan on small specks of black that aren't tops of characters*/
+		  if (start_y_check > 5)
 		    {
-		      img = NULL;
-		      AppendImage(imglist, img);
+		      if (y-start_y > 1.2*char_height)
+			{
+			  img = NULL;
+			  AppendImage(imglist, img);
+			}
+		      start_y = y; /*record start scan height, to go slices of fontsize down*/
+		      y_flag = start_y;
+		      break;
 		    }
-		  start_y = y; /*record start scan height, to go slices of fontsize down*/
-		  y_flag = start_y;
-		  break;
 		}
 	    }
 	  if (y_flag > 0)
