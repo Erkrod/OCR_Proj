@@ -78,8 +78,8 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 	y1 = (y1 < y2) ? y1 : y2;
 	y2 = (y_c < y2) ? y2 : y_c;
 
-	W = (x2 - x1) + 1;
-	H = (y2 - y1) + 1;
+	W = (x2 - x1) ;
+	H = (y2 - y1) ;
 
 	image_tmp = CreateImage(W, H);
 
@@ -93,7 +93,7 @@ IMAGE *CropImage(IMAGE *image, int x1, int y1, int x2, int y2){
 		}
 	}
 #else
-	for (j = y1; j <= y2; j++) {
+	for (j = y1; j < y2; j++) {
 		memcpy(image_tmp->R + (j-y1) * image_tmp->Width, image->R + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
 		memcpy(image_tmp->G + (j-y1) * image_tmp->Width, image->G + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
 		memcpy(image_tmp->B + (j-y1) * image_tmp->Width, image->B + x1 + j * image->Width, sizeof(unsigned char) * image_tmp->Width);
@@ -380,30 +380,41 @@ void AddNoise(IMAGE *image)
 
 
 /* Resize */
+static int ceil_width(IMAGE * image, int x){
+	if (x >= image->Width) return image->Width - 1;
+	else return x;
+}
+
+static int ceil_height(IMAGE * image, int y){
+	if (y >= image->Height) return image->Height - 1;
+	else return y;
+}
+
 static unsigned char enlarge_compute_intensity(IMAGE * image, int x_big, int y_big, int xpercentage, int ypercentage, int intensity_type){
 	double x_small = x_big * 100.0 / xpercentage;
 	double y_small = y_big * 100.0 / ypercentage;
 	unsigned char temp[4];
+	memset(temp, 0, 4);
 	unsigned char return_value;	
 	double x_factor = 1 - fmod(x_small, 1.0); double y_factor = 1 - fmod(y_small, 1.0);
 	switch (intensity_type){
 		case 0:
-			temp[0] = GetPixelR(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[1] = GetPixelR(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
-			temp[2] = GetPixelR(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[3] = GetPixelR(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[0] = GetPixelR(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[1] = GetPixelR(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
+			temp[2] = GetPixelR(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[3] = GetPixelR(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
 			break;
 		case 1:
-			temp[0] = GetPixelG(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[1] = GetPixelG(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
-			temp[2] = GetPixelG(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[3] = GetPixelG(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[0] = GetPixelG(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[1] = GetPixelG(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
+			temp[2] = GetPixelG(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[3] = GetPixelG(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
 			break;
 		case 2:
-			temp[0] = GetPixelB(image, floor(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[1] = GetPixelB(image, floor(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
-			temp[2] = GetPixelB(image, ceil(x_big * 100 / xpercentage), floor(y_big * 100 / ypercentage));
-			temp[3] = GetPixelB(image, ceil(x_big * 100 / xpercentage), ceil(y_big * 100 / ypercentage));
+			temp[0] = GetPixelB(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[1] = GetPixelB(image, ceil_width(image,floor(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
+			temp[2] = GetPixelB(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,floor(y_big * 100 / ypercentage)));
+			temp[3] = GetPixelB(image, ceil_width(image,ceil(x_big * 100 / xpercentage)), ceil_height(image,ceil(y_big * 100 / ypercentage)));
 			break;
 	}
 		
@@ -421,22 +432,22 @@ IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
 	IMAGE * image_out = CreateImage(out_width, out_height);
 	if (image_out == NULL) {printf("ERROR: Out of memory\n"); return image;}
 	int i,j;
-	
-	for (i = 0; i < image_out->Width; i++){
-		for (j = 0; j < image_out->Height; j++){			
-			if (newWidth != image->Width || newHeight != image->Height){
-				/*enlarge*/
-				SetPixelR(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 0));
-				SetPixelG(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 1));
-				SetPixelB(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 2));
+	if (newWidth != image->Width || newHeight != image->Height){
+		
+		for (i = 0; i < image_out->Width; i++){
+			for (j = 0; j < image_out->Height; j++){			
 				
-			} else {
-				DeleteImage(image_out);
-				return DuplicateImage(image);
-			}
+					/*enlarge*/
+					SetPixelR(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 0));
+					SetPixelG(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 1));
+					SetPixelB(image_out, i, j, enlarge_compute_intensity(image, i, j, xpercentage,ypercentage, 2));
 
+			}
 		}
-	}
+	} else {
+		DeleteImage(image_out);
+		return DuplicateImage(image);
+	}	
 	/*DeleteImage(image);*/
 	return image_out;
 }

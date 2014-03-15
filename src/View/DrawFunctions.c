@@ -18,6 +18,7 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
   GtkWidget *stainWindow	= drawStainRemoveWindow(MainViewHandle);
   GtkWidget *helpWindow = drawHelpWindow(MainViewHandle);
+  GtkWidget *compileWindow = drawCompileWindow(MainViewHandle);
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
@@ -35,7 +36,8 @@ void drawAllWindows(ViewHandle * MainViewHandle){
   gtk_widget_hide(filterWindow);
   gtk_widget_hide(ocrWindow);
   gtk_widget_hide(stainWindow);	
-  gtk_widget_hide(helpWindow);  
+  gtk_widget_hide(helpWindow); 
+  gtk_widget_hide(compileWindow);
   
 }
 
@@ -1110,6 +1112,62 @@ GtkWidget *drawHelpWindow(ViewHandle * MainViewHandle){
 		    G_CALLBACK (gtk_widget_hide),
 		    helpWin);
   gtk_window_set_title (GTK_WINDOW (helpWin), "Help");
+  
+  vboxMain = gtk_vbox_new (FALSE, 5);
+  AddWidgetToViewHandle(MainViewHandle, "vboxMain", vboxMain);
+  gtk_container_set_border_width (GTK_CONTAINER (vboxMain), 10);
+  gtk_container_add (GTK_CONTAINER (helpWin), vboxMain);
+ 
+  gtk_box_pack_start (GTK_BOX (vboxMain), scrollWin, TRUE, TRUE, 0);
+
+  closeButton = gtk_button_new_with_label ("Close");
+  gtk_widget_set_size_request(closeButton, 80, 25);
+  AddWidgetToViewHandle(MainViewHandle, "CloseButton", closeButton);
+  g_signal_connect_swapped (closeButton, "clicked",
+			    G_CALLBACK (gtk_widget_hide),
+			    helpWin);
+  
+  hbox = gtk_hbox_new (FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vboxMain), hbox, FALSE, TRUE, 0);
+  gtk_box_pack_end (GTK_BOX (hbox), closeButton, FALSE, FALSE, 5);
+  
+  gtk_widget_show_all(helpWin); 
+  
+  return helpWin;
+}
+
+GtkWidget *drawCompileWindow(ViewHandle * MainViewHandle){
+
+  GtkWidget *helpWin, *scrollWin;
+  GtkWidget *vboxMain, *hbox;
+  GtkWidget *closeButton;
+  
+  scrollWin = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollWin),
+				 GTK_POLICY_ALWAYS,
+				 GTK_POLICY_ALWAYS);
+  AddWidgetToViewHandle(MainViewHandle, "CompileScrollWin", scrollWin);
+  
+  /*text area*/
+  GtkWidget * TextView = gtk_text_view_new ();
+  PangoFontDescription * font_desc = pango_font_description_from_string ("Courier New 10");
+  gtk_widget_modify_font (TextView, font_desc);
+  pango_font_description_free (font_desc);
+  gtk_text_view_set_editable(GTK_TEXT_VIEW(TextView), TRUE);
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(TextView), GTK_WRAP_WORD_CHAR);
+   gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollWin), TextView);
+   AddWidgetToViewHandle(MainViewHandle, "CompileTextArea", TextView);
+   
+  helpWin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  AddWidgetToViewHandle(MainViewHandle, "CompileWinMain", helpWin);
+  gtk_window_set_default_size(GTK_WINDOW(helpWin), 600, 600);
+  g_signal_connect (helpWin, "destroy",
+		    G_CALLBACK (gtk_widget_hide),
+		    helpWin);
+  g_signal_connect (helpWin, "delete-event",
+		    G_CALLBACK (gtk_widget_hide),
+		    helpWin);
+  gtk_window_set_title (GTK_WINDOW (helpWin), "Compile message");
   
   vboxMain = gtk_vbox_new (FALSE, 5);
   AddWidgetToViewHandle(MainViewHandle, "vboxMain", vboxMain);

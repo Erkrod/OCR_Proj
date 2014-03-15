@@ -29,6 +29,12 @@ typedef struct {
 	int InitialImage, InitialText;
 	ObjectHandle * XCoordObject, * YCoordObject;
 	
+	/*for preview isolate character*/
+	IMAGE * PreviewImage;
+	
+	/*for resize of image to display nicely*/
+	int DisplayWidth, DisplayHeight, OriginalWidth, OriginalHeight;
+	
 	/*for post processing*/
 	/*UT_array * KeywordArray, * SpecialCharArray;*/
 	

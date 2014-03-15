@@ -18,8 +18,8 @@ unsigned char GetPixelR(IMAGE *image, unsigned int x,  unsigned int y)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	return image->R[x + y * image->Width];
 }
@@ -31,8 +31,8 @@ unsigned char GetPixelG(IMAGE *image, unsigned int x,  unsigned int y)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	return image->G[x + y * image->Width];
 }
@@ -44,8 +44,8 @@ unsigned char GetPixelB(IMAGE *image, unsigned int x,  unsigned int y)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	return image->B[x + y * image->Width];
 }
@@ -57,8 +57,8 @@ void SetPixelR(IMAGE *image, unsigned int x,  unsigned int y, unsigned char r)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	image->R[x + y * image->Width] = r;
 }
@@ -70,8 +70,8 @@ void SetPixelG(IMAGE *image, unsigned int x,  unsigned int y, unsigned char g)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	image->G[x + y * image->Width] = g;
 }
@@ -83,8 +83,8 @@ void SetPixelB(IMAGE *image, unsigned int x,  unsigned int y, unsigned char b)
 	assert(image->R);
 	assert(image->G);
 	assert(image->B);
-	assert(x<=image->Width);
-	assert(y<=image->Height);
+	assert(x<image->Width);
+	assert(y<image->Height);
 
 	image->B[x + y * image->Width] = b;
 }

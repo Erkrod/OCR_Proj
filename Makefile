@@ -1,7 +1,7 @@
 #get lib sdl ready to compile
 
 CC	:= gcc
-CFLAGS	:= -Wall -O2
+CFLAGS	:= -Wall
 LDFLAGS := -lm
 
 #take care of test flags
@@ -10,7 +10,7 @@ ifeq ($(TEST_VIEW),y)
 endif
 
 ifeq ($(DEBUG),y)
-	CFLAGS += -DDEBUG -pg -g
+	CFLAGS += -DDEBUG -g
 	LDFLAGS += -pg
 endif
 

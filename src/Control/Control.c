@@ -12,7 +12,9 @@ char * GetTextArea(ControlHandle * MainControlHandle, char * DisplayString);
 
 ObjectHandle * FindObject(ControlHandle * MainControlHandle, const char * Name);
 
-void show_compilation_msg(const char * CompileMessage);
+void show_compilation_msg(ControlHandle * MainControlHandle, const char * CompileMessage);
+
+IMAGE * ResizeFitScreen(ControlHandle * MainControlHandle, IMAGE * original_image);
 
 void UpdateMainOutputString(ControlHandle * MainControlHandle){
 	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
@@ -112,14 +114,17 @@ void GetClickCoord(ControlHandle * MainControlHandle, int orig_x, int orig_y, in
 		ObjectHandle * CurrObject;
 		CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
 		gtk_widget_get_allocation(CurrObject->Widget, &allocation);
-		printf("Image scroll window is x=%d, y=%d, width=%d, height=%d\n",allocation.x, allocation.y, allocation.width, allocation.height);
+		
 		
 		/*get image widht and height*/
-		IMAGE * img = MainControlHandle->MainImageList->Last->Image;
-		if (img->Width >= allocation.width) *ret_x = orig_x;
-		else 	*ret_x = orig_x - (allocation.width - img->Width)/2;
-		if (img->Height >= allocation.height) *ret_y = orig_y;
-		else 	*ret_y = orig_y - (allocation.height - img->Height)/2;
+		
+		if (MainControlHandle->DisplayWidth >= allocation.width) *ret_x = orig_x * MainControlHandle->OriginalWidth / MainControlHandle->DisplayWidth;
+		else 	*ret_x = (orig_x - (allocation.width - MainControlHandle->DisplayWidth)/2) * MainControlHandle->OriginalWidth / MainControlHandle->DisplayWidth;
+		if (MainControlHandle->DisplayHeight >= allocation.height) *ret_y = orig_y * MainControlHandle->OriginalHeight / MainControlHandle->DisplayHeight;
+		else 	*ret_y = (orig_y - (allocation.height - MainControlHandle->DisplayHeight)/2)* MainControlHandle->OriginalHeight / MainControlHandle->DisplayHeight;
+#ifdef DEBUG
+		printf("return value x = %d, y = %d\n", *ret_x, *ret_y);
+#endif
 	}
 }
 
@@ -137,14 +142,14 @@ void Control_CleanUp(ControlHandle * MainHandle){
 
 void UpdateDisplayImage(ControlHandle * MainControlHandle){
 	ObjectHandle * CurrObject;
-	char name[MAX_HASH_KEY_LENGTH] =  "MainDisplayImage";
-	/*strcpy(name, "MainDisplayImage");*/
-	HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, name, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-	assert(CurrObject);
-	
+	CurrObject = FindObject(MainControlHandle, "MainDisplayImage");
 	/*save last image to a temp file first*/
-	if (MainControlHandle->MainImageList->Last){
-		assert(!SaveImage("Temp", MainControlHandle->MainImageList->Last->Image));
+	if (MainControlHandle->IsInPreview){
+		assert(!SaveImage("Temp", ResizeFitScreen(MainControlHandle, MainControlHandle->PreviewImage)));
+		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
+		gtk_widget_show(CurrObject->Widget);
+	} else if (MainControlHandle->MainImageList->Last){
+		assert(!SaveImage("Temp", ResizeFitScreen(MainControlHandle, MainControlHandle->MainImageList->Last->Image)));
 		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
 		gtk_widget_show(CurrObject->Widget);
 	} else {
@@ -228,10 +233,10 @@ void SetSentitiveAllWindows(ControlHandle * MainControlHandle, gboolean Sensitiv
 }
 
 void PopPreviewImage(ControlHandle * MainControlHandle){
-	if (MainControlHandle->IsInPreview == 1){
-		MainControlHandle->IsInPreview = 0;	
-		PopLastImage(MainControlHandle->MainImageList);
-		UpdateDisplayImage(MainControlHandle);
+	MainControlHandle->IsInPreview = 0;	
+	if (MainControlHandle->PreviewImage){
+		DeleteImage(MainControlHandle->PreviewImage);
+		MainControlHandle->PreviewImage = NULL;
 	}
 }
 
@@ -244,6 +249,12 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 	IMAGE * NewImage = NULL;
 	int x1, y1, x2, y2, degree;
 		
+	/*catch the case that you are selecting coordinate then select another one*/
+	if (MainControlHandle->State == SelectCoordinate && strcmp(ClickedObject->Name,"DisplayEventBox")){
+		MainControlHandle->State = Normal;
+		SetCursorImageBox(MainControlHandle);
+	}
+	
 #ifdef DEBUG
 	printf("Object clicked has name: %s\n", ClickedObject->Name);
 #endif
@@ -252,32 +263,35 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		OpenImageFile(MainControlHandle->InputImageFileName);
 		
 		/*load the image here*/
-		NewImage = ReadImage(utstring_body(MainControlHandle->InputImageFileName));		
-		if (NewImage){
-			DeleteImageList(MainControlHandle->MainImageList);
-			MainControlHandle->MainImageList = NewImageList();
-			MainControlHandle->IsInPreview = 0;
-			MainControlHandle->State = Normal;
-			AppendImage(MainControlHandle->MainImageList, NewImage);
-			UpdateDisplayImage(MainControlHandle);
-		} else {
-			show_error("Can't read image");
+		if (utstring_len(MainControlHandle->InputImageFileName) > 0) {
+			NewImage = ReadImage(utstring_body(MainControlHandle->InputImageFileName));		
+			if (NewImage){
+				DeleteImageList(MainControlHandle->MainImageList);
+				MainControlHandle->MainImageList = NewImageList();
+				MainControlHandle->IsInPreview = 0;
+				MainControlHandle->State = Normal;
+				AppendImage(MainControlHandle->MainImageList, NewImage);
+				UpdateDisplayImage(MainControlHandle);
+			} else {
+				show_error("Can't read image");
+			}
 		}
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"SaveFile") == 0){
 		SaveTextFile(MainControlHandle->OutputFileName);
-		FILE * NewFile = fopen(utstring_body(MainControlHandle->OutputFileName), "w");
-		if (NewFile){
-			fprintf(NewFile, "%s", utstring_body(MainControlHandle->MainOutputString));
-			fclose(NewFile);
-		} else {
-			printf("Can't open file %s\n", utstring_body(MainControlHandle->MainOutputString));
+		if (utstring_len(MainControlHandle->OutputFileName) > 0) {
+			FILE * NewFile = fopen(utstring_body(MainControlHandle->OutputFileName), "w");
+			if (NewFile){
+				fprintf(NewFile, "%s", utstring_body(MainControlHandle->MainOutputString));
+				fclose(NewFile);
+			} else {
+				printf("Can't open file %s\n", utstring_body(MainControlHandle->MainOutputString));
+			}
 		}
-		
 /*======================================================================*/			
 	} else if (strcmp(ClickedObject->Name,"UndoPreproc") == 0){
-		if (MainControlHandle->IsInPreview == 1) MainControlHandle->IsInPreview = 0;
-		PopLastImage(MainControlHandle->MainImageList);
+		if (MainControlHandle->IsInPreview == 1) PopPreviewImage(MainControlHandle);
+		else PopLastImage(MainControlHandle->MainImageList);
 		UpdateDisplayImage(MainControlHandle);
 		
 /*======================================================================*/		
@@ -301,11 +315,13 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		if (MainControlHandle->MainImageList->Last){		
 			int var1, var2, b_thres, dark_limit;
 			int result = GetStainRemovalParams(MainControlHandle, &var1, &var2, &b_thres, &dark_limit);
-			if (result == 0){
-				PopPreviewImage(MainControlHandle);
+			if (result == 0){				
 				IMAGE * NewImage = StainRemoval(MainControlHandle->MainImageList->Last->Image, var1, var2, b_thres, dark_limit);
-				AppendImage(MainControlHandle->MainImageList, NewImage);
-				UpdateDisplayImage(MainControlHandle);
+				if (NewImage){
+					PopPreviewImage(MainControlHandle);
+					AppendImage(MainControlHandle->MainImageList, NewImage);
+					UpdateDisplayImage(MainControlHandle);
+				} else show_error("Can't perform Stain Removal");				
 			} else if (result == 1){
 				show_error("Invalid Variance 1");
 			} else if (result == 2){
@@ -358,6 +374,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 					NewImage = ColorFilter(MainControlHandle->MainImageList->Last->Image, x, y, x1, y1, x2, y2, new_pix, thres);
 					if (!NewImage) show_error("Can't color filter this image");
 					else {
+						PopPreviewImage(MainControlHandle);
 						AppendImage(MainControlHandle->MainImageList, NewImage);
 						UpdateDisplayImage(MainControlHandle);
 					}
@@ -387,40 +404,33 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		
 /*======================================================================*/	
 	} else if (strcmp(ClickedObject->Name,"Rotate") == 0){
-		PopPreviewImage(MainControlHandle);
-		char nameRotateWindow[MAX_HASH_KEY_LENGTH] =  "RotateWindow";
-		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-		assert(CurrObject);
+		PopPreviewImage(MainControlHandle);		
+		CurrObject = FindObject(MainControlHandle, "RotateWindow");
 		gtk_widget_show(CurrObject->Widget);		
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"RotateButton") == 0){	
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
-		} else {
-			PopPreviewImage(MainControlHandle);
-			char nameRotateDegreeBox[MAX_HASH_KEY_LENGTH] =  "RotateSpinner";
-			HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameRotateDegreeBox, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-			assert(CurrObject);
+		} else {			
+			CurrObject = FindObject(MainControlHandle, "RotateSpinner");
 			degree = floor(gtk_spin_button_get_value(GTK_SPIN_BUTTON(CurrObject->Widget)));
 			NewImage = Rotate(MainControlHandle->MainImageList->Last->Image, degree);
-			AppendImage(MainControlHandle->MainImageList, NewImage);
-			UpdateDisplayImage(MainControlHandle);
+			if (NewImage){
+				PopPreviewImage(MainControlHandle);
+				AppendImage(MainControlHandle->MainImageList, NewImage);
+				UpdateDisplayImage(MainControlHandle);
+			} else show_error("Can't rotate this image. Maybe you don't have correct netpbm version.");				
 		}
-	} else if (strcmp(ClickedObject->Name,"LineBoundary") == 0){
-	
 /*======================================================================*/		
-	} else if (strcmp(ClickedObject->Name,"Crop") == 0){
-		PopPreviewImage(MainControlHandle);
+	} else if (strcmp(ClickedObject->Name,"Crop") == 0){		
 		CurrObject = FindObject(MainControlHandle, "CropWindow");		
 		gtk_widget_show(CurrObject->Widget);		
-		
 		
 /*======================================================================*/
 	} else if (strcmp(ClickedObject->Name,"CropButton") == 0){
 		if (!MainControlHandle->MainImageList->Last){
 			show_error("No image loaded yet");
-		} else {
-			PopPreviewImage(MainControlHandle);
+		} else {			
 			int result = GetCropCoordinate(MainControlHandle, &x1, &y1, &x2, &y2);
 			if (result == 5){
 				show_error("No image loaded yet");
@@ -433,6 +443,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			} else if (result == 4){
 				show_error("Invalid Y2");
 			} else {
+				PopPreviewImage(MainControlHandle);
 				NewImage = CropImage(MainControlHandle->MainImageList->Last->Image, x1, y1, x2, y2);
 				AppendImage(MainControlHandle->MainImageList, NewImage);
 				UpdateDisplayImage(MainControlHandle);
@@ -453,9 +464,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		
 /*======================================================================*/		
 	} else if (strcmp(ClickedObject->Name,"PerformOCR") == 0){
-		char nameOCRWindow[MAX_HASH_KEY_LENGTH] =  "OCRWindow";
-		HASH_FIND(HashByName,MainControlHandle->MainViewHandle->ObjectListByName, nameOCRWindow, sizeof(char) * MAX_HASH_KEY_LENGTH,CurrObject);
-		assert(CurrObject);
+		CurrObject = FindObject(MainControlHandle,"OCRWindow");
 		gtk_widget_show(CurrObject->Widget);
 		
 /*======================================================================*/		
@@ -494,12 +503,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 					utstring_clear(MainControlHandle->MainOutputString);
 					utstring_printf(MainControlHandle->MainOutputString, "%s", utstring_body(temp_string));
 					
-					/*display the text*/
-					
-					
-					/*a random string for now*/
-					/*utstring_clear(MainControlHandle->MainOutputString);
-					utstring_printf(MainControlHandle->MainOutputString, "%s", "Hello World.\n");*/
+					/*display the text*/				
 					AppendTextArea(MainControlHandle,utstring_body(MainControlHandle->MainOutputString));
 				}
 			}
@@ -533,7 +537,8 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 				else if (IsolateAlgorithm == 1) PreviewImage = PreviewActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);				
 				if(!PreviewImage){show_error("Can't perform Isolate character on this image");}
 				else {
-					AppendImage(MainControlHandle->MainImageList, PreviewImage);
+					if (MainControlHandle->PreviewImage) DeleteImage(MainControlHandle->PreviewImage);
+					MainControlHandle->PreviewImage = PreviewImage;
 					MainControlHandle->IsInPreview = 1;
 					UpdateDisplayImage(MainControlHandle);				
 				}
@@ -557,7 +562,7 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 		
 		if (utstring_len(MainControlHandle->MainOutputString) > 0){
 			UT_string * msg = GetCompileMessage(MainControlHandle->MainOutputString);
-			show_compilation_msg(utstring_body(msg));
+			show_compilation_msg(MainControlHandle, utstring_body(msg));
 			utstring_free(msg);
 		}
 	
@@ -601,17 +606,15 @@ void OpenImageFile(UT_string * ImageFileName){
                                            GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
                                            NULL);
     
+     utstring_clear(ImageFileName);
     if (gtk_dialog_run (GTK_DIALOG (openFile)) == GTK_RESPONSE_ACCEPT)
     {
         char *filename;        
         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (openFile));
-	  utstring_clear(ImageFileName);
+	 
         utstring_printf(ImageFileName, "%s", filename);
         g_free (filename);
-    } else {
-	  utstring_clear(ImageFileName);
-	  utstring_printf(ImageFileName, "a");
-    }
+    } 
     gtk_widget_destroy (openFile);    
 }
 
@@ -792,20 +795,42 @@ void show_error(const char * ErrorMessage)
   gtk_widget_destroy(dialog);
 }
 
-void show_compilation_msg(const char * CompileMessage)
+void show_compilation_msg(ControlHandle * MainControlHandle, const char * CompileMessage)
 {
-  GtkWidget *dialog;
-  dialog = gtk_message_dialog_new(NULL,
-            GTK_DIALOG_DESTROY_WITH_PARENT,
-            GTK_MESSAGE_INFO,
-            GTK_BUTTONS_OK,
-            CompileMessage);
-  gtk_window_set_title(GTK_WINDOW(dialog), "Error");
-  gtk_dialog_run(GTK_DIALOG(dialog));
-  gtk_widget_destroy(dialog);
+	/*show the widget*/
+	ObjectHandle * CurrObject = FindObject(MainControlHandle, "CompileWinMain");
+	gtk_widget_show(CurrObject->Widget);
+	
+	/*clear the text*/
+	CurrObject = FindObject(MainControlHandle, "CompileTextArea");
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));;
+	GtkTextIter iter1, iter2;
+	gtk_text_buffer_get_start_iter(buffer, &iter1);
+	gtk_text_buffer_get_end_iter(buffer, &iter2);
+	gtk_text_buffer_delete(buffer, &iter1, &iter2);
+	
+	/*set the text*/
+	gtk_text_buffer_get_end_iter(buffer, &iter1);
+	gtk_text_buffer_insert(buffer, &iter1, CompileMessage, -1);
+	
 }
 
-void on_rotate_clicked(){
-
-
+IMAGE * ResizeFitScreen(ControlHandle * MainControlHandle, IMAGE * original_image){
+	GtkAllocation allocation;
+	ObjectHandle * CurrObject;
+	int new_width, new_height;
+	CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
+	gtk_widget_get_allocation(CurrObject->Widget, &allocation);
+	if (original_image->Width >= original_image->Height){
+		new_width = allocation.height * original_image->Width / original_image->Height; 
+		new_height = allocation.height;
+	} else {
+		new_height = allocation.width * original_image->Height / original_image->Width; 
+		new_width = allocation.width;
+	}
+	MainControlHandle->DisplayWidth = new_width;
+	MainControlHandle->DisplayHeight = new_height;
+	MainControlHandle->OriginalWidth = original_image->Width;
+	MainControlHandle->OriginalHeight = original_image->Height;
+	return Resize(original_image, new_width, new_height);
 }

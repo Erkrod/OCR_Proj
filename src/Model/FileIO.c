@@ -57,7 +57,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     return NULL;
   }
 
-  fscanf(File, "%79s", MagicNum);
+  assert(1==fscanf(File, "%79s", MagicNum));
   // check for pbm
   if (MagicNum[0] == 'P' && ( MagicNum[1] == '1' || MagicNum[1] == '4')) {
 #ifdef DEBUG
@@ -85,7 +85,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     return NULL;
   }
 
-  fscanf(File, "%d", &W);
+  assert(1==fscanf(File, "%d", &W));
   if (W <= 0) {
 #ifdef DEBUG
     printf("\nUnsupported image width %d!\n", W);
@@ -94,7 +94,7 @@ IMAGE * ReadImage(char *ImageFileName) {
     return NULL;
   }
 
-  fscanf(File, "%d", &H);
+  assert(1==fscanf(File, "%d", &H));
   if (H <= 0) {
 #ifdef DEBUG
     printf("\nUnsupported image height %d!\n", H);
@@ -117,7 +117,7 @@ IMAGE * ReadImage(char *ImageFileName) {
 
   // case: if image is ppm
   if(typeFlag == 3) {
-    fscanf(File, "%d", &MaxValue);
+    assert(1==fscanf(File, "%d", &MaxValue));
     if (MaxValue != 255) {
 #ifdef DEBUG
       printf("\nUnsupported image maximum value %d!\n", MaxValue);
@@ -142,7 +142,7 @@ IMAGE * ReadImage(char *ImageFileName) {
   }
   // case: if image is pgm
   else if(typeFlag == 2) {
-    fscanf(File, "%d", &MaxValue);
+    assert(1==fscanf(File, "%d", &MaxValue));
     if (MaxValue <= 0 || MaxValue > 255) {
 #ifdef DEBUG
       printf("\nUnsupported image maximum value %d!\n", MaxValue);
