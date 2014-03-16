@@ -16,7 +16,6 @@ Phase 2: The algorithm should be able to match C syntax as much as possible
 #include "Model.h"
 #include "View.h"
 #include "Control.h"
-
 int main(void)
 {
   UT_array * dictionary;
@@ -105,7 +104,7 @@ int main(void)
   /*sixth char spot*/	
   utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
   /*first possibility*/
-  NewCharProbability.Char = 'y';
+  NewCharProbability.Char = 'a';
   NewCharProbability.Probability = 50;
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
   /*second probability*/
@@ -118,7 +117,7 @@ int main(void)
   /*seventh char spot*/	
   utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
   /*first possibility*/
-  NewCharProbability.Char = ' ';
+  NewCharProbability.Char = 'i';
   NewCharProbability.Probability = 50;
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
   /*second probability*/
@@ -131,7 +130,7 @@ int main(void)
   /*eigth char spot*/	
   utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
   /*first possibility*/
-  NewCharProbability.Char = 'h';
+  NewCharProbability.Char = 'n';
   NewCharProbability.Probability = 50;
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
   /*second probability*/
@@ -183,7 +182,7 @@ int main(void)
   /*sixth char spot*/	
   utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
   /*first possibility*/
-  NewCharProbability.Char = 'd';
+  NewCharProbability.Char = 'a';
   NewCharProbability.Probability = 50;
   utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
   /*second probability*/
@@ -247,7 +246,7 @@ int main(void)
   
   
   
-  postProcessing(WholeString,dictionary,specialChar);
+  postProcessingAdvance(WholeString,dictionary,specialChar);
   
 
   postProcessingCleanUP(dictionary, specialChar);
