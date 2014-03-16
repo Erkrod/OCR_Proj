@@ -1,5 +1,4 @@
 #include "Model.h"
-
 UT_icd CharProbability_icd = {sizeof(CharProbability), NULL, NULL, NULL};
 UT_icd CharProfile_icd = {sizeof(CharProfile), NULL, NULL, NULL};
 
@@ -10,6 +9,15 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 	CharProfile NewCharProfile;
 	IENTRY * Curr1 = imglist->First;
 
+	ILIST * CroppedTemplate = NewImageList();;
+	IENTRY * tempNode = Template->First;
+
+	while (tempNode)
+	{ 
+		ILIST * templist = ActiveIsolateCharacter(tempNode->Image, CourierNew, 12, 300);
+		AppendImage(CroppedTemplate, templist->First->Image);
+		tempNode = tempNode->Next;
+	}
 	while (Curr1)
 	{
 		UT_array * CharProbabilities;
@@ -21,14 +29,12 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			temp.Probability = 100;
 			temp.Char = "\n";
 			Curr1 = Curr1->Next;
-			utarray_push_back(CharProbabilities, &temp);
 			continue;
 		}
 		char CharTemplate[100] = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-		IENTRY * Curr2 = Template->First;
+		IENTRY * Curr2 = CroppedTemplate->First;
 		int Index;
-		IMAGE *newimage = Resize(image, Curr2->Image->Width, Curr2->Image->Height);
-		BlackNWhite(newimage);
+		BlackNWhite(image);
 		Index = 0;
 		while (Curr2)
 		{
@@ -40,22 +46,33 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			unsigned char RTemplate, GTemplate, BTemplate;
 			unsigned char RImage, GImage, BImage;
 			assert(image);
-			assert(newimage);
 			assert(Template);
 			BlackNWhite(Curr2->Image);
-			for ( y = 0; y < newimage->Height; y++)
-			for ( x = 0; x < newimage->Width; x++)
+			
+			if(Curr2->Image->Height > image->Height)
+			{
+				newy = image->Height;
+			}
+			else
+			{
+				newy = Curr2->Image->Height;
+			}
+			if(Curr2->Image->Width > image->Width)
+			{
+				newx = image->Width;
+			}
+			else
+			{
+				newx = Curr2->Image->Width;
+			}
+
+			for ( y = 0; y < newy; y++)
+			for ( x = 0; x < newx; x++)
 			{
 				RTemplate = GetPixelR(Curr2->Image, x, y);
-				RImage = GetPixelR(newimage, x, y);
-				
-				/*GTemplate = GetPixelG(Curr2->Image, x, y);
-				GImage = GetPixelG(newimage, x, y);
-				
-				BTemplate = GetPixelB(Curr2->Image, x, y);
-				BImage = GetPixelB(newimage, x, y);*/
-				
-				if (abs(RImage - RTemplate) < 20)
+				RImage = GetPixelR(image, x, y);
+
+				if (RImage == RTemplate)
 				{
 					counter++;
 				}
