@@ -51,6 +51,7 @@ void AddNoise(IMAGE *image) ;
 
 /* Resize */
 IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight);
+IMAGE * ResizePercentage(IMAGE *image, unsigned int percentage);
 
 IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter);
 

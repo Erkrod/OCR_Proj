@@ -321,7 +321,8 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 			int var1, var2, b_thres, dark_limit;
 			int result = GetStainRemovalParams(MainControlHandle, &var1, &var2, &b_thres, &dark_limit);
 			if (result == 0){				
-				IMAGE * NewImage = StainRemoval(MainControlHandle->MainImageList->Last->Image, var1, var2, b_thres, dark_limit);
+				IMAGE * NewImage = DuplicateImage(MainControlHandle->MainImageList->Last->Image);
+				NewImage = StainRemoval(NewImage, var1, var2, b_thres, dark_limit);
 				if (NewImage){
 					PopPreviewImage(MainControlHandle);
 					AppendImage(MainControlHandle->MainImageList, NewImage);
@@ -376,7 +377,8 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 					show_error("Invalid threshold value");
 					break;
 				case 0:
-					NewImage = ColorFilter(MainControlHandle->MainImageList->Last->Image, x, y, x1, y1, x2, y2, new_pix, thres);
+					NewImage = DuplicateImage(MainControlHandle->MainImageList->Last->Image);					
+					NewImage = ColorFilter(NewImage, x, y, x1, y1, x2, y2, new_pix, thres);
 					if (!NewImage) show_error("Can't color filter this image");
 					else {
 						PopPreviewImage(MainControlHandle);
@@ -823,19 +825,27 @@ void show_compilation_msg(ControlHandle * MainControlHandle, const char * Compil
 IMAGE * ResizeFitScreen(ControlHandle * MainControlHandle, IMAGE * original_image){
 	GtkAllocation allocation;
 	ObjectHandle * CurrObject;
-	int new_width, new_height;
+	/*int new_width, new_height;*/
 	CurrObject = FindObject(MainControlHandle, "ImageScrollWindow");
 	gtk_widget_get_allocation(CurrObject->Widget, &allocation);
+	int scale_percentage;
+	IMAGE * ResizedImage;
 	if (original_image->Width >= original_image->Height){
-		new_width = allocation.height * original_image->Width / original_image->Height; 
-		new_height = allocation.height;
+		/*new_width = allocation.height * original_image->Width / original_image->Height; 
+		new_height = allocation.height;*/
+		
+		scale_percentage = allocation.height * 100 / original_image->Height;
+		ResizedImage = ResizePercentage(original_image, scale_percentage);
 	} else {
-		new_height = allocation.width * original_image->Height / original_image->Width; 
-		new_width = allocation.width;
+		/*new_height = allocation.width * original_image->Height / original_image->Width; 
+		new_width = allocation.width;*/
+		
+		scale_percentage = allocation.width * 100 / original_image->Width;
+		ResizedImage = ResizePercentage(original_image, scale_percentage);
 	}
-	MainControlHandle->DisplayWidth = new_width;
-	MainControlHandle->DisplayHeight = new_height;
+	MainControlHandle->DisplayWidth = ResizedImage->Width;
+	MainControlHandle->DisplayHeight = ResizedImage->Height;
 	MainControlHandle->OriginalWidth = original_image->Width;
 	MainControlHandle->OriginalHeight = original_image->Height;
-	return Resize(original_image, new_width, new_height);
+	return ResizedImage;
 }
