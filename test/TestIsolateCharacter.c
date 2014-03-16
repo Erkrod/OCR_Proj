@@ -24,11 +24,11 @@ int main()
   IMAGE *PreviewImage = NULL, *PreviewImage2 = NULL;
   ILIST *imglist = NULL, *imglist2 = NULL;  
 
-  IENTRY *curr = NULL;
+  /*IENTRY *curr = NULL;
   int i=0;
   int k=0;
   char sname[50];
-  char index[50];
+  char index[50];*/
  
 #if IMAGE_CHOICE == 0
   char fname[50] = "Images/CourierNew12_300DPI.ppm";
