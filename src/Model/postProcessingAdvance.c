@@ -104,6 +104,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
   UT_string *output;
   
   utstring_new(output);
+  utstring_new(temp);
 
   currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile);
   while(currCharProfile)
@@ -115,7 +116,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
     /* highest posibility isn't a special character */
     while ((isSpecialChar == 0) && currCharProfile)
     {
-      utstring_new(temp);
+      utstring_clear(temp);
       currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
       chosen = currCharProbability->Char;
       utstring_printf(temp, "%c", chosen);
@@ -131,7 +132,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
     {
       if (chosen == '\'')
       {
-	if (currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile))
+	if ((currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile)))
 	{
 	  currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
 	  utstring_new(temp2);
@@ -140,7 +141,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
 	  if (quotation == '\'')
 	  {
 	    chosen = '"';
-	    utstring_new(temp);
+	    utstring_clear(temp);
 	    utstring_printf(temp, "%c", chosen);
 	  }
 	  utstring_concat(output, temp);
@@ -148,7 +149,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
       }
       else
       {
-	utstring_new(temp);
+	utstring_clear(temp);
 	utstring_printf(temp, "%c", chosen);
 	utstring_concat(output, temp);
       }
@@ -160,7 +161,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
     printf("output is: %s\n", utstring_body(output));
 #endif
     
-    //utstring_free(temp);
+    utstring_free(temp);
   return output;
 }
 
@@ -321,7 +322,7 @@ UT_string *wordCompare(UT_array * wordBank, UT_array * dictionary)
     }
   }
   tempWord1 = NULL;
-  while (tempWord1 = (char**)utarray_next(wordBank,tempWord1))
+  while ((tempWord1 = (char**)utarray_next(wordBank,tempWord1)))
   {
     utstring_new(temp1);
     utstring_printf(temp1, "%s", (*tempWord1)); 

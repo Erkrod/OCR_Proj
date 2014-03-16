@@ -17,11 +17,11 @@ int main (int   argc, char *argv[]){
   GtkWidget *hbox             = gtk_hbox_new(FALSE, 0);    
   GtkWidget *scrollWinImage   = drawImageWindow(MainViewHandle);
   GtkWidget *scrollWinText    = drawTextWindow(MainViewHandle);
-  GtkWidget *rotateWindow     = drawRotateWindow(MainViewHandle);
-  GtkWidget *cropWindow       = drawCropWindow(MainViewHandle);
-  GtkWidget *filterWindow     = drawColorFilterWindow(MainViewHandle);
-  GtkWidget *ocrWindow        = drawOCRWindow(MainViewHandle);
-  GtkWidget *aboutWindow      = drawAboutWindow(MainViewHandle);
+  /*GtkWidget *rotateWindow     = */drawRotateWindow(MainViewHandle);
+  /*GtkWidget *cropWindow       = */drawCropWindow(MainViewHandle);
+  /*GtkWidget *filterWindow     = */drawColorFilterWindow(MainViewHandle);
+  /*GtkWidget *ocrWindow        = */drawOCRWindow(MainViewHandle);
+  /*GtkWidget *aboutWindow      = */drawAboutWindow(MainViewHandle);
 
   gtk_container_add(GTK_CONTAINER(window), vbox);
   gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);

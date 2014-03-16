@@ -7,7 +7,7 @@
 #define TESTCASE 1
 
 int main(){
-	IMAGE *image, *ref_color;
+	IMAGE *image;/*, *ref_color;*/
 	char filename[SLEN];
 	/*int x, y, area_x1, area_x2, area_y1, area_y2, NewPixelValue, threshold;
 	unsigned char refr, refg, refb;*/
