@@ -58,12 +58,12 @@ ControlHandle * Control_Initialize(void){
 	ToReturn->IsInPreview = 0;
 	ToReturn->InitialImage = 1;	
 	ToReturn->InitialText = 1;	
+		
 	drawAllWindows(ToReturn->MainViewHandle);
 	
 	/*for post processing*/
-	/*utarray_new(ToReturn->KeywordArray, &ut_str_icd);
-	utarray_new(ToReturn->SpecialCharArray, &ut_str_icd);
-	postProcessingInitialize(ToReturn->KeywordArray, ToReturn->SpecialCharArray);*/
+	ToReturn->SpecialCharArray = postProcessingInitializeSpecialChar();
+	ToReturn->Dictionary = postProcessingInitializeDictionary();
 	
 	/*read templates*/
 	ToReturn->CourierNewTemplate = InitializeTemplate();
@@ -506,7 +506,11 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 					DeleteImageList(CutList);
 										
 					/*post processing*/
-					UT_string * temp_string = postProcessing(temp_array);
+					UT_string * temp_string ;
+					if (UseDictionary)
+						temp_string = postProcessingAdvance(temp_array, MainControlHandle->Dictionary, MainControlHandle->SpecialCharArray);
+					else 
+						temp_string = postProcessing(temp_array);
 					utstring_clear(MainControlHandle->MainOutputString);
 					utstring_printf(MainControlHandle->MainOutputString, "%s", utstring_body(temp_string));
 					

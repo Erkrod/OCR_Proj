@@ -5,6 +5,7 @@
 #include "ImageList.h"
 #include "uthash.h"
 #include "utstring.h"
+#include "utarray.h"
 #define MAX_HASH_KEY_LENGTH 20
 
 typedef struct ViewHandleStruct ViewHandle;
@@ -36,7 +37,7 @@ typedef struct {
 	int DisplayWidth, DisplayHeight, OriginalWidth, OriginalHeight;
 	
 	/*for post processing*/
-	/*UT_array * KeywordArray, * SpecialCharArray;*/
+	UT_array * Dictionary, * SpecialCharArray;
 	
 	/*for identify character*/
 	ILIST * CourierNewTemplate, * LucidaConsoleTemplate;

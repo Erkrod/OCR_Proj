@@ -2,23 +2,14 @@
 #include <stdlib.h>
 #include "utstring.h"
 #include "utarray.h"
-#include "ModelStructure.h"
+#include "Model.h"
 
 void CharProfile_free(void * profile_in){
 	CharProfile * profile = (CharProfile *) profile_in;
 	utarray_free(profile->CharChoices);
 }
 
-UT_array * postProcessingInitializeDictionary();
-UT_array * postProcessingInitializeSpecialChar();
-void postProcessingCleanUP(UT_array * , UT_array * );
-UT_array * getThreeKeyword(CharProfile *, UT_array *, UT_array *);
-UT_string * postProcessing(UT_array *);
-UT_string * postProcessingAdvance(UT_array *, UT_array *, UT_array *);
-char * getTopProb(CharProfile *);
-char * getSecondProb(CharProfile *);
-UT_string * wordCompare(UT_array *, UT_array *);
-int compareChar(UT_string *, UT_array *);
+
 
 UT_string * postProcessing(UT_array * charList)
 {
@@ -26,8 +17,6 @@ UT_string * postProcessing(UT_array * charList)
   UT_string * output;
   CharProfile * currCharProfile = NULL;
   CharProbability * currCharProbability = NULL;
-  int count1 = 0, count2 = 0;
-  int count = 0;
   int percentage = 0;
   char chosen = 'a';
   char quotation = 'a';
@@ -37,7 +26,7 @@ UT_string * postProcessing(UT_array * charList)
   
   while((currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile)))
   {
-    count2 = 0;
+    
     currCharProbability = NULL;
     percentage = 0;
     
@@ -102,7 +91,7 @@ UT_string * postProcessing(UT_array * charList)
 UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT_array * specialCharacter)
 {
   CharProfile * currCharProfile = NULL;
-  CharProfile * currCharProfile2 = NULL;
+  /*CharProfile * currCharProfile2 = NULL;*/
   CharProbability * currCharProbability = NULL;
   char chosen = 'a';
   char quotation = 'a';
@@ -416,7 +405,7 @@ UT_array * postProcessingInitializeSpecialChar()
 UT_array * postProcessingInitializeDictionary()
 {
   char * word;
-  char ** p;
+  /*char ** p;*/
 
   UT_array *dictionary;
   utarray_new(dictionary, &ut_str_icd);
