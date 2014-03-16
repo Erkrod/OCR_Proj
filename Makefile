@@ -77,5 +77,5 @@ TestCharArray: build/ExampleCharArray.o
 TestUTArray: build/utarray_example.o
 	$(CC) $(CFLAGS) $< -o bin/$@
 
-TestPostPo: build/postProcessing.o
+testpost: build/postProcessingAdvance.o
 	$(CC) $(CFLAGS) $< -o bin/$@
