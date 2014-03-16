@@ -12,127 +12,28 @@ void CharProfile_free(void * profile_in){
 UT_array * postProcessingInitializeDictionary();
 UT_array * postProcessingInitializeSpecialChar();
 void postProcessingCleanUP(UT_array * , UT_array * );
-
 UT_array * getThreeKeyword(CharProfile *, UT_array *, UT_array *);
-
 UT_string * postProcessing(UT_array *, UT_array *, UT_array *);
-
 char * getTopProb(CharProfile *);
 char * getSecondProb(CharProfile *);
 UT_string * wordCompare(UT_array *, UT_array *);
-
 int compareChar(UT_string *, UT_array *);
 
-int main(void)
-{
-  UT_array * dictionary;
-  UT_array * specialChar;
-  
-  UT_array * WholeString = NULL;
-  CharProfile NewCharProfile;
-  CharProbability NewCharProbability;
-  
-  utarray_new(dictionary, &ut_str_icd);
-  utarray_new(specialChar, &ut_str_icd);
-  dictionary = postProcessingInitializeDictionary();
-  specialChar = postProcessingInitializeSpecialChar();
-
-  
-  /*initialize string profile*/
-  UT_icd StringProfile_icd = {sizeof(CharProfile), NULL, NULL, CharProfile_free};
-  utarray_new(WholeString, &StringProfile_icd);
-  
-  /*first char spot*/	
-  UT_icd CharProbability_icd = {sizeof(CharProbability), NULL, NULL, NULL};
-  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
-  
-  /*first possibility*/
-  NewCharProbability.Char = 'f';
-  NewCharProbability.Probability = 25;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  
-  /*second probability*/
-  NewCharProbability.Char = 't';
-  NewCharProbability.Probability = 75;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  /*push to the whole string*/
-  utarray_push_back(WholeString, &NewCharProfile);
 
 
-  /*second char spot*/	
-  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
-  
-  /*first possibility*/
-  NewCharProbability.Char = 'o';
-  NewCharProbability.Probability = 35;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  
-  /*second probability*/
-  NewCharProbability.Char = '0';
-  NewCharProbability.Probability = 85;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  /*push to the whole string*/
-  utarray_push_back(WholeString, &NewCharProfile);
-  
-  /*third char spot*/	
-  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
-  
-  /*first possibility*/
-  NewCharProbability.Char = 'e';
-  NewCharProbability.Probability = 50;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  
-  /*second probability*/
-  NewCharProbability.Char = 'd';
-  NewCharProbability.Probability = 100;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  /*push to the whole string*/
-  utarray_push_back(WholeString, &NewCharProfile);
-  
-  
-  /*fourth char spot*/	
-  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
-  
-  /*first possibility*/
-  NewCharProbability.Char = '(';
-  NewCharProbability.Probability = 50;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  
-  /*second probability*/
-  NewCharProbability.Char = 'p';
-  NewCharProbability.Probability = 100;
-  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
-  
-  /*push to the whole string*/
-  utarray_push_back(WholeString, &NewCharProfile);
-  
-  
-  postProcessing(WholeString,dictionary,specialChar);
-  
-
-  postProcessingCleanUP(dictionary, specialChar);
-  return 0;
-}
 
 UT_string * postProcessing(UT_array * charList, UT_array * dictionary, UT_array * specialCharacter)
 {
   CharProfile * currCharProfile = NULL;
   CharProbability * currCharProbability = NULL;
   char chosen = 'a';
+  char quotation = 'a';
   
   int isSpecialChar = 0;
   
   UT_array * wordBank;
-  utarray_new(wordBank, &ut_str_icd);
-  
   UT_string *temp;
+  UT_string *temp2;
   UT_string *output;
   
   utstring_new(output);
@@ -141,22 +42,57 @@ UT_string * postProcessing(UT_array * charList, UT_array * dictionary, UT_array 
   while(currCharProfile)
   {
     currCharProbability = NULL;
+    utarray_new(wordBank, &ut_str_icd);
     wordBank = getThreeKeyword(currCharProfile, charList, specialCharacter);
     isSpecialChar = 0;
-    while (isSpecialChar == 0 && (currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile)))
+    /* highest posibility isn't a special character */
+    while ((isSpecialChar == 0) && currCharProfile)
     {
       utstring_new(temp);
       currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
       chosen = currCharProbability->Char;
       utstring_printf(temp, "%c", chosen);
       isSpecialChar = compareChar(temp, specialCharacter);
+      /*if (isSpecialChar)
+      {
+	(currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile));
+      }*/
+      (currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile));
     }
     utstring_concat(output, wordCompare(wordBank, dictionary));
-    utstring_new(temp);
-    utstring_printf(temp, "%c", ' ');
-    utstring_concat(output, temp);
+    if (isSpecialChar == 1)
+    {
+      if (chosen == '\'')
+      {
+	if (currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile))
+	{
+	  currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
+	  utstring_new(temp2);
+	  quotation = currCharProbability->Char;
+	  utstring_printf(temp2, "%c", quotation);
+	  if (quotation == '\'')
+	  {
+	    chosen = '"';
+	    utstring_new(temp);
+	    utstring_printf(temp, "%c", chosen);
+	  }
+	  else
+	  {
+	    utstring_concat(temp, temp2);
+	  }
+	  utstring_concat(output, temp);
+	  
+	}
+      }
+      else
+      {
+	utstring_new(temp);
+	utstring_printf(temp, "%c", chosen);
+	utstring_concat(output, temp);
+      }
+    }
   }
-  printf("output is: %s\n", utstring_body(output));
+  /*printf("output is: %s\n", utstring_body(output));*/
   
   return temp;
 }
@@ -165,10 +101,14 @@ UT_string * postProcessing(UT_array * charList, UT_array * dictionary, UT_array 
 UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList, UT_array * specialCharacter)
 {
   char * top;
+  char * top2;
   char * second;
   CharProfile * tempPosition = currCharProfile;
+  CharProfile * tempPosition2 = currCharProfile;
   char chosen;
+  char chosen2;
   UT_string *temp;
+  UT_string *temp2;
   UT_string *output;
 
   UT_array * wordBank;
@@ -180,7 +120,7 @@ UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList, UT
   int specialCharFlag = 0;
   
 
-  
+  /* doesn't grab the highest probability.... */
   for (i = 0; i < wordLength; i++)
   {
     utstring_new(output);
@@ -215,6 +155,10 @@ UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList, UT
       {
 	utstring_concat(output,temp);
       }
+      else
+      {
+	break;
+      }
       j++;
     }
     if (wordLengthFlag == 0)
@@ -224,7 +168,24 @@ UT_array * getThreeKeyword(CharProfile *currCharProfile, UT_array * charList, UT
     }
     utarray_push_back(wordBank, &utstring_body(output));
   }
+  
+  
+  /* grabbing highest prob */
+  utstring_new(output);
+  i = 0;
+  while (i < wordLength && tempPosition2)
+  {
+    utstring_new(temp2);
+    top2 = getTopProb(tempPosition2);
+    chosen2 = *top2;
+    tempPosition2 = (CharProfile *)utarray_next(charList, tempPosition2);
+    utstring_printf(temp2, "%c", chosen2);
+    utstring_concat(output, temp2);
+    i++;
+  } 
+  utarray_push_back(wordBank, &utstring_body(output));
   currCharProfile = tempPosition;
+  
   return wordBank;
 }
 
@@ -279,6 +240,7 @@ UT_string *wordCompare(UT_array * wordBank, UT_array * dictionary)
     utstring_new(temp1);
     utstring_printf(temp1, "%s", (*tempWord1));
     tempWord2 = NULL;
+    //printf("check please: %s\n", utstring_body(temp1));
     for (i = 0; i < 32; i++)
     {
       tempWord2 = (char **)utarray_next(dictionary, tempWord2);
@@ -292,9 +254,12 @@ UT_string *wordCompare(UT_array * wordBank, UT_array * dictionary)
     }
   }
   tempWord1 = NULL;
-  tempWord1 = (char**)utarray_next(wordBank,tempWord1);
-  utstring_new(temp1);
-  utstring_printf(temp1, "%s", (*tempWord1));
+  while (tempWord1 = (char**)utarray_next(wordBank,tempWord1))
+  {
+    utstring_new(temp1);
+    utstring_printf(temp1, "%s", (*tempWord1)); 
+  }
+  
   return temp1; 
 }
 
@@ -457,4 +422,242 @@ void postProcessingCleanUP(UT_array * dictionary, UT_array * specialCharacter)
 {
   utarray_free(dictionary);
   utarray_free(specialCharacter);
+}
+
+
+int main(void)
+{
+  UT_array * dictionary;
+  UT_array * specialChar;
+  
+  UT_array * WholeString = NULL;
+  CharProfile NewCharProfile;
+  CharProbability NewCharProbability;
+  
+  utarray_new(dictionary, &ut_str_icd);
+  utarray_new(specialChar, &ut_str_icd);
+  dictionary = postProcessingInitializeDictionary();
+  specialChar = postProcessingInitializeSpecialChar();
+
+  
+  /*initialize string profile*/
+  UT_icd StringProfile_icd = {sizeof(CharProfile), NULL, NULL, CharProfile_free};
+  utarray_new(WholeString, &StringProfile_icd);
+  
+  /*first char spot*/	
+  UT_icd CharProbability_icd = {sizeof(CharProbability), NULL, NULL, NULL};
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'f';
+  NewCharProbability.Probability = 25;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 't';
+  NewCharProbability.Probability = 75;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability); 
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*second char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'o';
+  NewCharProbability.Probability = 35;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = '0';
+  NewCharProbability.Probability = 85;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*third char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 't';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'r';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*third char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = '(';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = '=';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*fifth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'm';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'n';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'y';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 't';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*seventh char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = ' ';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'u';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*eigth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'h';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'w';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*ninth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = ')';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = '}';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*tenth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = '\n';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'u';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = '{';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = '[';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'd';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'a';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'u';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'd';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 't';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 'y';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+   /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = 'o';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = 't';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+   /*sixth char spot*/	
+  utarray_new(NewCharProfile.CharChoices, &CharProbability_icd);
+  /*first possibility*/
+  NewCharProbability.Char = '}';
+  NewCharProbability.Probability = 50;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*second probability*/
+  NewCharProbability.Char = ']';
+  NewCharProbability.Probability = 100;
+  utarray_push_back(NewCharProfile.CharChoices, &NewCharProbability);
+  /*push to the whole string*/
+  utarray_push_back(WholeString, &NewCharProfile);
+  
+  
+  
+  postProcessing(WholeString,dictionary,specialChar);
+  
+
+  postProcessingCleanUP(dictionary, specialChar);
+  return 0;
 }
