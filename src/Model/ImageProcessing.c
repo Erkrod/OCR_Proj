@@ -379,6 +379,150 @@ void AddNoise(IMAGE *image)
 
 
 
+
+
+
+
+
+#if 0				//using code from http://tech-algorithm.com/articles/bilinear-image-scaling/
+#if 0
+IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
+	IMAGE * image_out = CreateImage(newWidth, newHeight);
+	if (image_out == NULL) {printf("ERROR: Out of memory\n"); return image;}
+	int i,j, NewPixelValue;
+	int w = image->Width, h = image->Height, w2 = newWidth, h2 = newHeight;
+	int A, B, C, D, x, y ;
+	float x_ratio = ((float)(w-1))/w2 ;
+	float y_ratio = ((float)(h-1))/h2 ;
+	float x_diff, y_diff;//, ya, yb ;
+	
+	if (newWidth != image->Width || newHeight != image->Height){
+		
+		for (i = 0; i < image_out->Width; i++){
+			for (j = 0; j < image_out->Height; j++){			
+				
+				x = (int)(x_ratio * j) ;
+				y = (int)(y_ratio * i) ;
+				x_diff = (x_ratio * j) - x ;
+				y_diff = (y_ratio * i) - y ;
+				
+				    
+				
+				/*red pixels*/
+				A = GetPixelR(image, x , y);
+				B = GetPixelR(image, x + 1 , y);
+				C = GetPixelR(image, x , y + 1 );
+				D = GetPixelR(image, x + 1 , y + 1);
+				
+				
+				NewPixelValue = (int)(
+				A*(1-x_diff)*(1-y_diff) +  B*(x_diff)*(1-y_diff) +
+				C*(y_diff)*(1-x_diff)   +  D*(x_diff*y_diff)
+				) ;
+
+				SetPixelR(image, i,j, NewPixelValue);    
+				
+				/*Green pixels*/
+				A = GetPixelG(image, x , y);
+				B = GetPixelG(image, x + 1 , y);
+				C = GetPixelG(image, x , y + 1 );
+				D = GetPixelG(image, x + 1 , y + 1);
+				
+				
+				NewPixelValue = (int)(
+				A*(1-x_diff)*(1-y_diff) +  B*(x_diff)*(1-y_diff) +
+				C*(y_diff)*(1-x_diff)   +  D*(x_diff*y_diff)
+				) ;
+
+				SetPixelG(image, i,j, NewPixelValue);  
+				
+				
+				/*Blue pixels*/
+				A = GetPixelB(image, x , y);
+				B = GetPixelB(image, x + 1 , y);
+				C = GetPixelB(image, x , y + 1 );
+				D = GetPixelB(image, x + 1 , y + 1);
+				
+				
+				NewPixelValue = (int)(
+				A*(1-x_diff)*(1-y_diff) +  B*(x_diff)*(1-y_diff) +
+				C*(y_diff)*(1-x_diff)   +  D*(x_diff*y_diff)
+				) ;
+
+				SetPixelB(image, i,j, NewPixelValue);  
+
+			}
+		}
+	} else {
+		DeleteImage(image_out);
+		return DuplicateImage(image);
+	}	
+	
+	return image_out;  
+}	
+#endif
+
+IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
+	IMAGE * image_out = CreateImage(newWidth, newHeight);
+	if (image_out == NULL) {printf("ERROR: Out of memory\n"); return image;}
+	
+	if (newWidth != image->Width || newHeight != image->Height){
+		
+		resizeBilinear
+		
+	} else {
+		DeleteImage(image_out);
+		return DuplicateImage(image);
+	}	
+	
+	return image_out;  
+}
+
+void resizeBilinear(int * pixels, int * temp, int w, int h, int w2, int h2) {
+    int[] temp = new int[w2*h2] ;
+    int a, b, c, d, x, y, index ;
+    float x_ratio = ((float)(w-1))/w2 ;
+    float y_ratio = ((float)(h-1))/h2 ;
+    float x_diff, y_diff, blue, red, green ;
+    int offset = 0 ;
+    for (int i=0;i<h2;i++) {
+        for (int j=0;j<w2;j++) {
+            x = (int)(x_ratio * j) ;
+            y = (int)(y_ratio * i) ;
+            x_diff = (x_ratio * j) - x ;
+            y_diff = (y_ratio * i) - y ;
+            index = (y*w+x) ;                
+            a = pixels[index] ;
+            b = pixels[index+1] ;
+            c = pixels[index+w] ;
+            d = pixels[index+w+1] ;
+
+            // blue element
+            // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
+            blue = (a&0xff)*(1-x_diff)*(1-y_diff) + (b&0xff)*(x_diff)*(1-y_diff) +
+                   (c&0xff)*(y_diff)*(1-x_diff)   + (d&0xff)*(x_diff*y_diff);
+
+            // green element
+            // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
+            green = ((a>>8)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>8)&0xff)*(x_diff)*(1-y_diff) +
+                    ((c>>8)&0xff)*(y_diff)*(1-x_diff)   + ((d>>8)&0xff)*(x_diff*y_diff);
+
+            // red element
+            // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
+            red = ((a>>16)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>16)&0xff)*(x_diff)*(1-y_diff) +
+                  ((c>>16)&0xff)*(y_diff)*(1-x_diff)   + ((d>>16)&0xff)*(x_diff*y_diff);
+
+            temp[offset++] = 
+                    0xff000000 | // hardcode alpha
+                    ((((int)red)<<16)&0xff0000) |
+                    ((((int)green)<<8)&0xff00) |
+                    ((int)blue) ;
+        }
+    }
+    return temp ;
+}
+
+#else
 /* Resize */
 static int ceil_width(IMAGE * image, int x){
 	if (x >= image->Width) return image->Width - 1;
@@ -389,6 +533,7 @@ static int ceil_height(IMAGE * image, int y){
 	if (y >= image->Height) return image->Height - 1;
 	else return y;
 }
+
 
 static unsigned char enlarge_compute_intensity(IMAGE * image, int x_big, int y_big, int xpercentage, int ypercentage, int intensity_type){
 	double x_small = x_big * 100.0 / xpercentage;
@@ -421,8 +566,8 @@ static unsigned char enlarge_compute_intensity(IMAGE * image, int x_big, int y_b
 	return_value = temp[0] * x_factor * y_factor + temp[1] * (1 - x_factor) * y_factor + temp[2] * x_factor * (1 - y_factor) + temp[3] * (1-x_factor) * (1-y_factor);
 	return return_value;
 	
-}
-
+}    
+    
 /*Resize*/
 IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
 	unsigned int out_height = newHeight;
@@ -451,6 +596,8 @@ IMAGE *Resize(IMAGE *image, unsigned int newWidth, unsigned int newHeight){
 	/*DeleteImage(image);*/
 	return image_out;
 }
+
+#endif
 
 IMAGE *StainRemoval(IMAGE *image, int c_var1, int c_var2, int b_threshold, int darken_limiter){
 	int i, j;

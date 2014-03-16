@@ -143,13 +143,18 @@ void Control_CleanUp(ControlHandle * MainHandle){
 void UpdateDisplayImage(ControlHandle * MainControlHandle){
 	ObjectHandle * CurrObject;
 	CurrObject = FindObject(MainControlHandle, "MainDisplayImage");
+	IMAGE * ResizedImage;
 	/*save last image to a temp file first*/
-	if (MainControlHandle->IsInPreview){
-		assert(!SaveImage("Temp", ResizeFitScreen(MainControlHandle, MainControlHandle->PreviewImage)));
+	if (MainControlHandle->IsInPreview){		
+		ResizedImage = ResizeFitScreen(MainControlHandle, MainControlHandle->PreviewImage);
+		assert(!SaveImage("Temp", ResizedImage));
+		DeleteImage(ResizedImage);
 		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
 		gtk_widget_show(CurrObject->Widget);
 	} else if (MainControlHandle->MainImageList->Last){
-		assert(!SaveImage("Temp", ResizeFitScreen(MainControlHandle, MainControlHandle->MainImageList->Last->Image)));
+		ResizedImage = ResizeFitScreen(MainControlHandle, MainControlHandle->MainImageList->Last->Image);
+		assert(!SaveImage("Temp", ResizedImage));
+		DeleteImage(ResizedImage);
 		gtk_image_set_from_file(GTK_IMAGE(CurrObject->Widget), "Temp.ppm");		
 		gtk_widget_show(CurrObject->Widget);
 	} else {

@@ -58,7 +58,8 @@ void AppendImage(ILIST *l, IMAGE *image)
 		newentry->Image = image;
 		
 		if(!l->First){
-			l->First = l->Last = newentry;
+			l->First = newentry;
+			l->Last = newentry;
 		}
 		else{
 			l->Last->Next = newentry;
@@ -182,7 +183,7 @@ void PopLastImage(ILIST *l){
 		} else {
 			if (l->Last->Image) DeleteImage(l->Last->Image);
 			l->Last = l->Last->Prev;
-			free(l->Last);
+			free(l->Last->Next);
 			l->Last->Next = NULL;			
 		}
 	}
