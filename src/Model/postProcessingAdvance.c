@@ -155,8 +155,13 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
     }
     
   }
-   /* printf("output is: %s\n", utstring_body(output));*/
-  return temp;
+    
+#ifdef DEBUG
+    printf("output is: %s\n", utstring_body(output));
+#endif
+    
+    //utstring_free(temp);
+  return output;
 }
 
 
