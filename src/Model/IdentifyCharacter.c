@@ -43,10 +43,10 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template )
 			int counter, total;
 			counter = 0;
 			total = 0;
-			unsigned char RTemplate, GTemplate, BTemplate;
-			unsigned char RImage, GImage, BImage;
+			unsigned char RTemplate;
+			unsigned char RImage;
 			assert(image);
-			assert(Template);
+			assert(Curr2->Image);
 			BlackNWhite(Curr2->Image);
 			
 			if(Curr2->Image->Height > image->Height)
