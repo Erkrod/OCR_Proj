@@ -53,7 +53,6 @@ ILIST * Align(ILIST* imglist)
 	ILIST * Alignedimglist;
 	int x, y;
 	int newx, newy;
-	char gothere[50] = "gotHere";
 	
 	Alignedimglist = NewImageList();
 	Curr = imglist->First;
@@ -88,7 +87,6 @@ ILIST * Align(ILIST* imglist)
 		nextstep1:
 		tempimage = CropImage(Curr->Image, newx, newy, Curr->Image->Width-1, Curr->Image->Height-1);
 		AppendImage(Alignedimglist, tempimage);
-		SaveImage(gothere, Curr->Image);
 		Curr = Curr->Next;
 	}
 	return Alignedimglist;
@@ -295,7 +293,6 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 	utarray_new(CharProfiles, &CharProfile_icd);
 	CharProfile NewCharProfile;
 	UT_array * CharProbabilities;
-	utarray_new(CharProbabilities, &CharProbability_icd);
 	CharProbability temp;
 	IENTRY * Curr1;
 	IENTRY * Curr2;
@@ -312,6 +309,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 
 	while(Curr1)
 	{
+		utarray_new(CharProbabilities, &CharProbability_icd);
 		if (IsNewLine(Curr1->Image))
 		{
 			temp.Probability = 100;
