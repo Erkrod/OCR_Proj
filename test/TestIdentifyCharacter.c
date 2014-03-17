@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Model.h"
+#define TEST_CHOICE 0    /* <<<<<<<<<<---------------- Change test there ~~~~~~~~~~~~ */
+
 
 int main()
 {
@@ -13,33 +15,50 @@ int main()
 	IMAGE *image = NULL;
 	IMAGE *PreviewImage = NULL;
 	ILIST *imglist = NULL;
+
+#if TEST_CHOICE == 0 || TEST_CHOICE == 1
 	char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
 	image = ReadImage(fname);
 	img = CropImage(image,50,200,1450,1400);
 	SaveImage("img", img);
 	ILIST *template = InitializeTemplateCourier();
-	
-	//char fname1[50] = "Fonts/CourierNew12_300DPI/48.jpg";	/*Comparing with 0*/
-	//char fname2[50] = "Fonts/CourierNew12_300DPI/79.jpg";	/*Comparing with O*/
-	//char fname3[50] = "Fonts/CourierNew12_300DPI/111.jpg";/*Comparing with o*/
-	//IMAGE * image1 = ReadImage(fname1);
-	//IMAGE * image2 = ReadImage(fname2);
-	//IMAGE * image3 = ReadImage(fname3);
-	//ILIST *testlist = NewImageList();
-	
-	PreviewImage = PreviewActiveIsolateCharacter(img, CourierNew, 12, 300);
-	SaveImage("CheckActiveIsolate", PreviewImage);
-	printf("Finished preview active algorithm\n");
-	imglist = ActiveIsolateCharacter(img, CourierNew, 12, 300);  
-	printf("Finished active algorithm\n");
+#elif TEST_CHOICE == 2 || TEST_CHOICE == 3
+	char fname[50] = "Images/41_OCRtest_Lucida_Clean300DPI.png";
+	image = ReadImage(fname);
+  	img = CropImage(image,280,200,2000,3000);
+	SaveImage("img", img);
+	ILIST *template = InitializeTemplateLucida();
+#endif
+#if TEST_CHOICE == 0
+	PreviewImage = PreviewLazyIsolateCharacter(img, CourierNew, 12, 300);
+	SaveImage("CheckLazyIsolateCourier", PreviewImage);
+	imglist = LazyIsolateCharacter(img, CourierNew, 12, 300);  
 	assert(imglist && PreviewImage);
 	DeleteImage(PreviewImage);
-  
-	//AppendImage(testlist, image1);
-	//AppendImage(testlist, image2);
-	//AppendImage(testlist, image3);
+	CharProfiles = IdentifyCharacter(imglist, template, 0);
+#elif TEST_CHOICE == 1
+	PreviewImage = PreviewActiveIsolateCharacter(img, CourierNew, 12, 300);
+	SaveImage("CheckActiveIsolateCourier", PreviewImage);
+	imglist = ActiveIsolateCharacter(img, CourierNew, 12, 300);  
+	assert(imglist && PreviewImage);
+	DeleteImage(PreviewImage);
 	CharProfiles = IdentifyCharacter(imglist, template, 1);
-	printf("Finish Identify\n");
+#elif TEST_CHOICE == 2
+	PreviewImage = PreviewLazyIsolateCharacter(img, LucidaConsole, 10, 300);
+	SaveImage("CheckLazyIsolateLucida", PreviewImage);
+	imglist = LazyIsolateCharacter(img, LucidaConsole, 10, 300);  
+	assert(imglist && PreviewImage);
+	DeleteImage(PreviewImage);
+	CharProfiles = IdentifyCharacter(imglist, template, 0);
+#elif TEST_CHOICE == 3
+	PreviewImage = PreviewActiveIsolateCharacter(img, LucidaConsole, 10, 300);
+	SaveImage("CheckActiveIsolateLucida", PreviewImage);
+	imglist = LazyIsolateCharacter(img, LucidaConsole, 10, 300);  
+	assert(imglist && PreviewImage);
+	DeleteImage(PreviewImage);
+	CharProfiles = IdentifyCharacter(imglist, template, 0);
+#endif
+
 	CharProfile *Curr1 = (CharProfile*)utarray_front(CharProfiles);
 	i = 0;
 	while ( Curr1 )
