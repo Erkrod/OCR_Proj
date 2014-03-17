@@ -388,7 +388,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 	return CharProfiles;
 }
 
-ILIST * InitializeTemplate(void)
+ILIST * InitializeTemplateCourier(void)
 {
 	ILIST *template = NewImageList();
 	IMAGE *templateimage = NULL;
@@ -401,6 +401,29 @@ ILIST * InitializeTemplate(void)
 		char tempname[50] = "Fonts/CourierNew12_300DPI/";
 		strcat(tempname, index);
 		strcat(tempname, ".jpg");
+		if (file_exist(tempname))
+		{
+			templateimage = ReadImage(tempname);
+			AppendImage(template, templateimage);
+		}
+		i++;
+	}
+	return template;
+}
+
+ILIST * InitializeTemplateLucida(void)
+{
+	ILIST *template = NewImageList();
+	IMAGE *templateimage = NULL;
+	int i;
+	i = 0;
+	while( i < 127 )
+	{
+		char index[50];
+		sprintf(index, "%d", i);
+		char tempname[50] = "Fonts/LucidaConsole10_300DPI/";
+		strcat(tempname, index);
+		strcat(tempname, ".png");
 		if (file_exist(tempname))
 		{
 			templateimage = ReadImage(tempname);

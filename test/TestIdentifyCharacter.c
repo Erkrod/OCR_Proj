@@ -25,7 +25,7 @@ int main()
 	IMAGE * image1 = ReadImage(fname1);
 	IMAGE * image2 = ReadImage(fname2);
 	IMAGE * image3 = ReadImage(fname3);
-	ILIST *template = InitializeTemplate();
+	ILIST *template = InitializeTemplateCourier();
 	ILIST *testlist = NewImageList();
 	
 	PreviewImage = PreviewActiveIsolateCharacter(img, CourierNew, 12, 300);
