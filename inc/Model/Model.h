@@ -32,7 +32,7 @@ UT_icd CharProbability_icd;
 UT_icd CharProfile_icd; 
 
 
-UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template );
+UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template , int IsolateAlgorithm);
 ILIST * InitializeTemplate(void);
 int IsPixelBlack(IMAGE * image, int x, int y);
 #endif
