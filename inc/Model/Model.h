@@ -34,4 +34,5 @@ UT_icd CharProfile_icd;
 
 UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template );
 ILIST * InitializeTemplate(void);
+int IsPixelBlack(IMAGE * image, int x, int y);
 #endif
