@@ -32,7 +32,7 @@ int IsSpace(IMAGE* image, int IsolateAlgorithm)
 			if(IsPixelBlack(image, x, y))
 				count++;
 		}
-		if (count < 5)
+		if (count < 15)
 			return 1;
 		else
 			return 0;
