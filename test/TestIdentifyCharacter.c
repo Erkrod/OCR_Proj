@@ -16,7 +16,7 @@ int main()
 	char fname[50] = "Images/01_HelloWorld_Clean300DPI.jpg";
 	image = ReadImage(fname);
 	img = CropImage(image,50,200,1450,1400);
-	SaveImage("imglist", img);
+	SaveImage("img", img);
 
 	
 	char fname1[50] = "Fonts/CourierNew12_300DPI/48.jpg";	/*Comparing with 0*/

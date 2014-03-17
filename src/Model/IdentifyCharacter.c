@@ -53,6 +53,7 @@ ILIST * Align(ILIST* imglist)
 	ILIST * Alignedimglist;
 	int x, y;
 	int newx, newy;
+	char gothere[50] = "gotHere";
 	
 	Alignedimglist = NewImageList();
 	Curr = imglist->First;
@@ -60,6 +61,8 @@ ILIST * Align(ILIST* imglist)
 	{
 		if (IsNewLine(Curr->Image))
 		{
+			tempimage = NULL;
+			AppendImage(Alignedimglist, tempimage);
 			Curr = Curr->Next;
 			continue;
 		}
@@ -68,7 +71,7 @@ ILIST * Align(ILIST* imglist)
 		{
 			if (IsPixelBlack(Curr->Image, x, y))
 			{
-				newy = y;
+				newx = x;
 				goto nextstep;
 			}
 		}
@@ -78,13 +81,14 @@ ILIST * Align(ILIST* imglist)
 		{
 			if (IsPixelBlack(Curr->Image, x, y))
 			{
-				newx = x;
+				newy = y;
 				goto nextstep1;
 			}
 		}
 		nextstep1:
 		tempimage = CropImage(Curr->Image, newx, newy, Curr->Image->Width-1, Curr->Image->Height-1);
 		AppendImage(Alignedimglist, tempimage);
+		SaveImage(gothere, Curr->Image);
 		Curr = Curr->Next;
 	}
 	return Alignedimglist;
@@ -306,20 +310,19 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 	Curr2 = Alignedimglist->First;
 	Curr3 = AlignedTemplate->First;
 
-
 	while(Curr1)
 	{
-		if (Curr1->Image->Width < 3 || Curr1->Image->Height < 3)
-		{
-			Curr1 = Curr1->Next;
-			Curr2 = Curr2->Next;
-			continue;
-		}
-		else if (IsNewLine(Curr1->Image))
+		if (IsNewLine(Curr1->Image))
 		{
 			temp.Probability = 100;
 			temp.Char = '\n';
 			utarray_push_back(CharProbabilities, &temp);
+		}
+		else if (Curr1->Image->Width < 3 || Curr1->Image->Height < 3)
+		{
+			Curr1 = Curr1->Next;
+			Curr2 = Curr2->Next;
+			continue;
 		}
 		else if (IsSpace(Curr1->Image, IsolateAlgorithm))
 		{
@@ -330,13 +333,17 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 		else
 		{
 			int Index;
-			int x, y, newx, newy;
-			int counter, total;
-			unsigned char RImage, RTemplate;
 			char CharTemplate[100] = "!'#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 			Index = 0;
+
 			while (Curr3)
 			{
+				int x, y, newx, newy;
+				int counter, total;
+				unsigned char RImage, RTemplate;
+				counter = 0;
+				total = 0;
+
 				if(Curr2->Image->Height > Curr3->Image->Height)
 				{
 					newy = Curr3->Image->Height;
@@ -359,14 +366,17 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 				{
 					RImage = GetPixelR(Curr2->Image, x, y);
 					RTemplate = GetPixelR(Curr3->Image, x, y);
-					if (abs(RImage - RTemplate) < 20 && RImage > 50 && RTemplate > 50)
+					if (abs(RImage - RTemplate) < 20)
+					{
 						counter++;
+					}
 					total++;
 				}
 				temp.Char = CharTemplate[Index];
-				temp.Probability = (counter * 10000 / total);
+				temp.Probability = (counter * 100 / total);
 				utarray_push_back(CharProbabilities, &temp);
 				Curr3 = Curr3->Next;
+				Index++;
 			}
 		}
 		NewCharProfile.CharChoices = CharProbabilities;
