@@ -11,10 +11,88 @@ int CharProbSort(const void *a,const void*b) {
     else return 1;
 }
 
+int IsNewLine(IMAGE* image)
+{
+	if (image == NULL)
+	return 1;
+	else
+	return 0;
+}
+
+int IsSpace(IMAGE* image, int IsolateAlgorithm)
+{
+	if (!IsolateAlgorithm)
+	{
+		int count;
+		int x, y;
+		count  = 0;
+		for (y = 0; y < image->Height; y++)
+		for (x = 0; x < image->Width; x++)
+		{
+			if(IsPixelBlack(image, x, y))
+				count++;
+		}
+		if (count < 5)
+			return 1;
+		else
+			return 0;
+	}
+	else
+	{
+		if (image->Width > 30)
+			return 1;
+		else
+			return 0;
+	}
+}
+
+ILIST * Align(ILIST* imglist)
+{
+	IENTRY * Curr;
+	IMAGE * tempimage;
+	ILIST * Alignedimglist;
+	int x, y;
+	int newx, newy;
+	
+	Alignedimglist = NewImageList();
+	Curr = imglist->First;
+	while (Curr)
+	{
+		if (IsNewLine(Curr->Image))
+		{
+			Curr = Curr->Next;
+			continue;
+		}
+		for (x = 0; x < Curr->Image->Width; x++)
+		for (y = 0; y < Curr->Image->Height; y++)
+		{
+			if (IsPixelBlack(Curr->Image, x, y))
+			{
+				newy = y;
+				goto nextstep;
+			}
+		}
+		nextstep:
+		for (y = 0; y < Curr->Image->Height; y++)
+		for (x = 0; x < Curr->Image->Width; x++)
+		{
+			if (IsPixelBlack(Curr->Image, x, y))
+			{
+				newx = x;
+				goto nextstep1;
+			}
+		}
+		nextstep1:
+		tempimage = CropImage(Curr->Image, newx, newy, Curr->Image->Width-1, Curr->Image->Height-1);
+		AppendImage(Alignedimglist, tempimage);
+		Curr = Curr->Next;
+	}
+	return Alignedimglist;
+}
+
 UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgorithm )// 0 is lazy
 {
 	#if 0
-	UT_array * CharProfiles;
 	utarray_new(CharProfiles, &CharProfile_icd);
 	CharProfile NewCharProfile;
 	CharProbability temp;
@@ -208,6 +286,95 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 		Curr1 = Curr1->Next;
 	}
 #endif	
+
+	UT_array * CharProfiles;
+	utarray_new(CharProfiles, &CharProfile_icd);
+	CharProfile NewCharProfile;
+	UT_array * CharProbabilities;
+	utarray_new(CharProbabilities, &CharProbability_icd);
+	CharProbability temp;
+	IENTRY * Curr1;
+	IENTRY * Curr2;
+	IENTRY * Curr3;
+	ILIST * AlignedTemplate;
+	ILIST * Alignedimglist;
+
+
+	AlignedTemplate = Align(Template);
+	Alignedimglist = Align(imglist);
+	Curr1 = imglist->First;
+	Curr2 = Alignedimglist->First;
+	Curr3 = AlignedTemplate->First;
+
+
+	while(Curr1)
+	{
+		if (Curr1->Image->Width < 3 || Curr1->Image->Height < 3)
+		{
+			Curr1 = Curr1->Next;
+			Curr2 = Curr2->Next;
+			continue;
+		}
+		else if (IsNewLine(Curr1->Image))
+		{
+			temp.Probability = 100;
+			temp.Char = '\n';
+			utarray_push_back(CharProbabilities, &temp);
+		}
+		else if (IsSpace(Curr1->Image, IsolateAlgorithm))
+		{
+			temp.Probability = 100;
+			temp.Char = ' ';
+			utarray_push_back(CharProbabilities, &temp);
+		}
+		else
+		{
+			int Index;
+			int x, y, newx, newy;
+			int counter, total;
+			unsigned char RImage, RTemplate;
+			char CharTemplate[100] = "!'#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+			Index = 0;
+			while (Curr3)
+			{
+				if(Curr2->Image->Height > Curr3->Image->Height)
+				{
+					newy = Curr3->Image->Height;
+				}
+				else
+				{
+					newy = Curr2->Image->Height;
+				}
+				if(Curr2->Image->Width > Curr3->Image->Width)
+				{
+					newx = Curr3->Image->Width;
+				}
+				else
+				{
+					newx = Curr2->Image->Width;
+				}
+
+				for ( y = 0; y < newy; y++ )
+				for ( x = 0; x < newx; x++ )
+				{
+					RImage = GetPixelR(Curr2->Image, x, y);
+					RTemplate = GetPixelR(Curr3->Image, x, y);
+					if (abs(RImage - RTemplate) < 20 && RImage > 50 && RTemplate > 50)
+						counter++;
+					total++;
+				}
+				temp.Char = CharTemplate[Index];
+				temp.Probability = (counter * 10000 / total);
+				utarray_push_back(CharProbabilities, &temp);
+				Curr3 = Curr3->Next;
+			}
+		}
+		NewCharProfile.CharChoices = CharProbabilities;
+		utarray_sort(CharProbabilities, CharProbSort);
+		utarray_push_back(CharProfiles, &NewCharProfile);
+		Curr1 = Curr1->Next;
+		Curr2 = Curr2->Next;
+	}	
 	return CharProfiles;
 }
 
