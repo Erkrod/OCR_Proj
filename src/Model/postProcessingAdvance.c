@@ -88,6 +88,19 @@ UT_string * postProcessing(UT_array * charList)
 }
 
 
+void DisplayCharProfile(CharProfile * input){
+	
+		CharProbability * Curr2 = (CharProbability *) utarray_front(input->CharChoices);
+		while (Curr2)
+		{
+			printf("Chance of %c is %d percent.\n", Curr2->Char, Curr2->Probability);
+			Curr2 = (CharProbability*)utarray_next(input->CharChoices, Curr2);
+		}
+	
+	
+	
+}
+
 UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT_array * specialCharacter)
 {
   CharProfile * currCharProfile = NULL;
@@ -100,7 +113,7 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
   
   UT_array * wordBank;
   UT_string *temp;
-  UT_string *temp2;
+  /*UT_string *temp2;*/
   UT_string *output;
   
   utstring_new(output);
@@ -109,6 +122,17 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
   currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile);
   while(currCharProfile)
   {
+	  /*Quan add this part for 100% prob character*/
+	  CharProbability * currCharProb =(CharProbability *) utarray_front(currCharProfile->CharChoices);
+	  if (currCharProb->Probability == 100){
+		utstring_clear(temp);
+		utstring_printf(temp, "%c", currCharProb->Char);
+		utstring_concat(output, temp);
+		currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile);
+		continue;
+	  }
+	  
+	  
     currCharProbability = NULL;
     utarray_new(wordBank, &ut_str_icd);
     wordBank = getThreeKeyword(currCharProfile, charList, specialCharacter);
@@ -117,7 +141,13 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
     while ((isSpecialChar == 0) && currCharProfile)
     {
       utstring_clear(temp);
-      currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
+	
+	currCharProbability = NULL;	/*Quan put here to solve Seg fault*/
+      currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);	
+#ifdef DEBUG
+	printf("look at spot %ld index %ld\n", utarray_eltidx(charList, currCharProfile), utarray_eltidx(currCharProfile->CharChoices, currCharProbability));
+	DisplayCharProfile(currCharProfile);
+#endif
       chosen = currCharProbability->Char;
       utstring_printf(temp, "%c", chosen);
       isSpecialChar = compareChar(temp, specialCharacter);
@@ -134,10 +164,11 @@ UT_string * postProcessingAdvance(UT_array * charList, UT_array * dictionary, UT
       {
 	if ((currCharProfile = (CharProfile *) utarray_next(charList, currCharProfile)))
 	{
+	currCharProbability = NULL;	/*Quan put here to solve Seg fault*/
 	  currCharProbability = (CharProbability *) utarray_next(currCharProfile->CharChoices, currCharProbability);
-	  utstring_new(temp2);
+	  utstring_clear(temp);
 	  quotation = currCharProbability->Char;
-	  utstring_printf(temp2, "%c", quotation);
+	  utstring_printf(temp, "%c", quotation);
 	  if (quotation == '\'')
 	  {
 	    chosen = '"';

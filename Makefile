@@ -109,7 +109,7 @@ TestIsolateCharacter: build/TestIsolateCharacter.o $(MODEL_LIB_DEPEND)
 TestIdentifyCharacter: build/TestIdentifyCharacter.o $(MODEL_LIB_DEPEND)
 	$(info Linking $@)
 	@$(CC) build/TestIdentifyCharacter.o -Lbuild $(MODEL_LIB_COMPILE) $(GUI_LFLAGS) $(LDFLAGS) -o bin/$@ 
-	bin/TestIdentifyCharacter
+#	bin/TestIdentifyCharacter
 	
 TestGUI: build/TestGUI.o $(VIEW_LIB_DEPEND) $(CONTROL_LIB_DEPEND) $(MODEL_LIB_DEPEND)
 	$(info Linking $@)

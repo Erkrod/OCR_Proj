@@ -66,7 +66,8 @@ ControlHandle * Control_Initialize(void){
 	ToReturn->Dictionary = postProcessingInitializeDictionary();
 	
 	/*read templates*/
-	ToReturn->CourierNewTemplate = InitializeTemplate();
+	ToReturn->CourierNewTemplate = InitializeTemplateCourier();
+	ToReturn->LucidaConsoleTemplate = InitializeTemplateLucida();
 	
 	/*set initial image and string here*/
 	ObjectHandle * ImageDisplay = FindObject(ToReturn, "MainDisplayImage");
@@ -176,6 +177,7 @@ void ClearTextArea(ControlHandle * MainControlHandle){
 
 void AppendTextArea(ControlHandle * MainControlHandle, char * DisplayString){
 	if (MainControlHandle->InitialText) ClearTextArea(MainControlHandle);
+	MainControlHandle->InitialText = 0;
 	ObjectHandle * CurrObject = FindObject(MainControlHandle, "MainTextArea");
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(CurrObject->Widget));
 	GtkTextIter iter;
@@ -497,12 +499,16 @@ void Control_ProcessEvent(ObjectHandle * ClickedObject, GdkEvent * event){
 				/*cut the image into pieces and display it*/
 				
 				ILIST * CutList = NULL;
-				if (IsolateAlgorithm == 0) CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
-				else if (IsolateAlgorithm == 1) CutList = ActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				if (IsolateAlgorithm == 0) {
+					CutList = LazyIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				} else if (IsolateAlgorithm == 1) {
+					CutList = ActiveIsolateCharacter(MainControlHandle->MainImageList->Last->Image, Font, FontSize, ScanRes);
+				}
 				if (!CutList) show_error("Can't perform OCR on this image.");
 				else {
 					/*Identify them into probability*/
-					UT_array * temp_array = IdentifyCharacter(CutList, MainControlHandle->CourierNewTemplate);
+					ILIST * template = Font == CourierNew ? MainControlHandle->CourierNewTemplate : MainControlHandle->LucidaConsoleTemplate;
+					UT_array * temp_array = IdentifyCharacter(CutList, template, IsolateAlgorithm);
 					DeleteImageList(CutList);
 										
 					/*post processing*/

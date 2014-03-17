@@ -315,6 +315,10 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 			temp.Probability = 100;
 			temp.Char = '\n';
 			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
+			
 		}
 		else if (Curr1->Image->Width < 3 || Curr1->Image->Height < 3)
 		{
@@ -326,6 +330,10 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 		{
 			temp.Probability = 100;
 			temp.Char = ' ';
+			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
+			utarray_push_back(CharProbabilities, &temp);
 			utarray_push_back(CharProbabilities, &temp);
 		}
 		else
@@ -380,6 +388,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 		}
 		NewCharProfile.CharChoices = CharProbabilities;
 		utarray_sort(CharProbabilities, CharProbSort);
+		
 		if (utarray_len(CharProbabilities) > 5)
 		{
 			utarray_resize(CharProbabilities, 5);
