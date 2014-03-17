@@ -334,6 +334,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 			char CharTemplate[100] = "!'#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 			Index = 0;
 			Curr3 = AlignedTemplate->First;
+
 			while (Curr3)
 			{
 				int x, y, newx, newy;
@@ -379,6 +380,10 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 		}
 		NewCharProfile.CharChoices = CharProbabilities;
 		utarray_sort(CharProbabilities, CharProbSort);
+		if (utarray_len(CharProbabilities) > 5)
+		{
+			utarray_resize(CharProbabilities, 5);
+		}
 		utarray_push_back(CharProfiles, &NewCharProfile);
 		Curr1 = Curr1->Next;
 		Curr2 = Curr2->Next;
