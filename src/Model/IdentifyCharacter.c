@@ -305,7 +305,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 	Alignedimglist = Align(imglist);
 	Curr1 = imglist->First;
 	Curr2 = Alignedimglist->First;
-	Curr3 = AlignedTemplate->First;
+
 
 	while(Curr1)
 	{
@@ -333,7 +333,7 @@ UT_array * IdentifyCharacter( ILIST * imglist, ILIST * Template, int IsolateAlgo
 			int Index;
 			char CharTemplate[100] = "!'#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 			Index = 0;
-
+			Curr3 = AlignedTemplate->First;
 			while (Curr3)
 			{
 				int x, y, newx, newy;
